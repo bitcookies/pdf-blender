@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PDFBlender.App/PDFBlender.App.csproj" />
+    <Project Path="src/PDFBlender.Core/PDFBlender.Core.csproj" />
+    <Project Path="src/PDFBlender.Pdf/PDFBlender.Pdf.csproj" />
+    <Project Path="tests/PDFBlender.Core.Tests/PDFBlender.Core.Tests.csproj" />
+  </Folder>
+</Solution>

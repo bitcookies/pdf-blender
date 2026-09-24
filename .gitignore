@@ -1,0 +1,51 @@
+# .NET / Visual Studio build output
+[Bb]in/
+[Oo]bj/
+.vs/
+.vscode/
+artifacts/
+build/
+publish/
+test-results/
+TestResults/
+
+# User-specific IDE files
+*.user
+*.suo
+*.userosscache
+*.csproj.user
+
+# NuGet and generated package files
+packages/
+*.nupkg
+*.snupkg
+project.assets.json
+
+# MSIX build and signing artifacts
+*.msix
+*.msixbundle
+*.appinstaller
+*.cer
+*.pfx
+
+# Local-only reference material
+/PDF-Poisoning/
+/参考图/
+
+# Local processing output and fixtures
+/output/
+/samples/
+/temp/
+/tmp/
+*.blend-output
+
+# Logs and local configuration
+*.log
+.env
+.env.*
+!.env.example
+*.secret.json
+
+# Operating system files
+Thumbs.db
+.DS_Store
