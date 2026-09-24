@@ -19,11 +19,11 @@ The home screen is a compact single-window tool. It centers the PDF drop/browse 
 
 Use Segoe UI Variable with Segoe UI fallback. Keep the type scale compact: 18–20 px for page titles, 13–14 px for body controls, and 11–12 px for supporting text. Use an 8/12/16/24 spacing rhythm, corner radii no larger than 8 px for ordinary controls and 12–16 px for the main work surface, and thin borders with restrained elevation. Light mode uses a neutral light-gray background with white surfaces; dark mode uses deep gray surfaces with readable contrast. The coral accent is derived from the logo and should remain a focused action color rather than a full-page wash.
 
-Use small translucent surfaces only where they improve hierarchy. Do not rely on continuous blur or custom window chrome. The standard Windows title bar remains in place for reliable high-DPI behavior, resizing, and accessibility.
+Use small translucent surfaces only where they improve hierarchy. Do not rely on continuous blur or custom window chrome. The WPF-UI `FluentWindow` and `TitleBar` provide the shell controls while retaining standard Windows behavior for high-DPI sizing, resizing, and accessibility.
 
 ## Home Layout
 
-The main window is approximately 760×560 with a 680×500 minimum. It contains one compact column: product identity and a Settings icon at the top, a smaller drag-and-drop surface with selected-file summary, Profile and output summary, the three-level Blend rail, and a bottom action row with progress and Cancel. The home screen does not expose theme or language selectors.
+The main window is approximately 960×680 with an 860×600 minimum. It contains a compact navigation shell: product identity, Home/Settings/About navigation, a smaller drag-and-drop surface with selected-file summary, Profile and output summary, the three-level Blend rail, and a bottom action row with progress and Cancel. The home screen does not expose theme or language selectors.
 
 ## Blend Level Rail
 
@@ -34,6 +34,8 @@ The main window is approximately 760×560 with a 680×500 minimum. It contains o
 Settings are grouped into Appearance (System/Light/Dark and System/English/Simplified Chinese), Format, Protection, Watermark, Image, and Output. Theme and language changes apply when saved. `AppPreferencesStore` persists theme, language, and selected Blend level at `%LOCALAPPDATA%\\PDFBlender\\preferences.json`; malformed or out-of-range values fall back to safe defaults. Profiles and PDF processing semantics are unchanged.
 
 The initial presets are `STIR`, `BLEND`, and `PULSE`. `CRUSH` and `OVERBLEND` remain future/experimental until their quality and behavior are validated. Users can independently toggle supported options, and manual edits turn the selected preset into a modified/custom configuration.
+
+The application uses the pinned `WPF-UI` 4.0.2 package for Fluent controls, themes, navigation, and icons. PDF processing remains in the existing Core/Pdf projects; the UI dependency does not alter output or protection semantics.
 
 ## Content Width and Page Geometry
 

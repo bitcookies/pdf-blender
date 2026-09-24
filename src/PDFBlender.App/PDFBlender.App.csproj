@@ -19,4 +19,8 @@
     <Resource Include="Assets\logo.ico" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="WPF-UI" Version="4.0.2" />
+  </ItemGroup>
+
 </Project>

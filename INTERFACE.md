@@ -4,7 +4,7 @@ Status: v0.2.0 interface redesign
 
 ## Visual Direction
 
-Use Windows 11 and Fluent design conventions: clear hierarchy, restrained surfaces, crisp typography, purposeful motion, and accessible contrast. The UI should have a distinctive PDF Blender identity without resembling a security product. Use the supplied logo from `assets/`. Reference screenshots remain local and ignored. Implement the visual system with native WPF controls and styles; do not add a UI framework solely to imitate WinUI controls.
+Use Windows 11 and Fluent design conventions: clear hierarchy, restrained surfaces, crisp typography, purposeful motion, and accessible contrast. The UI should have a distinctive PDF Blender identity without resembling a security product. Use the supplied logo from `assets/`. Reference screenshots remain local and ignored. Implement the visual system with WPF-UI 4.0.2 controls and themes; keep application-specific layout and behavior in the App project.
 
 Use translucency only where it improves hierarchy and remains legible in both themes. Prefer compact, aligned settings rows for repeated toggles; reserve cards for distinct repeated items or genuinely framed tools. Support system, light, and dark appearance. Respect reduced-motion and high-contrast system settings where practical. Keep any HWND-hosted legacy controls isolated because WPF interop has airspace, clipping, and input limitations.
 
@@ -14,7 +14,7 @@ Ship Simplified Chinese (`zh-CN`) and English (`en-US`). Provide System, Chinese
 
 ## Navigation and Home
 
-The first screen is the working tool, not a marketing page. The compact 760×560 default window contains:
+The first screen is the working tool, not a marketing page. The compact 960×680 default window contains:
 
 1. Product identity and compact Settings access.
 2. A prominent drag-and-drop PDF target with a Browse action and selected-file summary.
@@ -22,6 +22,8 @@ The first screen is the working tool, not a marketing page. The compact 760×560
 4. A clear primary `Blend PDF` action and output destination summary.
 
 The main workflow is `Drop/Browse -> choose Profile -> choose Blend level -> Blend PDF`. v0.2.0 handles one PDF at a time. Reject unsupported file types clearly and do not start processing before a valid PDF is selected. Theme and language controls are absent from the home screen and available in Settings.
+
+The shell is a single WPF-UI `FluentWindow` with a `NavigationView` and a content `Frame`. Home, Settings, and About are pages sharing one `AppSession`; Settings changes are applied to the session immediately and persisted locally.
 
 ### BlendLevelRail
 

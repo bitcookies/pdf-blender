@@ -15,7 +15,7 @@ Status: v0.2.0 implementation baseline
 ```text
 PDFBlender.sln
 src/
-  PDFBlender.App/       WPF windows, views, localization, theme, commands
+  PDFBlender.App/       WPF-UI shell, pages, localization, theme, commands
   PDFBlender.Core/      settings, profiles, blend presets, pipeline contracts, validation
   PDFBlender.Pdf/       PDF inspection, rendering, page sizing, document reconstruction
   PDFBlender.Image/     raster scaling, watermark composition, conservative noise
@@ -41,6 +41,8 @@ Flatten is both the MVP primary protection method and the raster reconstruction 
 ## UI and State
 
 The App project owns presentation state and persistence adapters. Core owns typed settings and preset definitions. The PDF layer exposes narrow interfaces such as document inspection, page rendering, and document writing so a library can be replaced without changing view models or preset semantics.
+
+The v0.2.0 shell is `MainWindow` (`FluentWindow`) with a `NavigationView` and shared `AppSession`. `HomePage` owns the PDF workflow, `SettingsPage` applies editable settings immediately, and `AboutPage` exposes version and legal information. `WPF-UI` is pinned to 4.0.2 and is limited to presentation concerns.
 
 Keep startup work minimal: load theme/language and lightweight preferences first; initialize heavyweight PDF components only when a file is selected or processing begins. All long operations run off the UI thread; progress events are marshaled through the WPF dispatcher.
 

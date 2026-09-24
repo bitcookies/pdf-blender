@@ -6,15 +6,21 @@ namespace PDFBlender.App;
 
 internal static class ThemeManager
 {
-    public static bool Apply(Window window, ThemePreference preference)
+    public static bool SystemUsesLightTheme()
     {
-        var dark = preference switch
+        try
         {
-            ThemePreference.Dark => true,
-            ThemePreference.Light => false,
-            _ => !SystemUsesLightTheme()
-        };
+            using var key = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize");
+            return Convert.ToInt32(key?.GetValue("AppsUseLightTheme", 1)) != 0;
+        }
+        catch (Exception)
+        {
+            return true;
+        }
+    }
 
+    public static void ApplyPalette(bool dark)
+    {
         var resources = Application.Current.Resources;
         SetBrush(resources, "WindowBackgroundBrush", dark ? "#17181D" : "#F5F6F7");
         SetBrush(resources, "SurfaceBrush", dark ? "#24262D" : "#FFFFFF");
@@ -26,23 +32,6 @@ internal static class ThemeManager
         SetBrush(resources, "AccentBrush", dark ? "#FF756A" : "#E45B59");
         SetBrush(resources, "AccentDarkBrush", dark ? "#D95757" : "#C8484D");
         SetBrush(resources, "AccentTextBrush", dark ? "#24171A" : "#FFFFFF");
-        SetBrush(resources, "FocusBrush", dark ? "#FF9A8F" : "#C8484D");
-        window.Background = (Brush)resources["WindowBackgroundBrush"];
-        return dark;
-    }
-
-    private static bool SystemUsesLightTheme()
-    {
-        try
-        {
-            using var key = Registry.CurrentUser.OpenSubKey(
-                "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize");
-            return Convert.ToInt32(key?.GetValue("AppsUseLightTheme", 1)) != 0;
-        }
-        catch (Exception)
-        {
-            return true;
-        }
     }
 
     private static void SetBrush(ResourceDictionary resources, string key, string hex)

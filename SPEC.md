@@ -20,7 +20,7 @@ PDF Blender creates a new, ordinarily readable PDF from a source PDF while raisi
 
 This release changes the WPF shell, interaction layout, local UI preferences, and localization presentation. It does not add PDF protection algorithms, change output semantics, or add network services.
 
-- Compact single-window home layout at approximately `760×560`, with a `680×500` minimum.
+- Compact single-window home layout at approximately `960×680`, with an `860×600` minimum.
 - Settings-only theme and language controls, supporting System/Light/Dark and System/English/简体中文.
 - A snapped, keyboard-accessible Blend level rail showing the validated `STIR`, `BLEND`, and `PULSE` presets.
 - Local preferences at `%LOCALAPPDATA%\\PDFBlender\\preferences.json`, with safe defaults for malformed values.
