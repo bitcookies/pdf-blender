@@ -1,6 +1,6 @@
 # PDF Blender Design Overview
 
-Status: v0.1.0 baseline  
+Status: v0.2.0 UI redesign
 Detailed requirements: `SPEC.md`  
 Architecture boundaries: `ARCHITECTURE.md`  
 Interface and localization: `INTERFACE.md`
@@ -11,9 +11,27 @@ PDF Blender helps authors publish documents that remain readable to everyone whi
 
 The product uses a hands-on Blender metaphor: users choose a reusable Profile, select a Blend Mode, and blend a PDF. Blend Modes are named presets over normal settings. They do not represent security levels. The application should feel like a focused Windows utility with a recognizable identity, not a generic PDF editor or security dashboard.
 
-## v0.1.0 Product Shape
+## v0.2.0 Product Shape
 
-The home screen centers the PDF drop/browse action and keeps the recurring path short: select a file, select Profile and Blend Mode, then blend. Detailed options live in settings and are grouped into Format, Protection, Watermark, Image, AI / Notice, and Output. Only features that work in the current release should be shown as available.
+The home screen is a compact single-window tool. It centers the PDF drop/browse action and keeps the recurring path short: select a file, select Profile and a Blend level, then blend. Theme and language are settings, not home-screen workflow controls. Detailed options live in a compact settings page grouped into Appearance, Format, Protection, Watermark, Image, and Output. Only features that work in the current release should be shown as available.
+
+## Visual System
+
+Use Segoe UI Variable with Segoe UI fallback. Keep the type scale compact: 18–20 px for page titles, 13–14 px for body controls, and 11–12 px for supporting text. Use an 8/12/16/24 spacing rhythm, corner radii no larger than 8 px for ordinary controls and 12–16 px for the main work surface, and thin borders with restrained elevation. Light mode uses a neutral light-gray background with white surfaces; dark mode uses deep gray surfaces with readable contrast. The coral accent is derived from the logo and should remain a focused action color rather than a full-page wash.
+
+Use small translucent surfaces only where they improve hierarchy. Do not rely on continuous blur or custom window chrome. The standard Windows title bar remains in place for reliable high-DPI behavior, resizing, and accessibility.
+
+## Home Layout
+
+The main window is approximately 760×560 with a 680×500 minimum. It contains one compact column: product identity and a Settings icon at the top, a smaller drag-and-drop surface with selected-file summary, Profile and output summary, the three-level Blend rail, and a bottom action row with progress and Cancel. The home screen does not expose theme or language selectors.
+
+## Blend Level Rail
+
+`BlendLevelRail` is a data-driven WPF control backed by a snapped `Slider`. v0.2.0 exposes only the validated `STIR`, `BLEND`, and `PULSE` presets. It supports mouse dragging, arrow keys, Home, End, visible name/summary text, keyboard focus, and an accessible slider name. The control API leaves room for one to five data items without presenting future algorithms.
+
+## Settings and Preferences
+
+Settings are grouped into Appearance (System/Light/Dark and System/English/Simplified Chinese), Format, Protection, Watermark, Image, and Output. Theme and language changes apply when saved. `AppPreferencesStore` persists theme, language, and selected Blend level at `%LOCALAPPDATA%\\PDFBlender\\preferences.json`; malformed or out-of-range values fall back to safe defaults. Profiles and PDF processing semantics are unchanged.
 
 The initial presets are `STIR`, `BLEND`, and `PULSE`. `CRUSH` and `OVERBLEND` remain future/experimental until their quality and behavior are validated. Users can independently toggle supported options, and manual edits turn the selected preset into a modified/custom configuration.
 

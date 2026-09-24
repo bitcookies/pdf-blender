@@ -1,6 +1,6 @@
 # PDF Blender Interface Specification
 
-Status: v0.1.0 interface baseline
+Status: v0.2.0 interface redesign
 
 ## Visual Direction
 
@@ -14,21 +14,27 @@ Ship Simplified Chinese (`zh-CN`) and English (`en-US`). Provide System, Chinese
 
 ## Navigation and Home
 
-The first screen is the working tool, not a marketing page. It contains:
+The first screen is the working tool, not a marketing page. The compact 760×560 default window contains:
 
 1. Product identity and compact Settings access.
 2. A prominent drag-and-drop PDF target with a Browse action and selected-file summary.
-3. Profile selector and Blend Mode selector.
+3. Profile selector and the discrete Blend level rail.
 4. A clear primary `Blend PDF` action and output destination summary.
 
-The main workflow is `Drop/Browse -> choose Profile -> choose Blend Mode -> Blend PDF`. v0.1.0 handles one PDF at a time. Reject unsupported file types clearly and do not start processing before a valid PDF is selected.
+The main workflow is `Drop/Browse -> choose Profile -> choose Blend level -> Blend PDF`. v0.2.0 handles one PDF at a time. Reject unsupported file types clearly and do not start processing before a valid PDF is selected. Theme and language controls are absent from the home screen and available in Settings.
+
+### BlendLevelRail
+
+`BlendLevelRail` exposes `Levels`, `SelectedIndex`, and `SelectionChanged`. It uses a snapped WPF `Slider`, supports mouse and keyboard navigation, and renders the selected preset name and summary. The shipped list contains `STIR`, `BLEND`, and `PULSE`; future one-to-five-level data is an extension point only.
 
 ## Settings
 
-Advanced controls are grouped under Format, Protection, Watermark, Image, AI / Notice, and Output. Only implemented v0.1.0 controls should appear as active settings. Future features may be documented elsewhere but must not be presented as working toggles.
+Advanced controls are grouped under Appearance, Format, Protection, Watermark, Image, and Output. Only implemented v0.2.0 controls should appear as active settings. Future features may be documented elsewhere but must not be presented as working toggles.
+
+Preferences are local to the device and stored at `%LOCALAPPDATA%\\PDFBlender\\preferences.json`. Theme, language, and Blend level restore across restarts. A malformed file is ignored and replaced by default values.
 
 - Format: Normalize Content Width toggle and configurable target width in millimeters. Clarify that it scales content proportionally rather than converting pages to A4 or equal heights.
-- Protection: mutually exclusive method selector. v0.1.0 enables Flatten; future methods must be visibly unavailable or absent.
+- Protection: mutually exclusive method selector. The current MVP enables Flatten; future methods must be visibly unavailable or absent.
 - Watermark: enable toggle; text, opacity, size, rotation, placement, and repeated-page spacing as applicable.
 - Image: pixel-noise toggle and bounded strength selector.
 - Output: destination, filename suffix, and open-output-folder behavior; original remains protected from accidental overwrite.

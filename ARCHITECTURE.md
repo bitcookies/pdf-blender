@@ -1,6 +1,6 @@
 # PDF Blender Architecture
 
-Status: v0.1.0 implementation baseline
+Status: v0.2.0 implementation baseline
 
 ## Design Goals
 
@@ -46,7 +46,7 @@ Keep startup work minimal: load theme/language and lightweight preferences first
 
 ## Persistence and Privacy
 
-Store non-secret Profiles in app-local settings storage with schema versioning. v0.1.0 has no secret-key subsystem. Do not persist temporary page images after an operation, send document data over the network, or include document content in diagnostics.
+Store non-secret Profiles in app-local settings storage with schema versioning. The MVP has no secret-key subsystem. Do not persist temporary page images after an operation, send document data over the network, or include document content in diagnostics.
 
 ## Packaging and Build
 

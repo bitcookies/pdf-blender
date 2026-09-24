@@ -4,9 +4,6 @@ using PDFBlender.Core.Processing;
 using PDFBlender.Pdf;
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 
 namespace PDFBlender.App;
 
@@ -14,20 +11,25 @@ public partial class MainWindow : Window
 {
     private readonly IReadOnlyList<BlendPreset> _presets = Presets.All;
     private readonly List<ProfileDefinition> _profiles = ProfileStore.Load().ToList();
+    private AppPreferences _preferences;
     private BlendSettings _settings = BlendSettings.Default;
     private string? _inputPath;
-    private UiLanguage _language = UiLanguage.System;
-    private bool _darkTheme = true;
+    private UiLanguage _language;
+    private ThemePreference _themePreference;
     private bool _initializing;
     private CancellationTokenSource? _processingCts;
     private readonly IBlendProcessor _processor = new PdfBlendProcessor();
 
     public MainWindow()
     {
+        _preferences = AppPreferencesStore.Load();
+        _language = _preferences.Language;
+        _themePreference = _preferences.Theme;
+
         InitializeComponent();
         InitializeSelectors();
-        ApplyLanguage();
         ApplyTheme();
+        ApplyLanguage();
         SetInputPath(null);
     }
 
@@ -38,21 +40,17 @@ public partial class MainWindow : Window
         {
             ProfileCombo.Items.Add(ProfileDisplayName(profile.Id));
         }
+
         ProfileCombo.SelectedIndex = 0;
-
-        foreach (var preset in _presets)
-        {
-            ModeCombo.Items.Add(new ComboBoxItem { Content = preset.DisplayName, Tag = preset });
-        }
-
-        ModeCombo.SelectedIndex = 1;
-        LanguageCombo.Items.Add("System");
-        LanguageCombo.Items.Add("English");
-        LanguageCombo.Items.Add("简体中文");
-        LanguageCombo.SelectedIndex = 0;
+        BlendLevelRailControl.SetLevels(BuildLevelItems());
+        BlendLevelRailControl.SelectedIndex = Math.Clamp(
+            _preferences.SelectedBlendLevel, 0, Math.Max(0, _presets.Count - 1));
+        _selectedBlendLevel = BlendLevelRailControl.SelectedIndex;
+        _settings = _presets[_selectedBlendLevel].Settings;
         _initializing = false;
-        UpdateModeSummary();
     }
+
+    private int _selectedBlendLevel;
 
     private void BrowseButton_Click(object sender, RoutedEventArgs e)
     {
@@ -80,7 +78,8 @@ public partial class MainWindow : Window
     {
         if (e.Data.GetData(DataFormats.FileDrop) is string[] files)
         {
-            var pdf = files.FirstOrDefault(path => string.Equals(Path.GetExtension(path), ".pdf", StringComparison.OrdinalIgnoreCase));
+            var pdf = files.FirstOrDefault(path =>
+                string.Equals(Path.GetExtension(path), ".pdf", StringComparison.OrdinalIgnoreCase));
             if (pdf is not null)
             {
                 SetInputPath(pdf);
@@ -145,10 +144,15 @@ public partial class MainWindow : Window
 
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new SettingsWindow(_settings) { Owner = this };
+        var dialog = new SettingsWindow(_settings, _preferences) { Owner = this };
         if (dialog.ShowDialog() == true)
         {
             _settings = dialog.Settings;
+            _preferences = dialog.Preferences;
+            _language = _preferences.Language;
+            _themePreference = _preferences.Theme;
+            SavePreferences();
+
             if (ProfileCombo.SelectedIndex >= 0 && ProfileCombo.SelectedIndex < _profiles.Count)
             {
                 _profiles[ProfileCombo.SelectedIndex] = _profiles[ProfileCombo.SelectedIndex] with { Settings = _settings };
@@ -156,50 +160,47 @@ public partial class MainWindow : Window
                 catch (IOException) { }
                 catch (UnauthorizedAccessException) { }
             }
-            ModeSummaryText.Text = UiText.Get("customSettings");
+
+            ApplyTheme();
+            ApplyLanguage();
             StatusText.Text = UiText.Get("settingsSaved");
         }
     }
 
-    private void ThemeButton_Click(object sender, RoutedEventArgs e)
+    private void ProfileCombo_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
-        _darkTheme = !_darkTheme;
-        ApplyTheme();
-    }
-
-    private void LanguageCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (_initializing || LanguageCombo.SelectedIndex < 0)
+        if (_initializing || ProfileCombo.SelectedIndex < 0 || ProfileCombo.SelectedIndex >= _profiles.Count)
         {
             return;
         }
 
-        _language = LanguageCombo.SelectedIndex switch
+        _settings = _profiles[ProfileCombo.SelectedIndex].Settings;
+        var matchingPreset = _presets
+            .Select((preset, index) => (preset, index))
+            .FirstOrDefault(pair => pair.preset.Settings == _settings);
+        if (matchingPreset.preset is not null)
         {
-            1 => UiLanguage.English,
-            2 => UiLanguage.SimplifiedChinese,
-            _ => UiLanguage.System
-        };
-        ApplyLanguage();
+            _initializing = true;
+            BlendLevelRailControl.SelectedIndex = matchingPreset.index;
+            _selectedBlendLevel = matchingPreset.index;
+            _initializing = false;
+        }
+
+        StatusText.Text = $"{UiText.Get("profile")}: {ProfileDisplayName(_profiles[ProfileCombo.SelectedIndex].Id)}";
     }
 
-    private void ProfileCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void BlendLevelRailControl_SelectionChanged(object? sender, BlendLevelChangedEventArgs e)
     {
-        if (!_initializing && ProfileCombo.SelectedIndex >= 0 && ProfileCombo.SelectedIndex < _profiles.Count)
+        if (_initializing || e.SelectedIndex < 0 || e.SelectedIndex >= _presets.Count)
         {
-            _settings = _profiles[ProfileCombo.SelectedIndex].Settings;
-            UpdateModeSummary();
-            StatusText.Text = $"{UiText.Get("profile")}: {ProfileDisplayName(_profiles[ProfileCombo.SelectedIndex].Id)}";
+            return;
         }
-    }
 
-    private void ModeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (!_initializing && ModeCombo.SelectedItem is ComboBoxItem { Tag: BlendPreset preset })
-        {
-            _settings = preset.Settings;
-            UpdateModeSummary();
-        }
+        _selectedBlendLevel = e.SelectedIndex;
+        _settings = _presets[e.SelectedIndex].Settings;
+        _preferences = _preferences with { SelectedBlendLevel = _selectedBlendLevel };
+        SavePreferences();
+        StatusText.Text = e.Item.Summary;
     }
 
     private void ApplyLanguage()
@@ -209,23 +210,28 @@ public partial class MainWindow : Window
         DropTitleText.Text = UiText.Get("dropTitle");
         DropHintText.Text = UiText.Get("dropHint");
         LocalProcessingText.Text = UiText.Get("localProcessing");
-        SetupTitleText.Text = UiText.Get("setup");
-        BrowseButton.Content = UiText.Get("browse");
+        BrowseButtonText.Text = UiText.Get("browse");
         ProfileLabel.Text = UiText.Get("profile");
-        ModeLabel.Text = UiText.Get("mode");
         OutputLabel.Text = UiText.Get("output");
-        OutputHintText.Text = UiText.Get("outputHint");
-        BlendButton.Content = UiText.Get("blend");
-        CancelButton.Content = UiText.Get("cancel");
-        SettingsButton.Content = UiText.Get("settings");
-        ThemeButton.ToolTip = UiText.Get("themeTooltip");
-        LanguageLabel.Text = UiText.Get("language");
-        ThemeButton.Content = _darkTheme ? "☼" : "☾";
+        BlendButtonText.Text = UiText.Get("blend");
+        CancelButtonText.Text = UiText.Get("cancel");
+        CancelButton.ToolTip = UiText.Get("cancel");
+        SettingsButton.ToolTip = UiText.Get("settings");
         ReadyText.Text = _inputPath is null ? UiText.Get("ready") : UiText.Get("selected");
         StatusText.Text = _inputPath is null ? UiText.Get("ready") : Path.GetFileName(_inputPath);
+        BlendLevelRailControl.SetCaption(UiText.Get("blendLevel"));
+        BlendLevelRailControl.SetAccessibilityName(UiText.Get("blendLevel"));
+        BlendLevelRailControl.SetLevels(BuildLevelItems());
+        BlendLevelRailControl.SelectedIndex = _selectedBlendLevel;
         UpdateProfileLabels();
-        UpdateModeSummary();
     }
+
+    private IReadOnlyList<BlendLevelItem> BuildLevelItems() =>
+    [
+        new(_presets[0].DisplayName, UiText.Get("stirSummary")),
+        new(_presets[1].DisplayName, UiText.Get("blendSummary")),
+        new(_presets[2].DisplayName, UiText.Get("pulseSummary"))
+    ];
 
     private void UpdateProfileLabels()
     {
@@ -235,7 +241,11 @@ public partial class MainWindow : Window
         {
             ProfileCombo.Items.Add(ProfileDisplayName(profile.Id));
         }
-        ProfileCombo.SelectedIndex = Math.Min(selectedIndex, ProfileCombo.Items.Count - 1);
+
+        if (ProfileCombo.Items.Count > 0)
+        {
+            ProfileCombo.SelectedIndex = Math.Min(selectedIndex, ProfileCombo.Items.Count - 1);
+        }
     }
 
     private static string ProfileDisplayName(string id) => id switch
@@ -245,27 +255,7 @@ public partial class MainWindow : Window
         _ => UiText.Get("profileDefault")
     };
 
-    private void ApplyTheme()
-    {
-        var resources = Application.Current.Resources;
-        SetBrush(resources, "WindowBackgroundBrush", _darkTheme ? "#17181D" : "#F4F1EF");
-        SetBrush(resources, "SurfaceBrush", _darkTheme ? "#23252D" : "#FFFFFF");
-        SetBrush(resources, "SurfaceRaisedBrush", _darkTheme ? "#2C2F38" : "#F0ECEA");
-        SetBrush(resources, "SurfaceMutedBrush", _darkTheme ? "#1E2027" : "#F8F6F4");
-        SetBrush(resources, "BorderBrush", _darkTheme ? "#3B3E48" : "#DED8D3");
-        SetBrush(resources, "TextBrush", _darkTheme ? "#F6F4F2" : "#272329");
-        SetBrush(resources, "MutedTextBrush", _darkTheme ? "#A9A8B0" : "#716A70");
-        SetBrush(resources, "AccentBrush", _darkTheme ? "#FF6C62" : "#D94D54");
-        SetBrush(resources, "AccentDarkBrush", _darkTheme ? "#D84C52" : "#BC3F47");
-        SetBrush(resources, "AccentTextBrush", _darkTheme ? "#20171A" : "#FFFFFF");
-        Background = (Brush)resources["WindowBackgroundBrush"];
-        ThemeButton.Content = _darkTheme ? "☼" : "☾";
-    }
-
-    private static void SetBrush(ResourceDictionary resources, string key, string hex)
-    {
-        resources[key] = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex)!);
-    }
+    private void ApplyTheme() => ThemeManager.Apply(this, _themePreference);
 
     private void SetInputPath(string? path)
     {
@@ -274,7 +264,10 @@ public partial class MainWindow : Window
         ReadyText.Text = hasFile ? UiText.Get("selected") : UiText.Get("ready");
         FileNameText.Text = hasFile ? Path.GetFileName(path) : string.Empty;
         BlendButton.IsEnabled = hasFile;
-        OutputText.Text = hasFile ? Path.Combine(Path.GetDirectoryName(path)!, $"{Path.GetFileNameWithoutExtension(path)}_blended.pdf") : "—";
+        OutputText.Text = hasFile
+            ? Path.Combine(Path.GetDirectoryName(path) ?? string.Empty,
+                $"{Path.GetFileNameWithoutExtension(path)}_blended.pdf")
+            : "—";
         StatusText.Text = hasFile ? Path.GetFileName(path) : UiText.Get("ready");
     }
 
@@ -283,8 +276,8 @@ public partial class MainWindow : Window
         BlendButton.IsEnabled = !processing && _inputPath is not null;
         BrowseButton.IsEnabled = !processing;
         ProfileCombo.IsEnabled = !processing;
-        ModeCombo.IsEnabled = !processing;
-        LanguageCombo.IsEnabled = !processing;
+        SettingsButton.IsEnabled = !processing;
+        BlendLevelRailControl.IsEnabled = !processing;
         ProcessingProgress.Visibility = processing ? Visibility.Visible : Visibility.Collapsed;
         CancelButton.Visibility = processing ? Visibility.Visible : Visibility.Collapsed;
         if (!processing)
@@ -293,14 +286,11 @@ public partial class MainWindow : Window
         }
     }
 
-    private void UpdateModeSummary()
+    private void SavePreferences()
     {
-        if (ModeCombo.SelectedItem is ComboBoxItem { Tag: BlendPreset preset })
-        {
-            ModeSummaryText.Text = preset.Settings == _settings
-                ? preset.Summary
-                : UiText.Get("customSettings");
-        }
+        try { AppPreferencesStore.Save(_preferences); }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
     }
 
     private static bool HasPdfDrop(DragEventArgs e)

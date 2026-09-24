@@ -7,11 +7,13 @@ namespace PDFBlender.App;
 public partial class SettingsWindow : Window
 {
     public BlendSettings Settings { get; private set; }
+    public AppPreferences Preferences { get; private set; }
 
-    public SettingsWindow(BlendSettings settings)
+    public SettingsWindow(BlendSettings settings, AppPreferences preferences)
     {
         InitializeComponent();
         Settings = settings;
+        Preferences = preferences;
         InitializeControls();
     }
 
@@ -19,14 +21,33 @@ public partial class SettingsWindow : Window
     {
         Title = UiText.Get("advanced");
         TitleText.Text = UiText.Get("advanced");
+        SubtitleText.Text = UiText.Get("settingsSubtitle");
+        AppearanceHeader.Text = UiText.Get("appearance");
+        ThemeLabel.Text = UiText.Get("theme");
+        LanguageLabel.Text = UiText.Get("language");
+        FormatHeader.Text = UiText.Get("format");
+        ProtectionHeader.Text = UiText.Get("protection");
+        WatermarkHeader.Text = UiText.Get("watermark");
+        ImageHeader.Text = UiText.Get("image");
+        OutputHeader.Text = UiText.Get("output");
         NormalizeWidthCheck.Content = UiText.Get("normalizeWidth");
         TargetWidthLabel.Text = UiText.Get("targetWidth");
-        ProtectionLabel.Text = UiText.Get("protection");
-        WatermarkLabel.Text = UiText.Get("watermark");
+        TargetWidthHint.Text = UiText.Get("targetWidthHint");
         WatermarkTextLabel.Text = UiText.Get("watermarkText");
         NoiseLabel.Text = UiText.Get("noise");
+        OutputHintText.Text = UiText.Get("outputHint");
         CancelButton.Content = UiText.Get("close");
         SaveButton.Content = UiText.Get("save");
+
+        ThemeOptions.Items.Add(UiText.Get("system"));
+        ThemeOptions.Items.Add(UiText.Get("light"));
+        ThemeOptions.Items.Add(UiText.Get("dark"));
+        ThemeOptions.SelectedIndex = (int)Preferences.Theme;
+
+        LanguageOptions.Items.Add(UiText.Get("system"));
+        LanguageOptions.Items.Add("English");
+        LanguageOptions.Items.Add("简体中文");
+        LanguageOptions.SelectedIndex = (int)Preferences.Language;
 
         ProtectionCombo.Items.Add(UiText.Get("none"));
         ProtectionCombo.Items.Add(UiText.Get("flatten"));
@@ -70,6 +91,11 @@ public partial class SettingsWindow : Window
         }
 
         Settings = candidate;
+        Preferences = Preferences with
+        {
+            Theme = (ThemePreference)Math.Clamp(ThemeOptions.SelectedIndex, 0, 2),
+            Language = (UiLanguage)Math.Clamp(LanguageOptions.SelectedIndex, 0, 2)
+        };
         DialogResult = true;
     }
 
