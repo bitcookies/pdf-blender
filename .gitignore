@@ -5,7 +5,7 @@
 .vscode/
 artifacts/
 build/
-publish/
+/publish/
 test-results/
 TestResults/
 
