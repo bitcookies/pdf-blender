@@ -12,67 +12,45 @@ public partial class HomePage : Page
 {
     private readonly AppSession _session;
     private readonly UiNotificationService _notifications;
+    private readonly Action _openConfiguration;
     private readonly IBlendProcessor _processor = new PdfBlendProcessor();
     private bool _initializing;
     private CancellationTokenSource? _processingCts;
 
-    internal HomePage(AppSession session, UiNotificationService notifications)
+    internal HomePage(AppSession session, UiNotificationService notifications, Action openConfiguration)
     {
         _session = session;
         _notifications = notifications;
+        _openConfiguration = openConfiguration;
         InitializeComponent();
-        InitializeSelectors();
         RefreshFromSession();
     }
 
     public void RefreshFromSession()
     {
-        if (!IsInitialized)
-        {
-            return;
-        }
-
+        if (!IsInitialized) return;
+        _initializing = true;
         UiText.SetLanguage(_session.Preferences.Language);
         PageTitle.Text = UiText.Get("appName");
         PageSubtitle.Text = UiText.Get("subtitle");
         DropTitleText.Text = UiText.Get("dropTitle");
         DropHintText.Text = UiText.Get("dropHint");
-        LocalProcessingText.Text = UiText.Get("localProcessing");
         BrowseButtonText.Text = UiText.Get("browse");
-        ProfileLabel.Text = UiText.Get("profile");
-        OutputLabel.Text = UiText.Get("output");
+        ConfigurationButtonText.Text = UiText.Get("configuration");
         BlendButtonText.Text = UiText.Get("blend");
         CancelButtonText.Text = UiText.Get("cancel");
         BlendLevelRailControl.SetCaption(UiText.Get("blendLevel"));
         BlendLevelRailControl.SetAccessibilityName(UiText.Get("blendLevel"));
         BlendLevelRailControl.SetLevels(BuildLevelItems());
-        BlendLevelRailControl.SelectedIndex = Math.Clamp(_session.Preferences.SelectedBlendLevel, 0, _session.Presets.Count - 1);
-        UpdateProfileLabels();
+        BlendLevelRailControl.SelectedIndex = _session.SelectedBlendLevel;
         SetInputPath(_session.InputPath, notify: false);
-    }
-
-    private void InitializeSelectors()
-    {
-        _initializing = true;
-        BlendLevelRailControl.SetLevels(BuildLevelItems());
-        ProfileCombo.ItemsSource = _session.Profiles.Select(profile => ProfileDisplayName(profile.Id)).ToList();
-        ProfileCombo.SelectedIndex = _session.SelectedProfileIndex;
         _initializing = false;
     }
 
     private void BrowseButton_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new OpenFileDialog
-        {
-            Filter = "PDF files (*.pdf)|*.pdf",
-            CheckFileExists = true,
-            Multiselect = false,
-            Title = UiText.Get("browse")
-        };
-        if (dialog.ShowDialog() == true)
-        {
-            SetInputPath(dialog.FileName);
-        }
+        var dialog = new OpenFileDialog { Filter = "PDF files (*.pdf)|*.pdf", CheckFileExists = true, Multiselect = false, Title = UiText.Get("browse") };
+        if (dialog.ShowDialog() == true) SetInputPath(dialog.FileName);
     }
 
     private void DropTarget_DragOver(object sender, DragEventArgs e)
@@ -93,20 +71,11 @@ public partial class HomePage : Page
 
     private async void BlendButton_Click(object sender, RoutedEventArgs e)
     {
-        if (_session.InputPath is null)
-        {
-            StatusText.Text = UiText.Get("ready");
-            return;
-        }
+        if (_session.InputPath is null) { StatusText.Text = UiText.Get("ready"); return; }
         if (_processingCts is not null) return;
 
-        var outputPath = OutputText.Text;
-        if (string.IsNullOrWhiteSpace(outputPath) || outputPath == "—")
-        {
-            StatusText.Text = UiText.Get("outputInvalid");
-            return;
-        }
-
+        var inputPath = _session.InputPath;
+        var outputPath = Path.Combine(Path.GetDirectoryName(inputPath) ?? string.Empty, $"{Path.GetFileNameWithoutExtension(inputPath)}_blended.pdf");
         _processingCts = new CancellationTokenSource();
         SetProcessingState(true);
         var progressNotification = _notifications.Show(UiNotificationKind.Progress, UiText.Get("blend"), UiText.Get("processing"), autoDismiss: false);
@@ -118,7 +87,7 @@ public partial class HomePage : Page
         });
         try
         {
-            var result = await _processor.ProcessAsync(new BlendRequest(_session.InputPath, outputPath, _session.Settings), progress, _processingCts.Token);
+            var result = await _processor.ProcessAsync(new BlendRequest(inputPath, outputPath, _session.Settings), progress, _processingCts.Token);
             StatusText.Text = $"{UiText.Get("completed")}: {Path.GetFileName(result.OutputPath)}";
             _notifications.Dismiss(progressNotification);
             _notifications.Show(UiNotificationKind.Success, UiText.Get("completed"), Path.GetFileName(result.OutputPath));
@@ -143,14 +112,8 @@ public partial class HomePage : Page
         }
     }
 
+    private void ConfigurationButton_Click(object sender, RoutedEventArgs e) => _openConfiguration();
     private void CancelButton_Click(object sender, RoutedEventArgs e) => _processingCts?.Cancel();
-
-    private void ProfileCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (_initializing || ProfileCombo.SelectedIndex < 0) return;
-        _session.SelectProfile(ProfileCombo.SelectedIndex);
-        StatusText.Text = $"{UiText.Get("profile")}: {ProfileDisplayName(_session.Profiles[ProfileCombo.SelectedIndex].Id)}";
-    }
 
     private void BlendLevelRailControl_SelectionChanged(object? sender, BlendLevelChangedEventArgs e)
     {
@@ -166,9 +129,6 @@ public partial class HomePage : Page
         ReadyText.Text = hasFile ? UiText.Get("selected") : UiText.Get("ready");
         FileNameText.Text = hasFile ? Path.GetFileName(path) : string.Empty;
         BlendButton.IsEnabled = hasFile;
-        OutputText.Text = hasFile
-            ? Path.Combine(Path.GetDirectoryName(path!) ?? string.Empty, $"{Path.GetFileNameWithoutExtension(path)}_blended.pdf")
-            : "—";
         StatusText.Text = hasFile ? Path.GetFileName(path) : UiText.Get("ready");
     }
 
@@ -176,20 +136,11 @@ public partial class HomePage : Page
     {
         BlendButton.IsEnabled = !processing && _session.InputPath is not null;
         BrowseButton.IsEnabled = !processing;
-        ProfileCombo.IsEnabled = !processing;
+        ConfigurationButton.IsEnabled = !processing;
         BlendLevelRailControl.IsEnabled = !processing;
         ProcessingProgress.Visibility = processing ? Visibility.Visible : Visibility.Collapsed;
         CancelButton.Visibility = processing ? Visibility.Visible : Visibility.Collapsed;
         if (!processing) ProcessingProgress.Value = 0;
-    }
-
-    private void UpdateProfileLabels()
-    {
-        var selected = ProfileCombo.SelectedIndex;
-        _initializing = true;
-        ProfileCombo.ItemsSource = _session.Profiles.Select(profile => ProfileDisplayName(profile.Id)).ToList();
-        ProfileCombo.SelectedIndex = Math.Clamp(selected < 0 ? _session.SelectedProfileIndex : selected, 0, Math.Max(0, _session.Profiles.Count - 1));
-        _initializing = false;
     }
 
     private IReadOnlyList<BlendLevelItem> BuildLevelItems() =>
@@ -199,15 +150,5 @@ public partial class HomePage : Page
         new(_session.Presets[2].DisplayName, UiText.Get("pulseSummary"))
     ];
 
-    private static string ProfileDisplayName(string id) => id switch
-    {
-        "research" => UiText.Get("profileResearch"),
-        "public" => UiText.Get("profilePublic"),
-        _ => UiText.Get("profileDefault")
-    };
-
-    private static bool HasPdfDrop(DragEventArgs e) =>
-        e.Data.GetDataPresent(DataFormats.FileDrop) &&
-        e.Data.GetData(DataFormats.FileDrop) is string[] files &&
-        files.Any(path => string.Equals(Path.GetExtension(path), ".pdf", StringComparison.OrdinalIgnoreCase));
+    private static bool HasPdfDrop(DragEventArgs e) => e.Data.GetDataPresent(DataFormats.FileDrop) && e.Data.GetData(DataFormats.FileDrop) is string[] files && files.Any(path => string.Equals(Path.GetExtension(path), ".pdf", StringComparison.OrdinalIgnoreCase));
 }

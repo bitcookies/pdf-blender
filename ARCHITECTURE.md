@@ -16,7 +16,7 @@ Status: v0.3.0 implementation baseline
 PDFBlender.sln
 src/
   PDFBlender.App/       WPF-UI shell, pages, localization, theme, commands
-  PDFBlender.Core/      settings, profiles, blend presets, pipeline contracts, validation
+  PDFBlender.Core/      settings, configurations, blend presets, pipeline contracts, validation
   PDFBlender.Pdf/       PDF inspection, rendering, page sizing, document reconstruction
   PDFBlender.Image/     raster scaling, watermark composition, conservative noise
 tests/
@@ -42,7 +42,7 @@ Flatten is both the MVP primary protection method and the raster reconstruction 
 
 The App project owns presentation state and persistence adapters. Core owns typed settings and preset definitions. The PDF layer exposes narrow interfaces such as document inspection, page rendering, and document writing so a library can be replaced without changing view models or preset semantics.
 
-The v0.3.0 shell is `MainWindow` (`FluentWindow`) with a compact rail, shared `AppSession`, and a right-aligned `UiNotificationHost`. `HomePage` owns the PDF workflow, `SettingsPage` applies editable settings immediately, and `AboutPage` exposes version and legal information. `WPF-UI` is pinned to 4.3.0 and is limited to presentation concerns.
+The v0.3.0 shell is `MainWindow` (`FluentWindow`) with a compact rail, shared `AppSession`, and a right-aligned `UiNotificationHost`. `HomePage` owns the PDF workflow, `ConfigurationPage` applies processing settings per blend level, `SettingsPage` applies appearance settings immediately, and `AboutPage` exposes version and legal information. `WPF-UI` is pinned to 4.3.0 and is limited to presentation concerns.
 
 Page navigation uses cached page instances and a short opacity transition. Theme resources are centralized in `App.xaml` and `ThemeManager`; the palette follows the UCDT neutral light/dark structure while the accent remains PDF Blender coral/red. Toast updates are dispatched through `UiNotificationService` and do not contain document contents.
 
@@ -50,7 +50,7 @@ Keep startup work minimal: load theme/language and lightweight preferences first
 
 ## Persistence and Privacy
 
-Store non-secret Profiles in app-local settings storage with schema versioning. The MVP has no secret-key subsystem. Do not persist temporary page images after an operation, send document data over the network, or include document content in diagnostics.
+Store non-secret Configurations in app-local settings storage with schema versioning. The MVP has no secret-key subsystem. Do not persist temporary page images after an operation, send document data over the network, or include document content in diagnostics.
 
 ## Packaging and Build
 

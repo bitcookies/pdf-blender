@@ -16,22 +16,22 @@ Ship Simplified Chinese (`zh-CN`) and English (`en-US`). Provide System, Chinese
 
 The first screen is the working tool, not a marketing page. The compact 820×600 default window, with a 760×540 minimum, contains:
 
-1. Product identity and compact Settings access.
-2. A prominent drag-and-drop PDF target with a Browse action and selected-file summary.
-3. Profile selector and the discrete Blend level rail.
-4. A clear primary `Blend PDF` action and output destination summary.
+1. Product identity in the fixed title bar.
+2. A prominent bordered drag-and-drop PDF target with a Browse action and selected-file summary.
+3. The discrete Blend level rail and a Configuration shortcut.
+4. A clear primary `Blend PDF` action.
 
-The main workflow is `Drop/Browse -> choose Profile -> choose Blend level -> Blend PDF`. v0.3.0 handles one PDF at a time. Reject unsupported file types clearly and do not start processing before a valid PDF is selected. Theme and language controls are absent from the home screen and available in Settings.
+The main workflow is `Drop/Browse -> choose Blend level -> Blend PDF`. v0.3.0 handles one PDF at a time. Reject unsupported file types clearly and do not start processing before a valid PDF is selected. The output is written beside the input as `<source>_blended.pdf`; the destination is not exposed as a home control. Theme and language controls are absent from the home screen and available in Settings.
 
-The shell is a single WPF-UI `FluentWindow` with a compact icon-and-label rail and a content `Frame`. Home, Settings, and About are pages sharing one `AppSession`; Settings changes are applied to the session immediately and persisted locally.
+The shell is a single WPF-UI `FluentWindow` with a compact icon-and-label rail and a content `Frame`. Home, Configuration, Settings, and About are pages sharing one `AppSession`; changes are applied immediately and persisted locally.
 
 ### BlendLevelRail
 
 `BlendLevelRail` exposes `Levels`, `SelectedIndex`, and `SelectionChanged`. It uses a snapped WPF `Slider`, supports mouse and keyboard navigation, and renders the selected preset name and summary. The shipped list contains `STIR`, `BLEND`, and `PULSE`; future one-to-five-level data is an extension point only.
 
-## Settings
+## Configuration and Settings
 
-Advanced controls are grouped under Appearance, Format, Protection, Watermark, Image, and Output. Only implemented v0.3.0 controls should appear as active settings. Future features may be documented elsewhere but must not be presented as working toggles.
+Configuration exposes Format, Protection, Watermark, and Image controls for the selected blend level. Settings exposes only Appearance (theme and language). Only implemented v0.3.0 controls should appear as active settings. Future features may be documented elsewhere but must not be presented as working toggles.
 
 The shell uses a compact icon-and-label rail, a custom application palette derived from the PDF Blender logo, and WPF-UI ComboBox resources with a bordered popup surface. Processing notifications appear in a right-aligned Toast host with a maximum of three visible items.
 
@@ -41,9 +41,9 @@ Preferences are local to the device and stored at `%LOCALAPPDATA%\\PDFBlender\\p
 - Protection: mutually exclusive method selector. The current MVP enables Flatten; future methods must be visibly unavailable or absent.
 - Watermark: enable toggle; text, opacity, size, rotation, placement, and repeated-page spacing as applicable.
 - Image: pixel-noise toggle and bounded strength selector.
-- Output: destination, filename suffix, and open-output-folder behavior; original remains protected from accidental overwrite.
+- Output is automatic: the original remains untouched and the generated file uses the `_blended.pdf` suffix in the source directory.
 
-Profiles and Blend Modes are selectors, not decorative badges. Changing an individual setting marks the preset as modified/custom.
+Configurations and Blend Modes are selectors, not decorative badges. Changing an individual setting marks the selected level as modified/custom.
 
 ## Processing States
 

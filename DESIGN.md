@@ -9,11 +9,11 @@ Interface and localization: `INTERFACE.md`
 
 PDF Blender helps authors publish documents that remain readable to everyone while making direct copying, OCR-based reuse, and image extraction less convenient. It is not a DRM or encryption product, and it must never promise that copying is impossible. Readability and accurate rendering take priority over resistance to automated reuse.
 
-The product uses a hands-on Blender metaphor: users choose a reusable Profile, select a Blend Mode, and blend a PDF. Blend Modes are named presets over normal settings. They do not represent security levels. The application should feel like a focused Windows utility with a recognizable identity, not a generic PDF editor or security dashboard.
+The product uses a hands-on Blender metaphor: users select a blend level, optionally tune its Configuration, and blend a PDF. Blend levels are named presets over normal settings. They do not represent security levels. The application should feel like a focused Windows utility with a recognizable identity, not a generic PDF editor or security dashboard.
 
 ## v0.3.0 Product Shape
 
-The home screen is a compact single-window tool. It centers the PDF drop/browse action and keeps the recurring path short: select a file, select Profile and a Blend level, then blend. Theme and language are settings, not home-screen workflow controls. Detailed options live in a compact settings page grouped into Appearance, Format, Protection, Watermark, Image, and Output. Only features that work in the current release should be shown as available.
+The home screen is a compact single-window tool. It centers the PDF drop/browse action and keeps the recurring path short: select a file, select a Blend level, then blend. Theme and language are software settings, not home-screen workflow controls. Detailed processing options live in Configuration; Settings only contains theme and language.
 
 ## Visual System
 
@@ -23,7 +23,7 @@ Use small translucent surfaces only where they improve hierarchy. Do not rely on
 
 ## Home Layout
 
-The main window is 820×600 with a 760×540 minimum. It contains a 72 px compact rail with icon and label navigation, a smaller drag-and-drop surface with selected-file summary, Profile and output summary, the three-level Blend rail, and a bottom action row with progress and Cancel. The home screen does not expose theme or language selectors.
+The main window is 820×600 with a 760×540 minimum. It contains a 74 px compact rail with icon and label navigation, a bordered white/dark drag-and-drop surface with selected-file summary, the three-level Blend rail, a Configuration shortcut, and a bottom action row with progress and Cancel. The home screen does not expose profile, output, theme, or language controls.
 
 ## Blend Level Rail
 
@@ -31,7 +31,7 @@ The main window is 820×600 with a 760×540 minimum. It contains a 72 px compact
 
 ## Settings and Preferences
 
-Settings are grouped into Appearance (System/Light/Dark and System/English/Simplified Chinese), Format, Protection, Watermark, Image, and Output. Theme and language changes apply when saved. `AppPreferencesStore` persists theme, language, and selected Blend level at `%LOCALAPPDATA%\\PDFBlender\\preferences.json`; malformed or out-of-range values fall back to safe defaults. Profiles and PDF processing semantics are unchanged.
+Settings contains Appearance only: System/Light/Dark and System/English/Simplified Chinese. Theme and language changes apply immediately. Configuration contains Format, Protection, Watermark, and Image controls. `AppPreferencesStore` persists theme, language, and selected Blend level at `%LOCALAPPDATA%\\PDFBlender\\preferences.json`; malformed or out-of-range values fall back to safe defaults. Existing profile files remain compatible and now store optional per-level overrides.
 
 The initial presets are `STIR`, `BLEND`, and `PULSE`. `CRUSH` and `OVERBLEND` remain future/experimental until their quality and behavior are validated. Users can independently toggle supported options, and manual edits turn the selected preset into a modified/custom configuration.
 

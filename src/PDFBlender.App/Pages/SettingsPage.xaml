@@ -3,87 +3,26 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="30,22,30,28" MaxWidth="760">
-            <TextBlock x:Name="TitleText" FontSize="22" FontWeight="SemiBold" />
-            <TextBlock x:Name="SubtitleText" Margin="0,4,0,22" Foreground="{DynamicResource MutedTextBrush}" />
-
-            <TextBlock x:Name="AppearanceHeader" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
-            <ui:Card Padding="18,4">
-                <StackPanel>
-                    <Grid MinHeight="64">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
-                        <StackPanel VerticalAlignment="Center"><TextBlock x:Name="ThemeLabel" FontWeight="SemiBold" /><TextBlock x:Name="ThemeHint" Foreground="{DynamicResource MutedTextBrush}" FontSize="12" /></StackPanel>
-                        <ComboBox x:Name="ThemeOptions" Grid.Column="1" VerticalAlignment="Center" SelectionChanged="ThemeOptions_SelectionChanged" />
-                    </Grid>
-                    <Separator />
-                    <Grid MinHeight="64">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
-                        <StackPanel VerticalAlignment="Center"><TextBlock x:Name="LanguageLabel" FontWeight="SemiBold" /><TextBlock x:Name="LanguageHint" Foreground="{DynamicResource MutedTextBrush}" FontSize="12" /></StackPanel>
-                        <ComboBox x:Name="LanguageOptions" Grid.Column="1" VerticalAlignment="Center" SelectionChanged="LanguageOptions_SelectionChanged" />
-                    </Grid>
-                </StackPanel>
-            </ui:Card>
-
-            <TextBlock x:Name="FormatHeader" FontSize="16" FontWeight="SemiBold" Margin="0,24,0,8" />
-            <ui:Card Padding="18,4">
-                <StackPanel>
-                    <Grid MinHeight="70">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="150" /></Grid.ColumnDefinitions>
-                        <StackPanel VerticalAlignment="Center"><TextBlock x:Name="NormalizeLabel" FontWeight="SemiBold" /><TextBlock x:Name="NormalizeHint" Foreground="{DynamicResource MutedTextBrush}" FontSize="12" TextWrapping="Wrap" /></StackPanel>
-                        <ui:ToggleSwitch x:Name="NormalizeWidthToggle" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Checked="SettingsControl_Changed" Unchecked="SettingsControl_Changed" />
-                    </Grid>
-                    <Separator />
-                    <Grid MinHeight="70">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="160" /></Grid.ColumnDefinitions>
-                        <StackPanel VerticalAlignment="Center"><TextBlock x:Name="TargetWidthLabel" FontWeight="SemiBold" /><TextBlock x:Name="TargetWidthHint" Foreground="{DynamicResource MutedTextBrush}" FontSize="12" TextWrapping="Wrap" /></StackPanel>
-                        <ui:TextBox x:Name="TargetWidthText" Grid.Column="1" VerticalAlignment="Center" TextChanged="SettingsControl_Changed" />
-                    </Grid>
-                </StackPanel>
-            </ui:Card>
-
-            <TextBlock x:Name="ProtectionHeader" FontSize="16" FontWeight="SemiBold" Margin="0,24,0,8" />
-            <ui:Card Padding="18,4">
-                <Grid MinHeight="70">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
-                    <StackPanel VerticalAlignment="Center"><TextBlock x:Name="ProtectionLabel" FontWeight="SemiBold" /><TextBlock x:Name="ProtectionHint" Foreground="{DynamicResource MutedTextBrush}" FontSize="12" /></StackPanel>
-                    <ComboBox x:Name="ProtectionCombo" Grid.Column="1" VerticalAlignment="Center" SelectionChanged="SettingsControl_Changed" />
+        <StackPanel Margin="22,20,22,24" MaxWidth="760">
+            <TextBlock x:Name="TitleText" Style="{StaticResource PageTitleTextStyle}" />
+            <TextBlock x:Name="SubtitleText" Style="{StaticResource PageDescriptionTextStyle}" />
+            <TextBlock x:Name="AppearanceHeader" Style="{StaticResource SectionTitleTextStyle}" />
+            <Border Background="{DynamicResource SettingItemBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12" Margin="0,0,0,12">
+                <Grid MinHeight="72">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
+                    <ui:SymbolIcon Symbol="Color24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,16,0" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="ThemeLabel" FontSize="15" FontWeight="SemiBold" /><TextBlock x:Name="ThemeHint" Style="{StaticResource SmallMutedTextStyle}" /></StackPanel>
+                    <ComboBox x:Name="ThemeOptions" Grid.Column="2" VerticalAlignment="Center" SelectionChanged="ThemeOptions_SelectionChanged" />
                 </Grid>
-            </ui:Card>
-
-            <TextBlock x:Name="WatermarkHeader" FontSize="16" FontWeight="SemiBold" Margin="0,24,0,8" />
-            <ui:Card Padding="18,4">
-                <StackPanel>
-                    <Grid MinHeight="64">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
-                        <StackPanel VerticalAlignment="Center"><TextBlock x:Name="WatermarkTypeLabel" FontWeight="SemiBold" /><TextBlock x:Name="WatermarkTypeHint" Foreground="{DynamicResource MutedTextBrush}" FontSize="12" /></StackPanel>
-                        <ComboBox x:Name="WatermarkCombo" Grid.Column="1" VerticalAlignment="Center" SelectionChanged="SettingsControl_Changed" />
-                    </Grid>
-                    <Separator />
-                    <Grid MinHeight="64">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="280" /></Grid.ColumnDefinitions>
-                        <TextBlock x:Name="WatermarkTextLabel" FontWeight="SemiBold" VerticalAlignment="Center" />
-                        <ui:TextBox x:Name="WatermarkTextBox" Grid.Column="1" VerticalAlignment="Center" TextChanged="SettingsControl_Changed" />
-                    </Grid>
-                </StackPanel>
-            </ui:Card>
-
-            <TextBlock x:Name="ImageHeader" FontSize="16" FontWeight="SemiBold" Margin="0,24,0,8" />
-            <ui:Card Padding="18,4">
-                <Grid MinHeight="70">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
-                    <StackPanel VerticalAlignment="Center"><TextBlock x:Name="NoiseLabel" FontWeight="SemiBold" /><TextBlock x:Name="NoiseHint" Foreground="{DynamicResource MutedTextBrush}" FontSize="12" /></StackPanel>
-                    <ComboBox x:Name="NoiseCombo" Grid.Column="1" VerticalAlignment="Center" SelectionChanged="SettingsControl_Changed" />
+            </Border>
+            <Border Background="{DynamicResource SettingItemBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12">
+                <Grid MinHeight="72">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
+                    <ui:SymbolIcon Symbol="LocalLanguage24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,16,0" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="LanguageLabel" FontSize="15" FontWeight="SemiBold" /><TextBlock x:Name="LanguageHint" Style="{StaticResource SmallMutedTextStyle}" /></StackPanel>
+                    <ComboBox x:Name="LanguageOptions" Grid.Column="2" VerticalAlignment="Center" SelectionChanged="LanguageOptions_SelectionChanged" />
                 </Grid>
-            </ui:Card>
-
-            <TextBlock x:Name="OutputHeader" FontSize="16" FontWeight="SemiBold" Margin="0,24,0,8" />
-            <ui:Card Padding="18,16">
-                <StackPanel Orientation="Horizontal">
-                    <ui:SymbolIcon Symbol="ShieldTask24" FontSize="22" Foreground="{DynamicResource AccentBrush}" Margin="0,0,12,0" />
-                    <TextBlock x:Name="OutputHintText" Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap" />
-                </StackPanel>
-            </ui:Card>
-            <TextBlock x:Name="ErrorText" Foreground="{DynamicResource AccentBrush}" Margin="0,10,0,0" TextWrapping="Wrap" />
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>

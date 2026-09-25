@@ -9,21 +9,21 @@ namespace PDFBlender.App;
 internal sealed class AppSession
 {
     public IReadOnlyList<BlendPreset> Presets { get; } = PDFBlender.Core.Models.Presets.All;
-    public List<ProfileDefinition> Profiles { get; } = ProfileStore.Load().ToList();
+    public List<ProfileDefinition> Configurations { get; } = ProfileStore.Load().ToList();
     public AppPreferences Preferences { get; private set; }
     public BlendSettings Settings { get; private set; }
-    public int SelectedProfileIndex { get; private set; }
+    public int SelectedConfigurationIndex { get; private set; }
     public string? InputPath { get; private set; }
+    public int SelectedBlendLevel => Math.Clamp(Preferences.SelectedBlendLevel, 0, Presets.Count - 1);
 
     public event EventHandler? Changed;
 
     public AppSession()
     {
         Preferences = AppPreferencesStore.Load();
-        SelectedProfileIndex = 0;
-        Settings = Profiles.Count > 0 ? Profiles[0].Settings : BlendSettings.Default;
-        var selected = Math.Clamp(Preferences.SelectedBlendLevel, 0, Presets.Count - 1);
-        Settings = Presets[selected].Settings;
+        SelectedConfigurationIndex = 0;
+        Settings = Configurations.Count > 0 ? Configurations[0].Settings : BlendSettings.Default;
+        Settings = GetLevelSettings(SelectedBlendLevel);
     }
 
     public void SetInputPath(string? path)
@@ -35,29 +35,29 @@ internal sealed class AppSession
     public void SetBlendLevel(int index)
     {
         var selected = Math.Clamp(index, 0, Presets.Count - 1);
-        Settings = Presets[selected].Settings;
+        Settings = GetLevelSettings(selected);
         Preferences = Preferences with { SelectedBlendLevel = selected };
         SavePreferences();
-        SaveSelectedProfile();
+        SaveSelectedConfiguration();
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
-    public void SelectProfile(int index)
+    public void SelectConfiguration(int index)
     {
-        if (index < 0 || index >= Profiles.Count)
+        if (index < 0 || index >= Configurations.Count)
         {
             return;
         }
 
-        SelectedProfileIndex = index;
-        Settings = Profiles[index].Settings;
+        SelectedConfigurationIndex = index;
+        Settings = GetLevelSettings(SelectedBlendLevel);
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
     public void ApplySettings(BlendSettings settings, bool notify = true)
     {
         Settings = settings;
-        SaveSelectedProfile();
+        SaveSelectedConfiguration();
         if (notify)
         {
             Changed?.Invoke(this, EventArgs.Empty);
@@ -82,16 +82,34 @@ internal sealed class AppSession
         catch (UnauthorizedAccessException) { }
     }
 
-    private void SaveSelectedProfile()
+    private void SaveSelectedConfiguration()
     {
-        if (SelectedProfileIndex < 0 || SelectedProfileIndex >= Profiles.Count)
+        if (SelectedConfigurationIndex < 0 || SelectedConfigurationIndex >= Configurations.Count)
         {
             return;
         }
 
-        Profiles[SelectedProfileIndex] = Profiles[SelectedProfileIndex] with { Settings = Settings };
-        try { ProfileStore.Save(Profiles); }
+        var profile = Configurations[SelectedConfigurationIndex];
+        var levels = new Dictionary<string, BlendSettings>(profile.LevelSettings, StringComparer.OrdinalIgnoreCase)
+        {
+            [Presets[SelectedBlendLevel].Mode.ToString()] = Settings
+        };
+        Configurations[SelectedConfigurationIndex] = profile with { Settings = Settings, LevelSettings = levels };
+        try { ProfileStore.Save(Configurations); }
         catch (IOException) { }
         catch (UnauthorizedAccessException) { }
+    }
+
+    private BlendSettings GetLevelSettings(int index)
+    {
+        if (Configurations.Count == 0)
+        {
+            return Presets[index].Settings;
+        }
+
+        var profile = Configurations[Math.Clamp(SelectedConfigurationIndex, 0, Configurations.Count - 1)];
+        return profile.LevelSettings.TryGetValue(Presets[index].Mode.ToString(), out var overrideSettings)
+            ? overrideSettings
+            : profile.Settings;
     }
 }

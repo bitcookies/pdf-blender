@@ -5,7 +5,12 @@ using PDFBlender.Core.Models;
 
 namespace PDFBlender.App;
 
-internal sealed record ProfileDefinition(string Id, BlendSettings Settings);
+internal sealed record ProfileDefinition(string Id, BlendSettings Settings)
+{
+    // Optional per-level overrides keep older profiles readable while allowing
+    // the Configuration page to edit STIR, BLEND, and PULSE independently.
+    public Dictionary<string, BlendSettings> LevelSettings { get; init; } = new(StringComparer.OrdinalIgnoreCase);
+}
 
 internal static class ProfileStore
 {

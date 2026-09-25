@@ -30,10 +30,10 @@ The processing scope below remains the v0.1.0 MVP behavior carried forward uncha
 
 The first usable release targets one input PDF per operation and includes:
 
-- Browse and drag/drop import, input summary, output path selection, and default output name `<source>_blended.pdf` without overwriting the source.
+- Browse and drag/drop import, input summary, and automatic output name `<source>_blended.pdf` beside the source without overwriting it.
 - Local PDF rendering and reconstruction, with progress, cancellation, understandable errors, and temporary-file cleanup.
 - Optional Normalize Content Width, Flatten, raster quality/DPI, text watermark, repeated full-page watermark, and conservative pixel noise.
-- Basic persistent Profiles and Blend Mode presets that can be manually overridden.
+- Basic persistent Configurations and Blend Mode presets that can be manually overridden per level.
 - Light, dark, and system themes; Simplified Chinese and English, with system-language selection.
 - A fast startup path: defer PDF engine initialization and other expensive work until needed; do not block the first window on nonessential work.
 - Build/test and portable-package workflows, plus Store-compatible MSIX packaging. `build.ps1` will return distinct documented numeric result codes.
@@ -64,9 +64,9 @@ Blend Modes are editable configuration presets. Changing a setting marks the sel
 
 Modes express processing presets, not security levels. The user can turn individual functions on or off and adjust supported settings.
 
-## Settings Categories
+## Configuration and Settings
 
-The advanced settings are grouped as Format, Protection, Watermark, Image, AI / Notice, and Output. The home screen exposes only import, Profile, Blend Mode, and the primary Blend action; detailed controls live in settings.
+Configuration contains Format, Protection, Watermark, and Image controls for the selected level. Settings contains only theme and language. The home screen exposes only import, Blend Mode, Configuration shortcut, and the primary Blend action.
 
 Primary protection methods are mutually exclusive: None, Flatten, Text Scrambling, or PDF Permission Restriction. v0.1.0 implements Flatten only. Watermarks and image processing can compose with the selected primary method.
 
@@ -81,7 +81,7 @@ Do not block v0.1.0 on Text Scrambling, PDF permission restrictions, keyed/dynam
 - Handle damaged and password-protected PDFs, unsupported features, oversized pages, memory pressure, invalid output paths, render failures, and cancellation with clear messages.
 - Never overwrite the source by default.
 - Validate rendering and output using real documents containing Chinese and English, formulas, tables, charts, vectors, raster images, transparent PNGs, varied fonts, portrait/landscape pages, and multiple pages.
-- Width normalization must preserve aspect ratio without cropping/stretching or forcing A4/equal heights. Flatten must remain visually readable and open in normal readers. Watermarks must be configurable and non-destructive. Profiles must persist across restarts.
+- Width normalization must preserve aspect ratio without cropping/stretching or forcing A4/equal heights. Flatten must remain visually readable and open in normal readers. Watermarks must be configurable and non-destructive. Configurations must persist across restarts.
 
 ## Explicitly Out of Scope
 

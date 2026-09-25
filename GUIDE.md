@@ -78,7 +78,7 @@ pwsh -NoProfile -File .\build.ps1 1 -Force
 PDFBlender/
 ├─ assets/                 项目使用的原始品牌资源，例如 Logo
 ├─ src/                    应用源码，按职责拆分
-│  ├─ PDFBlender.App/      WPF 窗口、主题、语言、Profile 和用户交互
+│  ├─ PDFBlender.App/      WPF 窗口、主题、语言、配置和用户交互
 │  ├─ PDFBlender.Core/     设置模型、预设、验证规则和处理契约
 │  └─ PDFBlender.Pdf/      PDFium 渲染、图片处理和 PDF 重建实现
 ├─ tests/                  自动化测试，包含模型测试和最小 PDF 管线测试
@@ -92,7 +92,7 @@ PDFBlender/
 ├─ AGENTS.md               AI 在本仓库中工作时必须遵守的规则
 ├─ THIRD-PARTY-NOTICES.md  第三方依赖和许可证说明
 ├─ PDFBlender.slnx         .NET 解决方案
-├─ Directory.Build.props   统一版本号，目前是 0.2.0 / 0.2.0.0
+├─ Directory.Build.props   统一版本号，目前是 0.3.0 / 0.3.0.0
 └─ build.ps1               数字构建入口
 ```
 

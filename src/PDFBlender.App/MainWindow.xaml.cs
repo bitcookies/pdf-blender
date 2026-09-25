@@ -13,6 +13,7 @@ public partial class MainWindow : FluentWindow
     private readonly AppSession _session = new();
     private readonly UiNotificationService _notifications;
     private HomePage? _homePage;
+    private ConfigurationPage? _configurationPage;
     private SettingsPage? _settingsPage;
     private AboutPage? _aboutPage;
 
@@ -28,6 +29,7 @@ public partial class MainWindow : FluentWindow
     }
 
     private void HomeNavigationItem_Click(object sender, RoutedEventArgs e) => NavigateTo("home");
+    private void ConfigurationNavigationItem_Click(object sender, RoutedEventArgs e) => NavigateTo("configuration");
     private void SettingsNavigationItem_Click(object sender, RoutedEventArgs e) => NavigateTo("settings");
     private void AboutNavigationItem_Click(object sender, RoutedEventArgs e) => NavigateTo("about");
 
@@ -35,9 +37,10 @@ public partial class MainWindow : FluentWindow
     {
         ContentFrame.Content = page switch
         {
+            "configuration" => _configurationPage ??= new ConfigurationPage(_session),
             "settings" => _settingsPage ??= new SettingsPage(_session),
             "about" => _aboutPage ??= new AboutPage(),
-            _ => _homePage ??= new HomePage(_session, _notifications)
+            _ => _homePage ??= new HomePage(_session, _notifications, () => NavigateTo("configuration"))
         };
         SetNavigationState(page);
         ShellTitleBar.Title = "PDF Blender";
@@ -49,6 +52,7 @@ public partial class MainWindow : FluentWindow
         ApplyTheme();
         ApplyLanguage();
         _homePage?.RefreshFromSession();
+        _configurationPage?.RefreshFromSession();
         _settingsPage?.RefreshFromSession();
         _aboutPage?.RefreshLanguage();
     }
@@ -57,6 +61,7 @@ public partial class MainWindow : FluentWindow
     {
         UiText.SetLanguage(_session.Preferences.Language);
         SetRailText(HomeNavigationButton, UiText.Get("home"));
+        SetRailText(ConfigurationNavigationButton, UiText.Get("configuration"));
         SetRailText(SettingsNavigationButton, UiText.Get("settings"));
         SetRailText(AboutNavigationButton, UiText.Get("about"));
         ShellTitleBar.Title = "PDF Blender";
@@ -79,6 +84,7 @@ public partial class MainWindow : FluentWindow
     private void SetNavigationState(string page)
     {
         SetRailButtonState(HomeNavigationButton, page == "home");
+        SetRailButtonState(ConfigurationNavigationButton, page == "configuration");
         SetRailButtonState(SettingsNavigationButton, page == "settings");
         SetRailButtonState(AboutNavigationButton, page == "about");
     }
