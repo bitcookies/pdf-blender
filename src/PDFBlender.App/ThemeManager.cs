@@ -22,18 +22,50 @@ internal static class ThemeManager
     public static void ApplyPalette(bool dark)
     {
         var resources = Application.Current.Resources;
-        SetBrush(resources, "WindowBackgroundBrush", dark ? "#202020" : "#F7F7F7");
-        SetBrush(resources, "SidebarBrush", dark ? "#1C1C1C" : "#FAFAFA");
-        SetBrush(resources, "TitleBarBrush", dark ? "#1A1A1A" : "#FDFDFD");
-        SetBrush(resources, "SurfaceBrush", dark ? "#262626" : "#FFFFFF");
-        SetBrush(resources, "SurfaceRaisedBrush", dark ? "#303030" : "#F1F1F1");
-        SetBrush(resources, "SurfaceMutedBrush", dark ? "#242424" : "#F8F8F8");
-        SetBrush(resources, "BorderBrush", dark ? "#353535" : "#E6E6E6");
-        SetBrush(resources, "TextBrush", dark ? "#F2F2F2" : "#202020");
-        SetBrush(resources, "MutedTextBrush", dark ? "#B8B8B8" : "#666666");
-        SetBrush(resources, "AccentBrush", dark ? "#F06A73" : "#D84F58");
-        SetBrush(resources, "AccentDarkBrush", dark ? "#D6535D" : "#B63D48");
-        SetBrush(resources, "AccentSoftBrush", dark ? "#35F06A73" : "#25D84F58");
+        if (dark)
+        {
+            SetBrush(resources, "WindowBackgroundBrush", "#202020");
+            SetBrush(resources, "SidebarBrush", "#1C1C1C");
+            SetBrush(resources, "TitleBarBrush", "#1A1A1A");
+            SetBrush(resources, "SurfaceBrush", "#262626");
+            SetBrush(resources, "CardBrush", "#262626");
+            SetBrush(resources, "SettingItemBrush", "#292929");
+            SetBrush(resources, "LogoTileBrush", "#3B252B");
+            SetBrush(resources, "SurfaceRaisedBrush", "#343434");
+            SetBrush(resources, "SurfaceMutedBrush", "#292929");
+            SetBrush(resources, "BorderBrush", "#353535");
+            SetBrush(resources, "TextBrush", "#F2F2F2");
+            SetBrush(resources, "TitleTextBrush", "#D8D8D8");
+            SetBrush(resources, "MutedTextBrush", "#B8B8B8");
+            SetBrush(resources, "AccentBrush", "#F06A73");
+            SetBrush(resources, "AccentDarkBrush", "#D6535D");
+            SetBrush(resources, "AccentSoftBrush", "#35F06A73");
+            SetBrush(resources, "NavHoverBrush", "#18FFFFFF");
+            SetBrush(resources, "NavSelectedBrush", "#3B252B");
+            SetBrush(resources, "NavTextBrush", "#D8D8D8");
+        }
+        else
+        {
+            SetBrush(resources, "WindowBackgroundBrush", "#F7F7F7");
+            SetBrush(resources, "SidebarBrush", "#FAFAFA");
+            SetBrush(resources, "TitleBarBrush", "#FDFDFD");
+            SetBrush(resources, "SurfaceBrush", "#FFFFFF");
+            SetBrush(resources, "CardBrush", "#FFFFFF");
+            SetBrush(resources, "SettingItemBrush", "#FFFFFF");
+            SetBrush(resources, "LogoTileBrush", "#FFF1F3");
+            SetBrush(resources, "SurfaceRaisedBrush", "#F6F6F6");
+            SetBrush(resources, "SurfaceMutedBrush", "#F8F8F8");
+            SetBrush(resources, "BorderBrush", "#E6E6E6");
+            SetBrush(resources, "TextBrush", "#202020");
+            SetBrush(resources, "TitleTextBrush", "#868686");
+            SetBrush(resources, "MutedTextBrush", "#666666");
+            SetBrush(resources, "AccentBrush", "#D84F58");
+            SetBrush(resources, "AccentDarkBrush", "#B63D48");
+            SetBrush(resources, "AccentSoftBrush", "#25D84F58");
+            SetBrush(resources, "NavHoverBrush", "#0F000000");
+            SetBrush(resources, "NavSelectedBrush", "#FFF0DDE0");
+            SetBrush(resources, "NavTextBrush", "#202020");
+        }
         SetBrush(resources, "AccentTextBrush", "#FFFFFF");
     }
 

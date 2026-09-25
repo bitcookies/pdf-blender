@@ -5,7 +5,7 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="30,26,30,28" MaxWidth="700">
             <StackPanel Orientation="Horizontal">
-                <Border Width="64" Height="64" CornerRadius="14" Background="#FFF1F3" Padding="6">
+                <Border Width="64" Height="64" CornerRadius="14" Background="{DynamicResource LogoTileBrush}" Padding="6">
                     <Image Source="/PDFBlender.App;component/Assets/logo.png" Stretch="Uniform" />
                 </Border>
                 <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">

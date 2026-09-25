@@ -13,23 +13,26 @@
             <RowDefinition Height="44" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <ui:TitleBar x:Name="ShellTitleBar" Grid.Row="0" Title="PDF Blender" Icon="/PDFBlender.App;component/Assets/logo.png" Background="{DynamicResource TitleBarBrush}" />
+        <ui:TitleBar x:Name="ShellTitleBar" Grid.Row="0" Title="PDF Blender" Height="44" Padding="12,0" Background="{DynamicResource TitleBarBrush}" Foreground="{DynamicResource TitleTextBrush}">
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Source="/PDFBlender.App;component/Assets/logo.ico" Width="16" Height="16" />
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
         <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="72" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+            <Grid.ColumnDefinitions><ColumnDefinition Width="74" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
             <Border Grid.Column="0" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
                 <Grid>
-                    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
-                    <Image Grid.Row="0" Source="/PDFBlender.App;component/Assets/logo.png" Width="28" Height="28" Margin="0,12,0,10" HorizontalAlignment="Center" />
-                    <StackPanel Grid.Row="1">
+                    <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0">
                         <Button x:Name="HomeNavigationButton" Style="{StaticResource RailButtonStyle}" Click="HomeNavigationItem_Click" AutomationProperties.Name="Home">
-                            <StackPanel><ui:SymbolIcon Symbol="Home24" HorizontalAlignment="Center" /><TextBlock Text="Home" FontSize="10" HorizontalAlignment="Center" Margin="0,3,0,0" /></StackPanel>
+                            <StackPanel><ui:SymbolIcon Symbol="Home24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="Home" FontSize="10.5" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" TextAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" /></StackPanel>
                         </Button>
                         <Button x:Name="SettingsNavigationButton" Style="{StaticResource RailButtonStyle}" Click="SettingsNavigationItem_Click" AutomationProperties.Name="Settings">
-                            <StackPanel><ui:SymbolIcon Symbol="Settings24" HorizontalAlignment="Center" /><TextBlock Text="Settings" FontSize="10" HorizontalAlignment="Center" Margin="0,3,0,0" /></StackPanel>
+                            <StackPanel><ui:SymbolIcon Symbol="Settings24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="Settings" FontSize="10.5" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" TextAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" /></StackPanel>
                         </Button>
                     </StackPanel>
-                    <Button x:Name="AboutNavigationButton" Grid.Row="2" Style="{StaticResource RailButtonStyle}" Click="AboutNavigationItem_Click" AutomationProperties.Name="About" Margin="6,3,6,12">
-                        <StackPanel><ui:SymbolIcon Symbol="Info24" HorizontalAlignment="Center" /><TextBlock Text="About" FontSize="10" HorizontalAlignment="Center" Margin="0,3,0,0" /></StackPanel>
+                    <Button x:Name="AboutNavigationButton" Grid.Row="1" Style="{StaticResource RailButtonStyle}" Click="AboutNavigationItem_Click" AutomationProperties.Name="About" Margin="0,1,0,12">
+                        <StackPanel><ui:SymbolIcon Symbol="Info24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="About" FontSize="10.5" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" TextAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" /></StackPanel>
                     </Button>
                 </Grid>
             </Border>

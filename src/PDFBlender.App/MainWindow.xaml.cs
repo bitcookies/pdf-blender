@@ -40,12 +40,7 @@ public partial class MainWindow : FluentWindow
             _ => _homePage ??= new HomePage(_session, _notifications)
         };
         SetNavigationState(page);
-        ShellTitleBar.Title = page switch
-        {
-            "settings" => UiText.Get("settings"),
-            "about" => UiText.Get("about"),
-            _ => UiText.Get("appName")
-        };
+        ShellTitleBar.Title = "PDF Blender";
         AnimateContent();
     }
 
@@ -64,7 +59,7 @@ public partial class MainWindow : FluentWindow
         SetRailText(HomeNavigationButton, UiText.Get("home"));
         SetRailText(SettingsNavigationButton, UiText.Get("settings"));
         SetRailText(AboutNavigationButton, UiText.Get("about"));
-        ShellTitleBar.Title = UiText.Get("appName");
+        ShellTitleBar.Title = "PDF Blender";
     }
 
     private void ApplyTheme()
@@ -90,12 +85,11 @@ public partial class MainWindow : FluentWindow
 
     private static void SetRailButtonState(System.Windows.Controls.Button button, bool selected)
     {
-        button.Background = selected
-            ? (Brush)Application.Current.Resources["AccentSoftBrush"]
-            : Brushes.Transparent;
+        button.Tag = selected;
+        button.Background = Brushes.Transparent;
         button.Foreground = selected
             ? (Brush)Application.Current.Resources["AccentBrush"]
-            : (Brush)Application.Current.Resources["MutedTextBrush"];
+            : (Brush)Application.Current.Resources["NavTextBrush"];
     }
 
     private static void SetRailText(System.Windows.Controls.Button button, string text)
