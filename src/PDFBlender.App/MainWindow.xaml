@@ -8,7 +8,11 @@
                  Width="820" Height="600" MinWidth="760" MinHeight="540"
                  WindowStartupLocation="CenterScreen"
                  ExtendsContentIntoTitleBar="True">
-    <Grid Background="{DynamicResource WindowBackgroundBrush}">
+    <Grid Background="{DynamicResource WindowBackgroundBrush}"
+          TextElement.FontFamily="Segoe UI"
+          TextElement.FontSize="13"
+          UseLayoutRounding="True"
+          SnapsToDevicePixels="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="44" />
             <RowDefinition Height="*" />
@@ -25,18 +29,20 @@
                     <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                     <StackPanel Grid.Row="0">
                         <Button x:Name="HomeNavigationButton" Style="{StaticResource RailButtonStyle}" Click="HomeNavigationItem_Click" AutomationProperties.Name="Home">
-                            <StackPanel><ui:SymbolIcon Symbol="Home24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="Home" FontSize="10.5" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" TextAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" /></StackPanel>
+                            <StackPanel><ui:SymbolIcon Symbol="Home24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="Home" Style="{StaticResource RailLabelTextStyle}" /></StackPanel>
                         </Button>
                         <Button x:Name="ConfigurationNavigationButton" Style="{StaticResource RailButtonStyle}" Click="ConfigurationNavigationItem_Click" AutomationProperties.Name="Configuration">
-                            <StackPanel><ui:SymbolIcon Symbol="Options24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="Configuration" FontSize="10.5" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" TextAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" /></StackPanel>
-                        </Button>
-                        <Button x:Name="SettingsNavigationButton" Style="{StaticResource RailButtonStyle}" Click="SettingsNavigationItem_Click" AutomationProperties.Name="Settings">
-                            <StackPanel><ui:SymbolIcon Symbol="Settings24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="Settings" FontSize="10.5" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" TextAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" /></StackPanel>
+                            <StackPanel><ui:SymbolIcon Symbol="Options24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="Configuration" Style="{StaticResource RailLabelTextStyle}" /></StackPanel>
                         </Button>
                     </StackPanel>
-                    <Button x:Name="AboutNavigationButton" Grid.Row="1" Style="{StaticResource RailButtonStyle}" Click="AboutNavigationItem_Click" AutomationProperties.Name="About" Margin="0,1,0,12">
-                        <StackPanel><ui:SymbolIcon Symbol="Info24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="About" FontSize="10.5" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" TextAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" /></StackPanel>
-                    </Button>
+                    <StackPanel Grid.Row="1">
+                        <Button x:Name="SettingsNavigationButton" Style="{StaticResource RailButtonStyle}" Click="SettingsNavigationItem_Click" AutomationProperties.Name="Settings" Margin="0,1,0,12">
+                            <StackPanel><ui:SymbolIcon Symbol="Settings24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="Settings" Style="{StaticResource RailLabelTextStyle}" /></StackPanel>
+                        </Button>
+                        <Button x:Name="AboutNavigationButton" Style="{StaticResource RailButtonStyle}" Click="AboutNavigationItem_Click" AutomationProperties.Name="About">
+                            <StackPanel><ui:SymbolIcon Symbol="Info24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="About" Style="{StaticResource RailLabelTextStyle}" /></StackPanel>
+                        </Button>
+                    </StackPanel>
                 </Grid>
             </Border>
             <Grid Grid.Column="1">
