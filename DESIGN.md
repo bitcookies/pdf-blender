@@ -1,6 +1,6 @@
 # PDF Blender Design Overview
 
-Status: v0.2.0 UI redesign
+Status: v0.3.0 UI redesign
 Detailed requirements: `SPEC.md`  
 Architecture boundaries: `ARCHITECTURE.md`  
 Interface and localization: `INTERFACE.md`
@@ -11,7 +11,7 @@ PDF Blender helps authors publish documents that remain readable to everyone whi
 
 The product uses a hands-on Blender metaphor: users choose a reusable Profile, select a Blend Mode, and blend a PDF. Blend Modes are named presets over normal settings. They do not represent security levels. The application should feel like a focused Windows utility with a recognizable identity, not a generic PDF editor or security dashboard.
 
-## v0.2.0 Product Shape
+## v0.3.0 Product Shape
 
 The home screen is a compact single-window tool. It centers the PDF drop/browse action and keeps the recurring path short: select a file, select Profile and a Blend level, then blend. Theme and language are settings, not home-screen workflow controls. Detailed options live in a compact settings page grouped into Appearance, Format, Protection, Watermark, Image, and Output. Only features that work in the current release should be shown as available.
 
@@ -23,11 +23,11 @@ Use small translucent surfaces only where they improve hierarchy. Do not rely on
 
 ## Home Layout
 
-The main window is approximately 960×680 with an 860×600 minimum. It contains a compact navigation shell: product identity, Home/Settings/About navigation, a smaller drag-and-drop surface with selected-file summary, Profile and output summary, the three-level Blend rail, and a bottom action row with progress and Cancel. The home screen does not expose theme or language selectors.
+The main window is 820×600 with a 760×540 minimum. It contains a 72 px compact rail with icon and label navigation, a smaller drag-and-drop surface with selected-file summary, Profile and output summary, the three-level Blend rail, and a bottom action row with progress and Cancel. The home screen does not expose theme or language selectors.
 
 ## Blend Level Rail
 
-`BlendLevelRail` is a data-driven WPF control backed by a snapped `Slider`. v0.2.0 exposes only the validated `STIR`, `BLEND`, and `PULSE` presets. It supports mouse dragging, arrow keys, Home, End, visible name/summary text, keyboard focus, and an accessible slider name. The control API leaves room for one to five data items without presenting future algorithms.
+`BlendLevelRail` is a data-driven WPF control backed by a snapped `Slider`. v0.3.0 exposes only the validated `STIR`, `BLEND`, and `PULSE` presets. It supports mouse dragging, arrow keys, Home, End, visible name/summary text, keyboard focus, and an accessible slider name. The control API leaves room for one to five data items without presenting future algorithms.
 
 ## Settings and Preferences
 
@@ -35,7 +35,13 @@ Settings are grouped into Appearance (System/Light/Dark and System/English/Simpl
 
 The initial presets are `STIR`, `BLEND`, and `PULSE`. `CRUSH` and `OVERBLEND` remain future/experimental until their quality and behavior are validated. Users can independently toggle supported options, and manual edits turn the selected preset into a modified/custom configuration.
 
-The application uses the pinned `WPF-UI` 4.0.2 package for Fluent controls, themes, navigation, and icons. PDF processing remains in the existing Core/Pdf projects; the UI dependency does not alter output or protection semantics.
+The application uses the pinned `WPF-UI` 4.3.0 package for Fluent controls, themes, and icons. PDF processing remains in the existing Core/Pdf projects; the UI dependency does not alter output or protection semantics.
+
+## v0.3.0 Interaction Patterns
+
+The shell follows the compact rail and neutral light/dark palette used by the local UCDT reference. PDF Blender uses a coral/red accent derived from its logo. Pages fade in with a short translation, the rail selection uses a coral surface, and buttons provide restrained hover and press feedback. Motion remains lightweight so startup and PDF processing stay responsive.
+
+Processing feedback appears in the page status area and in a right-aligned stack of up to three Toast notifications. Toasts support information, success, warning, error, and progress states without logging document content.
 
 ## Content Width and Page Geometry
 

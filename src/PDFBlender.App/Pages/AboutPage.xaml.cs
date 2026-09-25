@@ -14,7 +14,7 @@ public partial class AboutPage : Page
     public void RefreshLanguage()
     {
         ProductName.Text = UiText.Get("appName");
-        var version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "0.2.0";
+        var version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "0.3.0";
         VersionText.Text = $"v{version}";
         TechnologyText.Text = UiText.Get("technology");
         LocalProcessingText.Text = UiText.Get("localProcessingAbout");

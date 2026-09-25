@@ -9,6 +9,8 @@ build/
 test-results/
 TestResults/
 
+ucdt-computing-core/
+
 # User-specific IDE files
 *.user
 *.suo

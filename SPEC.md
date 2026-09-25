@@ -1,6 +1,6 @@
 # PDF Blender Product Specification
 
-Status: v0.2.0 implementation baseline
+Status: v0.3.0 implementation baseline
 Product: PDF Blender  
 Slogan: `DO NOT PLAGIARIZE MY PDF.`
 
@@ -12,15 +12,15 @@ PDF Blender creates a new, ordinarily readable PDF from a source PDF while raisi
 
 - Windows desktop application, C# / .NET 10, WPF, Fluent-inspired UI.
 - Microsoft Store is the sole release channel; release packaging is MSIX. Development builds may include a portable package.
-- Current version: `0.2.0`; package version: `0.2.0.0`.
+- Current version: `0.3.0`; package version: `0.3.0.0`.
 - Microsoft Store handles updates. No custom update service is in scope.
 - Preserve the reserved Store identity: Package Identity Name `57335Bitcookies.PDFBlender`; Publisher `CN=53636128-C1AF-456C-8B82-AC0D583B730C`; Publisher display name `Bitcookies`; Store ID `9P65BNNQRGVZ`. Do not change it or hard-code a Store URL before publication.
 
-## v0.2.0 Scope
+## v0.3.0 Scope
 
 This release changes the WPF shell, interaction layout, local UI preferences, and localization presentation. It does not add PDF protection algorithms, change output semantics, or add network services.
 
-- Compact single-window home layout at approximately `960×680`, with an `860×600` minimum.
+- Compact single-window home layout at `820×600`, with a `760×540` minimum and a compact icon-and-label navigation rail.
 - Settings-only theme and language controls, supporting System/Light/Dark and System/English/简体中文.
 - A snapped, keyboard-accessible Blend level rail showing the validated `STIR`, `BLEND`, and `PULSE` presets.
 - Local preferences at `%LOCALAPPDATA%\\PDFBlender\\preferences.json`, with safe defaults for malformed values.

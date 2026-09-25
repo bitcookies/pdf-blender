@@ -1,10 +1,10 @@
 # PDF Blender Interface Specification
 
-Status: v0.2.0 interface redesign
+Status: v0.3.0 interface redesign
 
 ## Visual Direction
 
-Use Windows 11 and Fluent design conventions: clear hierarchy, restrained surfaces, crisp typography, purposeful motion, and accessible contrast. The UI should have a distinctive PDF Blender identity without resembling a security product. Use the supplied logo from `assets/`. Reference screenshots remain local and ignored. Implement the visual system with WPF-UI 4.0.2 controls and themes; keep application-specific layout and behavior in the App project.
+Use Windows 11 and Fluent design conventions: clear hierarchy, restrained surfaces, crisp typography, purposeful motion, and accessible contrast. The UI should have a distinctive PDF Blender identity without resembling a security product. Use the supplied logo from `assets/`. Reference screenshots remain local and ignored. Implement the visual system with WPF-UI 4.3.0 controls and themes; keep application-specific layout and behavior in the App project.
 
 Use translucency only where it improves hierarchy and remains legible in both themes. Prefer compact, aligned settings rows for repeated toggles; reserve cards for distinct repeated items or genuinely framed tools. Support system, light, and dark appearance. Respect reduced-motion and high-contrast system settings where practical. Keep any HWND-hosted legacy controls isolated because WPF interop has airspace, clipping, and input limitations.
 
@@ -14,16 +14,16 @@ Ship Simplified Chinese (`zh-CN`) and English (`en-US`). Provide System, Chinese
 
 ## Navigation and Home
 
-The first screen is the working tool, not a marketing page. The compact 960×680 default window contains:
+The first screen is the working tool, not a marketing page. The compact 820×600 default window, with a 760×540 minimum, contains:
 
 1. Product identity and compact Settings access.
 2. A prominent drag-and-drop PDF target with a Browse action and selected-file summary.
 3. Profile selector and the discrete Blend level rail.
 4. A clear primary `Blend PDF` action and output destination summary.
 
-The main workflow is `Drop/Browse -> choose Profile -> choose Blend level -> Blend PDF`. v0.2.0 handles one PDF at a time. Reject unsupported file types clearly and do not start processing before a valid PDF is selected. Theme and language controls are absent from the home screen and available in Settings.
+The main workflow is `Drop/Browse -> choose Profile -> choose Blend level -> Blend PDF`. v0.3.0 handles one PDF at a time. Reject unsupported file types clearly and do not start processing before a valid PDF is selected. Theme and language controls are absent from the home screen and available in Settings.
 
-The shell is a single WPF-UI `FluentWindow` with a `NavigationView` and a content `Frame`. Home, Settings, and About are pages sharing one `AppSession`; Settings changes are applied to the session immediately and persisted locally.
+The shell is a single WPF-UI `FluentWindow` with a compact icon-and-label rail and a content `Frame`. Home, Settings, and About are pages sharing one `AppSession`; Settings changes are applied to the session immediately and persisted locally.
 
 ### BlendLevelRail
 
@@ -31,7 +31,9 @@ The shell is a single WPF-UI `FluentWindow` with a `NavigationView` and a conten
 
 ## Settings
 
-Advanced controls are grouped under Appearance, Format, Protection, Watermark, Image, and Output. Only implemented v0.2.0 controls should appear as active settings. Future features may be documented elsewhere but must not be presented as working toggles.
+Advanced controls are grouped under Appearance, Format, Protection, Watermark, Image, and Output. Only implemented v0.3.0 controls should appear as active settings. Future features may be documented elsewhere but must not be presented as working toggles.
+
+The shell uses a compact icon-and-label rail, a custom application palette derived from the PDF Blender logo, and WPF-UI ComboBox resources with a bordered popup surface. Processing notifications appear in a right-aligned Toast host with a maximum of three visible items.
 
 Preferences are local to the device and stored at `%LOCALAPPDATA%\\PDFBlender\\preferences.json`. Theme, language, and Blend level restore across restarts. A malformed file is ignored and replaced by default values.
 

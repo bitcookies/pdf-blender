@@ -9,18 +9,19 @@
                 <ui:ThemesDictionary Theme="Light" />
                 <ui:ControlsDictionary />
             </ResourceDictionary.MergedDictionaries>
-
-            <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#F5F6F7" />
+            <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#F7F7F7" />
+            <SolidColorBrush x:Key="SidebarBrush" Color="#FAFAFA" />
+            <SolidColorBrush x:Key="TitleBarBrush" Color="#FDFDFD" />
             <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="SurfaceRaisedBrush" Color="#F0F2F4" />
-            <SolidColorBrush x:Key="SurfaceMutedBrush" Color="#F8F9FA" />
-            <SolidColorBrush x:Key="BorderBrush" Color="#D9DDE3" />
-            <SolidColorBrush x:Key="TextBrush" Color="#202124" />
-            <SolidColorBrush x:Key="MutedTextBrush" Color="#6B7078" />
-            <SolidColorBrush x:Key="AccentBrush" Color="#E45B59" />
-            <SolidColorBrush x:Key="AccentDarkBrush" Color="#C8484D" />
+            <SolidColorBrush x:Key="SurfaceRaisedBrush" Color="#F1F1F1" />
+            <SolidColorBrush x:Key="SurfaceMutedBrush" Color="#F8F8F8" />
+            <SolidColorBrush x:Key="BorderBrush" Color="#E6E6E6" />
+            <SolidColorBrush x:Key="TextBrush" Color="#202020" />
+            <SolidColorBrush x:Key="MutedTextBrush" Color="#666666" />
+            <SolidColorBrush x:Key="AccentBrush" Color="#D84F58" />
+            <SolidColorBrush x:Key="AccentDarkBrush" Color="#B63D48" />
+            <SolidColorBrush x:Key="AccentSoftBrush" Color="#25D84F58" />
             <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
-
             <Style TargetType="TextBlock">
                 <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                 <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
@@ -30,9 +31,51 @@
                 <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
             </Style>
             <Style TargetType="ComboBox">
-                <Setter Property="MinHeight" Value="36" />
-                <Setter Property="Padding" Value="10,6" />
+                <Setter Property="MinHeight" Value="32" />
+                <Setter Property="Padding" Value="10,4" />
                 <Setter Property="FontSize" Value="13" />
+                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
+            </Style>
+            <Style TargetType="ComboBoxItem">
+                <Setter Property="Padding" Value="10,7" />
+                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}" /></Trigger>
+                    <Trigger Property="IsSelected" Value="True"><Setter Property="Background" Value="{DynamicResource AccentSoftBrush}" /><Setter Property="Foreground" Value="{DynamicResource AccentDarkBrush}" /></Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="ui:Button">
+                <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
+            </Style>
+            <Style x:Key="RailButtonStyle" TargetType="Button">
+                <Setter Property="Width" Value="60" />
+                <Setter Property="Height" Value="58" />
+                <Setter Property="Margin" Value="6,3" />
+                <Setter Property="Padding" Value="2" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="RailBorder" Background="{TemplateBinding Background}" CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="RailBorder" Property="Background" Value="{DynamicResource SurfaceRaisedBrush}" /></Trigger>
+                                <Trigger Property="IsPressed" Value="True"><Setter TargetName="RailBorder" Property="Opacity" Value="0.78" /></Trigger>
+                                <Trigger Property="IsEnabled" Value="False"><Setter TargetName="RailBorder" Property="Opacity" Value="0.45" /></Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
         </ResourceDictionary>
     </Application.Resources>

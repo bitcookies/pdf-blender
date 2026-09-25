@@ -11,13 +11,15 @@ namespace PDFBlender.App.Pages;
 public partial class HomePage : Page
 {
     private readonly AppSession _session;
+    private readonly UiNotificationService _notifications;
     private readonly IBlendProcessor _processor = new PdfBlendProcessor();
     private bool _initializing;
     private CancellationTokenSource? _processingCts;
 
-    internal HomePage(AppSession session)
+    internal HomePage(AppSession session, UiNotificationService notifications)
     {
         _session = session;
+        _notifications = notifications;
         InitializeComponent();
         InitializeSelectors();
         RefreshFromSession();
@@ -107,18 +109,32 @@ public partial class HomePage : Page
 
         _processingCts = new CancellationTokenSource();
         SetProcessingState(true);
+        var progressNotification = _notifications.Show(UiNotificationKind.Progress, UiText.Get("blend"), UiText.Get("processing"), autoDismiss: false);
         var progress = new Progress<BlendProgress>(value =>
         {
             ProcessingProgress.Value = value.Fraction * 100;
             StatusText.Text = $"{value.Stage} {value.CompletedPages}/{value.TotalPages}";
+            _notifications.UpdateProgress(progressNotification, StatusText.Text, value.Fraction);
         });
         try
         {
             var result = await _processor.ProcessAsync(new BlendRequest(_session.InputPath, outputPath, _session.Settings), progress, _processingCts.Token);
             StatusText.Text = $"{UiText.Get("completed")}: {Path.GetFileName(result.OutputPath)}";
+            _notifications.Dismiss(progressNotification);
+            _notifications.Show(UiNotificationKind.Success, UiText.Get("completed"), Path.GetFileName(result.OutputPath));
         }
-        catch (OperationCanceledException) { StatusText.Text = UiText.Get("cancelled"); }
-        catch (Exception exception) { StatusText.Text = $"{UiText.Get("processingError")}: {exception.Message}"; }
+        catch (OperationCanceledException)
+        {
+            StatusText.Text = UiText.Get("cancelled");
+            _notifications.Dismiss(progressNotification);
+            _notifications.Show(UiNotificationKind.Info, UiText.Get("cancelled"), UiText.Get("ready"));
+        }
+        catch (Exception exception)
+        {
+            StatusText.Text = $"{UiText.Get("processingError")}: {exception.Message}";
+            _notifications.Dismiss(progressNotification);
+            _notifications.Show(UiNotificationKind.Error, UiText.Get("processingError"), exception.Message, autoDismiss: false);
+        }
         finally
         {
             _processingCts.Dispose();
