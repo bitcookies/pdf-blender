@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 using PDFBlender.App.Pages;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
@@ -16,6 +17,9 @@ public partial class MainWindow : FluentWindow
     private ConfigurationPage? _configurationPage;
     private SettingsPage? _settingsPage;
     private AboutPage? _aboutPage;
+    private string _currentPage = "home";
+    private bool _railSelectionIndicatorReady;
+    private bool _railIndicatorLayoutDirty = true;
 
     public MainWindow()
     {
@@ -26,6 +30,7 @@ public partial class MainWindow : FluentWindow
         ApplyLanguage();
         NavigateTo("home");
         _session.Changed += Session_Changed;
+        Loaded += (_, _) => Dispatcher.BeginInvoke(() => UpdateRailSelectionIndicator(false), DispatcherPriority.Loaded);
     }
 
     private void HomeNavigationItem_Click(object sender, RoutedEventArgs e) => NavigateTo("home");
@@ -35,6 +40,7 @@ public partial class MainWindow : FluentWindow
 
     private void NavigateTo(string page)
     {
+        _currentPage = page;
         ContentFrame.Content = page switch
         {
             "configuration" => _configurationPage ??= new ConfigurationPage(_session),
@@ -51,6 +57,7 @@ public partial class MainWindow : FluentWindow
     {
         ApplyTheme();
         ApplyLanguage();
+        SetNavigationState(_currentPage);
         _homePage?.RefreshFromSession();
         _configurationPage?.RefreshFromSession();
         _settingsPage?.RefreshFromSession();
@@ -87,14 +94,80 @@ public partial class MainWindow : FluentWindow
         SetRailButtonState(ConfigurationNavigationButton, page == "configuration");
         SetRailButtonState(SettingsNavigationButton, page == "settings");
         SetRailButtonState(AboutNavigationButton, page == "about");
+        Dispatcher.BeginInvoke(() => UpdateRailSelectionIndicator(true), DispatcherPriority.Loaded);
+    }
+
+    private void RailRoot_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        _railIndicatorLayoutDirty = true;
+        Dispatcher.BeginInvoke(() => UpdateRailSelectionIndicator(false), DispatcherPriority.Loaded);
+    }
+
+    private void UpdateRailSelectionIndicator(bool animate)
+    {
+        var target = _currentPage switch
+        {
+            "configuration" => ConfigurationNavigationButton,
+            "settings" => SettingsNavigationButton,
+            "about" => AboutNavigationButton,
+            _ => HomeNavigationButton
+        };
+
+        if (!target.IsVisible || target.ActualHeight <= 0 || RailSelectionIndicator.ActualHeight <= 0)
+        {
+            Dispatcher.BeginInvoke(() => UpdateRailSelectionIndicator(animate), DispatcherPriority.Loaded);
+            return;
+        }
+
+        var targetTop = target.TranslatePoint(new Point(0, 0), RailRoot).Y;
+        var targetY = Math.Max(0, targetTop + (target.ActualHeight - RailSelectionIndicator.ActualHeight) / 2);
+        if (RailSelectionIndicator.RenderTransform is not TranslateTransform translate)
+        {
+            translate = new TranslateTransform();
+            RailSelectionIndicator.RenderTransform = translate;
+        }
+
+        var currentY = translate.Y;
+        translate.BeginAnimation(TranslateTransform.YProperty, null);
+        if (!animate || !_railSelectionIndicatorReady || _railIndicatorLayoutDirty)
+        {
+            translate.Y = targetY;
+            _railSelectionIndicatorReady = true;
+            _railIndicatorLayoutDirty = false;
+            return;
+        }
+
+        var animation = new DoubleAnimation(currentY, targetY, TimeSpan.FromMilliseconds(240))
+        {
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
+            FillBehavior = FillBehavior.Stop
+        };
+        animation.Completed += (_, _) => translate.Y = targetY;
+        translate.BeginAnimation(TranslateTransform.YProperty, animation);
     }
 
     private static void SetRailButtonState(System.Windows.Controls.Button button, bool selected)
     {
         button.Tag = selected;
+        button.Background = Brushes.Transparent;
         button.Foreground = selected
             ? (Brush)Application.Current.Resources["AccentBrush"]
             : (Brush)Application.Current.Resources["NavTextBrush"];
+
+        // Keep the active rail marker explicit as a fallback for template/resource
+        // reloads. This mirrors the reference app's independent indicator.
+        button.ApplyTemplate();
+        if (button.Template.FindName("ActiveSurface", button) is UIElement activeSurface)
+        {
+            activeSurface.BeginAnimation(UIElement.OpacityProperty, null);
+            var animation = new DoubleAnimation(selected ? 1 : 0, TimeSpan.FromMilliseconds(180))
+            {
+                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
+                FillBehavior = FillBehavior.Stop
+            };
+            animation.Completed += (_, _) => activeSurface.Opacity = selected ? 1 : 0;
+            activeSurface.BeginAnimation(UIElement.OpacityProperty, animation);
+        }
     }
 
     private static void SetRailText(System.Windows.Controls.Button button, string text)
