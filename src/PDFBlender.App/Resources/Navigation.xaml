@@ -5,6 +5,7 @@
         <Setter Property="MinHeight" Value="58" />
         <Setter Property="Margin" Value="0,1,0,3" />
         <Setter Property="Padding" Value="4" />
+        <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -29,10 +30,10 @@
                             <Trigger.EnterActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" To="-1" Duration="0:0:0.16" /></Storyboard></BeginStoryboard></Trigger.EnterActions>
                             <Trigger.ExitActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="Root" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" To="0" Duration="0:0:0.14" /></Storyboard></BeginStoryboard></Trigger.ExitActions>
                         </Trigger>
-                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag}" Value="True">
+                        <Trigger Property="Tag" Value="True">
                             <Setter TargetName="Root" Property="Background" Value="{DynamicResource NavSelectedBrush}" />
                             <Setter TargetName="Indicator" Property="Opacity" Value="1" />
-                        </DataTrigger>
+                        </Trigger>
                         <Trigger Property="IsPressed" Value="True"><Setter TargetName="Root" Property="Opacity" Value="0.82" /></Trigger>
                         <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Root" Property="Opacity" Value="0.42" /></Trigger>
                     </ControlTemplate.Triggers>

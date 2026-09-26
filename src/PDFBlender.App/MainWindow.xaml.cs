@@ -92,7 +92,6 @@ public partial class MainWindow : FluentWindow
     private static void SetRailButtonState(System.Windows.Controls.Button button, bool selected)
     {
         button.Tag = selected;
-        button.Background = Brushes.Transparent;
         button.Foreground = selected
             ? (Brush)Application.Current.Resources["AccentBrush"]
             : (Brush)Application.Current.Resources["NavTextBrush"];

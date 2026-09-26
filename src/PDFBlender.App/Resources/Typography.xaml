@@ -1,7 +1,11 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
-    <FontFamily x:Key="AppFontFamily">Segoe UI Variable, Segoe UI</FontFamily>
+    <!-- Keep Segoe UI for Latin text and use the Windows UI CJK family explicitly. -->
+    <FontFamily x:Key="AppFontFamily">Segoe UI, Microsoft YaHei UI, Microsoft YaHei, Noto Sans SC</FontFamily>
+    <Style TargetType="Control">
+        <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
+    </Style>
     <Style TargetType="TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
         <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
@@ -46,10 +50,9 @@
     <Style x:Key="RailLabelTextStyle" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
         <Setter Property="FontSize" Value="10.5" />
-        <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" />
         <Setter Property="TextAlignment" Value="Center" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-        <Setter Property="Margin" Value="0,3,0,0" />
+        <Setter Property="Margin" Value="0,2,0,0" />
     </Style>
 </ResourceDictionary>
