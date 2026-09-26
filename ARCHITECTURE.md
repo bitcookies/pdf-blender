@@ -1,6 +1,6 @@
 # PDF Blender Architecture
 
-Status: v0.3.0 implementation baseline
+Status: v0.4.0 implementation baseline
 
 ## Design Goals
 
@@ -42,7 +42,7 @@ Flatten is both the MVP primary protection method and the raster reconstruction 
 
 The App project owns presentation state and persistence adapters. Core owns typed settings and preset definitions. The PDF layer exposes narrow interfaces such as document inspection, page rendering, and document writing so a library can be replaced without changing view models or preset semantics.
 
-The v0.3.0 shell is `MainWindow` (`FluentWindow`) with a compact rail, shared `AppSession`, and a right-aligned `UiNotificationHost`. `HomePage` owns the PDF workflow, `ConfigurationPage` applies processing settings per blend level, `SettingsPage` applies appearance settings immediately, and `AboutPage` exposes version and legal information. `WPF-UI` is pinned to 4.3.0 and is limited to presentation concerns.
+The v0.4.0 shell is `MainWindow` (`FluentWindow`) with a compact rail, shared `AppSession`, reusable visual resource dictionaries, reduced-motion page transitions, and a right-aligned `UiNotificationHost`. `HomePage` owns the PDF workflow, `ConfigurationPage` applies processing settings per blend level, `SettingsPage` applies appearance settings immediately, and `AboutPage` exposes version and legal information. Resource dictionaries are grouped under `Resources/` by colors, typography, surfaces, navigation, buttons, and inputs. `WPF-UI` is pinned to 4.3.0 and is limited to presentation concerns.
 
 Page navigation uses cached page instances and a short opacity transition. Theme resources are centralized in `App.xaml` and `ThemeManager`; the palette follows the UCDT neutral light/dark structure while the accent remains PDF Blender coral/red. Toast updates are dispatched through `UiNotificationService` and do not contain document contents.
 

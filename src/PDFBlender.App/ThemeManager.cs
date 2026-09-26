@@ -43,6 +43,11 @@ internal static class ThemeManager
             SetBrush(resources, "NavHoverBrush", "#18FFFFFF");
             SetBrush(resources, "NavSelectedBrush", "#3B252B");
             SetBrush(resources, "NavTextBrush", "#D8D8D8");
+            SetBrush(resources, "PillBrush", "#343434");
+            SetBrush(resources, "PillTextBrush", "#F0F0F0");
+            SetBrush(resources, "NotificationBrush", "#2D2D2D");
+            SetBrush(resources, "NotificationBorderBrush", "#454545");
+            SetBrush(resources, "NotificationMessageBrush", "#C8C8C8");
         }
         else
         {
@@ -65,6 +70,11 @@ internal static class ThemeManager
             SetBrush(resources, "NavHoverBrush", "#0F000000");
             SetBrush(resources, "NavSelectedBrush", "#FFF0DDE0");
             SetBrush(resources, "NavTextBrush", "#202020");
+            SetBrush(resources, "PillBrush", "#F6F6F6");
+            SetBrush(resources, "PillTextBrush", "#202020");
+            SetBrush(resources, "NotificationBrush", "#FCFCFC");
+            SetBrush(resources, "NotificationBorderBrush", "#DADADA");
+            SetBrush(resources, "NotificationMessageBrush", "#5E5E5E");
         }
         SetBrush(resources, "AccentTextBrush", "#FFFFFF");
     }

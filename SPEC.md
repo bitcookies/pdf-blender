@@ -1,6 +1,6 @@
 # PDF Blender Product Specification
 
-Status: v0.3.0 implementation baseline
+Status: v0.4.0 implementation baseline
 Product: PDF Blender  
 Slogan: `DO NOT PLAGIARIZE MY PDF.`
 
@@ -12,19 +12,22 @@ PDF Blender creates a new, ordinarily readable PDF from a source PDF while raisi
 
 - Windows desktop application, C# / .NET 10, WPF, Fluent-inspired UI.
 - Microsoft Store is the sole release channel; release packaging is MSIX. Development builds may include a portable package.
-- Current version: `0.3.0`; package version: `0.3.0.0`.
+- Current version: `0.4.0`; package version: `0.4.0.0`.
 - Microsoft Store handles updates. No custom update service is in scope.
 - Preserve the reserved Store identity: Package Identity Name `57335Bitcookies.PDFBlender`; Publisher `CN=53636128-C1AF-456C-8B82-AC0D583B730C`; Publisher display name `Bitcookies`; Store ID `9P65BNNQRGVZ`. Do not change it or hard-code a Store URL before publication.
 
-## v0.3.0 Scope
+## v0.4.0 Scope
 
-This release changes the WPF shell, interaction layout, local UI preferences, and localization presentation. It does not add PDF protection algorithms, change output semantics, or add network services.
+This release refines the WPF shell, reusable visual resources, page layouts, and lightweight motion. It does not add PDF protection algorithms, change output semantics, or add network services.
 
 - Compact single-window home layout at `820×600`, with a `760×540` minimum and a compact icon-and-label navigation rail.
 - Settings-only theme and language controls, supporting System/Light/Dark and System/English/简体中文.
 - A snapped, keyboard-accessible Blend level rail showing the validated `STIR`, `BLEND`, and `PULSE` presets.
 - Local preferences at `%LOCALAPPDATA%\\PDFBlender\\preferences.json`, with safe defaults for malformed values.
 - Logo-derived multi-size `logo.ico` used by the WPF window and executable.
+- Shared color, typography, surface, navigation, button, and input resource dictionaries.
+- Compact logo-led home header, bordered PDF drop surface, setting rows, and theme-aware notification cards.
+- Page transitions adapt to Windows client-area animation and the active WPF render tier.
 
 The processing scope below remains the v0.1.0 MVP behavior carried forward unchanged.
 

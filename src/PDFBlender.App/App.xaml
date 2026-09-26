@@ -8,99 +8,13 @@
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemesDictionary Theme="Light" />
                 <ui:ControlsDictionary />
+                <ResourceDictionary Source="/PDFBlender.App;component/Resources/Colors.xaml" />
+                <ResourceDictionary Source="/PDFBlender.App;component/Resources/Typography.xaml" />
+                <ResourceDictionary Source="/PDFBlender.App;component/Resources/Surfaces.xaml" />
+                <ResourceDictionary Source="/PDFBlender.App;component/Resources/Navigation.xaml" />
+                <ResourceDictionary Source="/PDFBlender.App;component/Resources/Buttons.xaml" />
+                <ResourceDictionary Source="/PDFBlender.App;component/Resources/Inputs.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#F7F7F7" />
-            <SolidColorBrush x:Key="SidebarBrush" Color="#FAFAFA" />
-            <SolidColorBrush x:Key="TitleBarBrush" Color="#FDFDFD" />
-            <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="SettingItemBrush" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="LogoTileBrush" Color="#FFF1F3" />
-            <SolidColorBrush x:Key="SurfaceRaisedBrush" Color="#F1F1F1" />
-            <SolidColorBrush x:Key="SurfaceMutedBrush" Color="#F8F8F8" />
-            <SolidColorBrush x:Key="BorderBrush" Color="#E6E6E6" />
-            <SolidColorBrush x:Key="TextBrush" Color="#202020" />
-            <SolidColorBrush x:Key="TitleTextBrush" Color="#868686" />
-            <SolidColorBrush x:Key="MutedTextBrush" Color="#666666" />
-            <SolidColorBrush x:Key="AccentBrush" Color="#D84F58" />
-            <SolidColorBrush x:Key="AccentDarkBrush" Color="#B63D48" />
-            <SolidColorBrush x:Key="AccentSoftBrush" Color="#25D84F58" />
-            <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="NavHoverBrush" Color="#0F000000" />
-            <SolidColorBrush x:Key="NavSelectedBrush" Color="#FFF0DDE0" />
-            <SolidColorBrush x:Key="NavTextBrush" Color="#202020" />
-            <Style TargetType="TextBlock">
-                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                <Setter Property="FontFamily" Value="Segoe UI" />
-            </Style>
-            <Style x:Key="RailLabelTextStyle" TargetType="TextBlock">
-                <Setter Property="FontFamily" Value="Segoe UI" />
-                <Setter Property="FontSize" Value="10.5" />
-                <Setter Property="FontWeight" Value="Normal" />
-                <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" />
-                <Setter Property="TextAlignment" Value="Center" />
-                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-                <Setter Property="Margin" Value="0,2,0,0" />
-            </Style>
-            <Style x:Key="PageTitleTextStyle" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="28" />
-                <Setter Property="FontWeight" Value="SemiBold" />
-                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                <Setter Property="Margin" Value="0,0,0,5" />
-            </Style>
-            <Style x:Key="PageDescriptionTextStyle" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="13" />
-                <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
-                <Setter Property="TextWrapping" Value="Wrap" />
-                <Setter Property="Margin" Value="0,0,0,18" />
-            </Style>
-            <Style x:Key="SectionTitleTextStyle" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="17" />
-                <Setter Property="FontWeight" Value="SemiBold" />
-                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                <Setter Property="Margin" Value="0,0,0,8" />
-            </Style>
-            <Style x:Key="CardTitleTextStyle" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="15" />
-                <Setter Property="FontWeight" Value="SemiBold" />
-                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-            </Style>
-            <Style x:Key="CardDescriptionTextStyle" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="13" />
-                <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
-                <Setter Property="TextWrapping" Value="Wrap" />
-            </Style>
-            <Style x:Key="SmallMutedTextStyle" TargetType="TextBlock">
-                <Setter Property="FontSize" Value="12" />
-                <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
-                <Setter Property="TextWrapping" Value="Wrap" />
-            </Style>
-            <Style TargetType="Page">
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="FontFamily" Value="Segoe UI" />
-            </Style>
-            <Style TargetType="ComboBox">
-                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                <Setter Property="FontFamily" Value="Segoe UI" />
-            </Style>
-            <Style TargetType="ComboBoxItem">
-                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                <Setter Property="FontFamily" Value="Segoe UI" />
-            </Style>
-            <Style TargetType="ui:Button">
-                <Setter Property="FontFamily" Value="Segoe UI" />
-                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-            </Style>
-            <Style TargetType="ui:Card">
-                <Setter Property="Background" Value="{DynamicResource CardBrush}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
-            </Style>
-            <Style TargetType="ui:TextBox">
-                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                <Setter Property="FontFamily" Value="Segoe UI" />
-            </Style>
             <Style TargetType="ui:ToggleSwitch">
                 <Setter Property="Width" Value="54" />
                 <Setter Property="Height" Value="28" />
@@ -114,75 +28,17 @@
                             <Border x:Name="SwitchTrack" Width="54" Height="28" CornerRadius="14" Background="{DynamicResource BorderBrush}" ClipToBounds="True">
                                 <Canvas Width="54" Height="28">
                                     <Ellipse x:Name="SwitchThumb" Width="20" Height="20" Fill="White" Canvas.Left="4" Canvas.Top="4">
-                                        <Ellipse.RenderTransform>
-                                            <TranslateTransform x:Name="SwitchThumbTransform" X="0" />
-                                        </Ellipse.RenderTransform>
+                                        <Ellipse.RenderTransform><TranslateTransform x:Name="SwitchThumbTransform" /></Ellipse.RenderTransform>
                                     </Ellipse>
                                 </Canvas>
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsChecked" Value="True">
                                     <Setter TargetName="SwitchTrack" Property="Background" Value="{DynamicResource AccentBrush}" />
-                                    <Trigger.EnterActions>
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetName="SwitchThumbTransform" Storyboard.TargetProperty="X" To="26" Duration="0:0:0.16">
-                                                    <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut" /></DoubleAnimation.EasingFunction>
-                                                </DoubleAnimation>
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </Trigger.EnterActions>
-                                    <Trigger.ExitActions>
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetName="SwitchThumbTransform" Storyboard.TargetProperty="X" To="0" Duration="0:0:0.16">
-                                                    <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut" /></DoubleAnimation.EasingFunction>
-                                                </DoubleAnimation>
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </Trigger.ExitActions>
+                                    <Trigger.EnterActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="SwitchThumbTransform" Storyboard.TargetProperty="X" To="26" Duration="0:0:0.16" /></Storyboard></BeginStoryboard></Trigger.EnterActions>
+                                    <Trigger.ExitActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="SwitchThumbTransform" Storyboard.TargetProperty="X" To="0" Duration="0:0:0.16" /></Storyboard></BeginStoryboard></Trigger.ExitActions>
                                 </Trigger>
-                                <Trigger Property="IsEnabled" Value="False"><Setter TargetName="SwitchTrack" Property="Opacity" Value="0.55" /></Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-            <Style x:Key="RailButtonStyle" TargetType="Button">
-                <Setter Property="Width" Value="58" />
-                <Setter Property="MinHeight" Value="58" />
-                <Setter Property="Margin" Value="0,1,0,3" />
-                <Setter Property="Padding" Value="5" />
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                <Setter Property="Focusable" Value="True" />
-                <Setter Property="KeyboardNavigation.IsTabStop" Value="True" />
-                <Setter Property="Cursor" Value="Hand" />
-                <Setter Property="Foreground" Value="{DynamicResource NavTextBrush}" />
-                <Setter Property="HorizontalContentAlignment" Value="Center" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="RailBorder" Background="{TemplateBinding Background}" CornerRadius="7" RenderTransformOrigin="0.5,0.5">
-                                <Border.RenderTransform><TranslateTransform Y="0" /></Border.RenderTransform>
-                                <Grid>
-                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    <Border x:Name="RailIndicator" Width="5" Height="24" CornerRadius="2.5" Background="{DynamicResource AccentBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" Opacity="0" />
-                                </Grid>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="RailBorder" Property="Background" Value="{DynamicResource NavHoverBrush}" />
-                                    <Trigger.EnterActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="RailBorder" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" To="-1" Duration="0:0:0.16" /></Storyboard></BeginStoryboard></Trigger.EnterActions>
-                                    <Trigger.ExitActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="RailBorder" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" To="0" Duration="0:0:0.14" /></Storyboard></BeginStoryboard></Trigger.ExitActions>
-                                </Trigger>
-                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Tag}" Value="True">
-                                    <Setter TargetName="RailBorder" Property="Background" Value="{DynamicResource NavSelectedBrush}" />
-                                    <Setter TargetName="RailIndicator" Property="Opacity" Value="1" />
-                                </DataTrigger>
-                                <Trigger Property="IsPressed" Value="True"><Setter TargetName="RailBorder" Property="Opacity" Value="0.86" /></Trigger>
-                                <Trigger Property="IsEnabled" Value="False"><Setter TargetName="RailBorder" Property="Opacity" Value="0.58" /></Trigger>
+                                <Trigger Property="IsEnabled" Value="False"><Setter TargetName="SwitchTrack" Property="Opacity" Value="0.5" /></Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>

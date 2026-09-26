@@ -106,14 +106,15 @@ public partial class MainWindow : FluentWindow
 
     private void AnimateContent()
     {
+        var motion = UiMotionPolicy.Resolve();
         ContentFrame.Opacity = 0;
-        var offset = new TranslateTransform(-6, 0);
+        var offset = new TranslateTransform(-motion.Offset, 0);
         ContentFrame.RenderTransform = offset;
-        var animation = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(180))
+        var animation = new DoubleAnimation(0, 1, motion.EnterOpacity)
         {
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
         };
-        var slide = new DoubleAnimation(-6, 0, TimeSpan.FromMilliseconds(180))
+        var slide = new DoubleAnimation(-motion.Offset, 0, motion.EnterSlide)
         {
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
         };

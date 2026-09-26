@@ -1,6 +1,6 @@
 # PDF Blender Design Overview
 
-Status: v0.3.0 UI redesign
+Status: v0.4.0 UI visual refinement
 Detailed requirements: `SPEC.md`  
 Architecture boundaries: `ARCHITECTURE.md`  
 Interface and localization: `INTERFACE.md`
@@ -11,23 +11,23 @@ PDF Blender helps authors publish documents that remain readable to everyone whi
 
 The product uses a hands-on Blender metaphor: users select a blend level, optionally tune its Configuration, and blend a PDF. Blend levels are named presets over normal settings. They do not represent security levels. The application should feel like a focused Windows utility with a recognizable identity, not a generic PDF editor or security dashboard.
 
-## v0.3.0 Product Shape
+## v0.4.0 Product Shape
 
 The home screen is a compact single-window tool. It centers the PDF drop/browse action and keeps the recurring path short: select a file, select a Blend level, then blend. Theme and language are software settings, not home-screen workflow controls. Detailed processing options live in Configuration; Settings only contains theme and language.
 
 ## Visual System
 
-Use Segoe UI Variable with Segoe UI fallback. Keep the type scale compact: 18–20 px for page titles, 13–14 px for body controls, and 11–12 px for supporting text. Use an 8/12/16/24 spacing rhythm, corner radii no larger than 8 px for ordinary controls and 12–16 px for the main work surface, and thin borders with restrained elevation. Light mode uses a neutral light-gray background with white surfaces; dark mode uses deep gray surfaces with readable contrast. The coral accent is derived from the logo and should remain a focused action color rather than a full-page wash.
+Use Segoe UI Variable with Segoe UI fallback. Keep the type scale compact: 18–24 px for page titles, 13–14 px for body controls, and 11–12 px for supporting text. Use an 8/12/16/24 spacing rhythm, corner radii no larger than 8 px for ordinary controls and 12–16 px for the main work surface, and thin borders with restrained elevation. Light mode uses a neutral light-gray background with white surfaces; dark mode uses deep gray surfaces with readable contrast. The coral accent is derived from the logo and should remain a focused action color rather than a full-page wash.
 
 Use small translucent surfaces only where they improve hierarchy. Do not rely on continuous blur or custom window chrome. The WPF-UI `FluentWindow` and `TitleBar` provide the shell controls while retaining standard Windows behavior for high-DPI sizing, resizing, and accessibility.
 
 ## Home Layout
 
-The main window is 820×600 with a 760×540 minimum. It contains a 74 px compact rail with icon and label navigation, a bordered white/dark drag-and-drop surface with selected-file summary, the three-level Blend rail, a Configuration shortcut, and a bottom action row with progress and Cancel. The home screen does not expose profile, output, theme, or language controls.
+The main window is 820×600 with a 760×540 minimum. It contains a 74 px compact rail with icon and label navigation, a bordered white/dark drag-and-drop surface with selected-file summary, the three-level Blend rail, a Configuration shortcut, and a bottom action row with progress and Cancel. A restrained coral wave sits behind the compact logo/title header. The home screen does not expose profile, output, theme, or language controls.
 
 ## Blend Level Rail
 
-`BlendLevelRail` is a data-driven WPF control backed by a snapped `Slider`. v0.3.0 exposes only the validated `STIR`, `BLEND`, and `PULSE` presets. It supports mouse dragging, arrow keys, Home, End, visible name/summary text, keyboard focus, and an accessible slider name. The control API leaves room for one to five data items without presenting future algorithms.
+`BlendLevelRail` is a data-driven WPF control backed by a snapped `Slider`. v0.4.0 exposes only the validated `STIR`, `BLEND`, and `PULSE` presets. It supports mouse dragging, arrow keys, Home, End, visible name/summary text, keyboard focus, and an accessible slider name. The control API leaves room for one to five data items without presenting future algorithms.
 
 ## Settings and Preferences
 
@@ -37,9 +37,9 @@ The initial presets are `STIR`, `BLEND`, and `PULSE`. `CRUSH` and `OVERBLEND` re
 
 The application uses the pinned `WPF-UI` 4.3.0 package for Fluent controls, themes, and icons. PDF processing remains in the existing Core/Pdf projects; the UI dependency does not alter output or protection semantics.
 
-## v0.3.0 Interaction Patterns
+## v0.4.0 Interaction Patterns
 
-The shell follows the compact rail and neutral light/dark palette used by the local UCDT reference. PDF Blender uses a coral/red accent derived from its logo. Pages fade in with a short translation, the rail selection uses a coral surface, and buttons provide restrained hover and press feedback. Motion remains lightweight so startup and PDF processing stay responsive.
+The shell follows the compact rail and neutral light/dark palette used by the local UCDT reference. PDF Blender uses a coral/red accent derived from its logo. Pages fade in with a short translation, the rail selection uses a coral surface and leading indicator, and buttons provide restrained hover and press feedback. Transitions respect Windows client-area animation and render-tier settings.
 
 Processing feedback appears in the page status area and in a right-aligned stack of up to three Toast notifications. Toasts support information, success, warning, error, and progress states without logging document content.
 

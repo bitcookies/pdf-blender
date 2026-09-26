@@ -2,85 +2,65 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="22,20,22,24" MaxWidth="760">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="20,16,20,22" MaxWidth="760">
             <TextBlock x:Name="TitleText" Style="{StaticResource PageTitleTextStyle}" />
             <TextBlock x:Name="SubtitleText" Style="{StaticResource PageDescriptionTextStyle}" />
-
-            <Border Background="{DynamicResource SettingItemBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12" Margin="0,0,0,12">
-                <Grid>
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock x:Name="ConfigurationNameLabel" FontSize="15" FontWeight="SemiBold" />
-                        <TextBlock x:Name="ConfigurationNameHint" Style="{StaticResource SmallMutedTextStyle}" />
-                    </StackPanel>
-                    <ComboBox x:Name="ConfigurationCombo" Grid.Column="1" SelectionChanged="ConfigurationCombo_SelectionChanged" />
+            <Border Style="{StaticResource SettingRowStyle}">
+                <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
+                    <ui:SymbolIcon Symbol="FolderOpen24" FontSize="21" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="ConfigurationNameLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="ConfigurationNameHint" Style="{StaticResource SmallMutedTextStyle}" /></StackPanel>
+                    <ComboBox x:Name="ConfigurationCombo" Grid.Column="2" SelectionChanged="ConfigurationCombo_SelectionChanged" />
                 </Grid>
             </Border>
-
-            <Border Background="{DynamicResource SettingItemBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12" Margin="0,0,0,18">
-                <Grid>
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock x:Name="LevelLabel" FontSize="15" FontWeight="SemiBold" />
-                        <TextBlock x:Name="LevelHint" Style="{StaticResource SmallMutedTextStyle}" />
-                    </StackPanel>
-                    <ComboBox x:Name="LevelCombo" Grid.Column="1" SelectionChanged="LevelCombo_SelectionChanged" />
+            <Border Style="{StaticResource SettingRowStyle}" Margin="0,0,0,16">
+                <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
+                    <ui:SymbolIcon Symbol="DataTrending24" FontSize="21" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="LevelLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="LevelHint" Style="{StaticResource SmallMutedTextStyle}" /></StackPanel>
+                    <ComboBox x:Name="LevelCombo" Grid.Column="2" SelectionChanged="LevelCombo_SelectionChanged" />
                 </Grid>
             </Border>
-
             <TextBlock x:Name="FormatHeader" Style="{StaticResource SectionTitleTextStyle}" />
-            <Border Background="{DynamicResource SettingItemBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12" Margin="0,0,0,12">
-                <StackPanel>
-                    <Grid MinHeight="64">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="120" /></Grid.ColumnDefinitions>
-                        <StackPanel VerticalAlignment="Center"><TextBlock x:Name="NormalizeLabel" FontSize="15" FontWeight="SemiBold" /><TextBlock x:Name="NormalizeHint" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" /></StackPanel>
-                        <ui:ToggleSwitch x:Name="NormalizeWidthToggle" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Checked="SettingsControl_Changed" Unchecked="SettingsControl_Changed" />
-                    </Grid>
-                    <Separator />
-                    <Grid MinHeight="64">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="160" /></Grid.ColumnDefinitions>
-                        <StackPanel VerticalAlignment="Center"><TextBlock x:Name="TargetWidthLabel" FontSize="15" FontWeight="SemiBold" /><TextBlock x:Name="TargetWidthHint" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" /></StackPanel>
-                        <ui:TextBox x:Name="TargetWidthText" Grid.Column="1" VerticalAlignment="Center" TextChanged="SettingsControl_Changed" />
-                    </Grid>
-                </StackPanel>
-            </Border>
-
-            <TextBlock x:Name="ProtectionHeader" Style="{StaticResource SectionTitleTextStyle}" />
-            <Border Background="{DynamicResource SettingItemBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12" Margin="0,0,0,12">
-                <Grid MinHeight="64">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
-                    <StackPanel VerticalAlignment="Center"><TextBlock x:Name="ProtectionLabel" FontSize="15" FontWeight="SemiBold" /><TextBlock x:Name="ProtectionHint" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" /></StackPanel>
-                    <ComboBox x:Name="ProtectionCombo" Grid.Column="1" SelectionChanged="SettingsControl_Changed" />
+            <Border Style="{StaticResource SettingRowStyle}"><StackPanel>
+                <Grid MinHeight="56"><Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition Width="100" /></Grid.ColumnDefinitions>
+                    <ui:SymbolIcon Symbol="Options24" FontSize="20" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="NormalizeLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="NormalizeHint" Style="{StaticResource SmallMutedTextStyle}" /></StackPanel>
+                    <ui:ToggleSwitch x:Name="NormalizeWidthToggle" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Checked="SettingsControl_Changed" Unchecked="SettingsControl_Changed" />
                 </Grid>
-            </Border>
-
-            <TextBlock x:Name="WatermarkHeader" Style="{StaticResource SectionTitleTextStyle}" />
-            <Border Background="{DynamicResource SettingItemBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12" Margin="0,0,0,12">
-                <StackPanel>
-                    <Grid MinHeight="64">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
-                        <StackPanel VerticalAlignment="Center"><TextBlock x:Name="WatermarkTypeLabel" FontSize="15" FontWeight="SemiBold" /><TextBlock x:Name="WatermarkTypeHint" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" /></StackPanel>
-                        <ComboBox x:Name="WatermarkCombo" Grid.Column="1" SelectionChanged="SettingsControl_Changed" />
-                    </Grid>
-                    <Separator />
-                    <Grid MinHeight="64">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="280" /></Grid.ColumnDefinitions>
-                        <TextBlock x:Name="WatermarkTextLabel" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" />
-                        <ui:TextBox x:Name="WatermarkTextBox" Grid.Column="1" VerticalAlignment="Center" TextChanged="SettingsControl_Changed" />
-                    </Grid>
-                </StackPanel>
-            </Border>
-
-            <TextBlock x:Name="ImageHeader" Style="{StaticResource SectionTitleTextStyle}" />
-            <Border Background="{DynamicResource SettingItemBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="7" Padding="12">
-                <Grid MinHeight="64">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
-                    <StackPanel VerticalAlignment="Center"><TextBlock x:Name="NoiseLabel" FontSize="15" FontWeight="SemiBold" /><TextBlock x:Name="NoiseHint" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" /></StackPanel>
-                    <ComboBox x:Name="NoiseCombo" Grid.Column="1" SelectionChanged="SettingsControl_Changed" />
+                <Separator Margin="32,0,0,0" />
+                <Grid MinHeight="56"><Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition Width="160" /></Grid.ColumnDefinitions>
+                    <ui:SymbolIcon Symbol="Options24" FontSize="20" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="TargetWidthLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="TargetWidthHint" Style="{StaticResource SmallMutedTextStyle}" /></StackPanel>
+                    <ui:TextBox x:Name="TargetWidthText" Grid.Column="2" VerticalAlignment="Center" TextChanged="SettingsControl_Changed" />
                 </Grid>
-            </Border>
-            <TextBlock x:Name="ErrorText" Foreground="{DynamicResource AccentBrush}" Margin="0,10,0,0" TextWrapping="Wrap" />
+            </StackPanel></Border>
+            <TextBlock x:Name="ProtectionHeader" Style="{StaticResource SectionTitleTextStyle}" Margin="0,10,0,8" />
+            <Border Style="{StaticResource SettingRowStyle}"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
+                <ui:SymbolIcon Symbol="Info24" FontSize="21" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="ProtectionLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="ProtectionHint" Style="{StaticResource SmallMutedTextStyle}" /></StackPanel>
+                <ComboBox x:Name="ProtectionCombo" Grid.Column="2" SelectionChanged="SettingsControl_Changed" />
+            </Grid></Border>
+            <TextBlock x:Name="WatermarkHeader" Style="{StaticResource SectionTitleTextStyle}" Margin="0,10,0,8" />
+            <Border Style="{StaticResource SettingRowStyle}"><StackPanel>
+                <Grid MinHeight="56"><Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
+                    <ui:SymbolIcon Symbol="Edit24" FontSize="20" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="WatermarkTypeLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="WatermarkTypeHint" Style="{StaticResource SmallMutedTextStyle}" /></StackPanel>
+                    <ComboBox x:Name="WatermarkCombo" Grid.Column="2" SelectionChanged="SettingsControl_Changed" />
+                </Grid>
+                <Separator Margin="32,0,0,0" />
+                <Grid MinHeight="56"><Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition Width="250" /></Grid.ColumnDefinitions>
+                    <ui:SymbolIcon Symbol="Edit24" FontSize="20" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                    <TextBlock x:Name="WatermarkTextLabel" Grid.Column="1" Style="{StaticResource CardTitleTextStyle}" VerticalAlignment="Center" />
+                    <ui:TextBox x:Name="WatermarkTextBox" Grid.Column="2" VerticalAlignment="Center" TextChanged="SettingsControl_Changed" />
+                </Grid>
+            </StackPanel></Border>
+            <TextBlock x:Name="ImageHeader" Style="{StaticResource SectionTitleTextStyle}" Margin="0,10,0,8" />
+            <Border Style="{StaticResource SettingRowStyle}"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="32" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
+                <ui:SymbolIcon Symbol="Image24" FontSize="21" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="NoiseLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="NoiseHint" Style="{StaticResource SmallMutedTextStyle}" /></StackPanel>
+                <ComboBox x:Name="NoiseCombo" Grid.Column="2" SelectionChanged="SettingsControl_Changed" />
+            </Grid></Border>
+            <TextBlock x:Name="ErrorText" Foreground="{DynamicResource AccentBrush}" Margin="0,2,0,0" TextWrapping="Wrap" />
         </StackPanel>
     </ScrollViewer>
 </Page>

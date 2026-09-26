@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
 
 namespace PDFBlender.App;
 
@@ -59,7 +60,16 @@ public partial class UiNotificationHost : UserControl
         var layout = new Grid();
         layout.Children.Add(panel);
         layout.Children.Add(close);
-        var card = new Border { Child = layout, Background = (Brush)FindResource("SurfaceBrush"), BorderBrush = (Brush)FindResource("BorderBrush"), BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), Padding = new Thickness(12), Margin = new Thickness(0, 0, 0, 8), Opacity = 0 };
+        var card = new Border { Child = layout, Background = (Brush)FindResource("NotificationBrush"), BorderBrush = (Brush)FindResource("NotificationBorderBrush"), BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), Padding = new Thickness(12), Margin = new Thickness(0, 0, 0, 8), Opacity = 0, Effect = (Effect)FindResource("FlyoutShadowEffect") };
+        var stripe = new Border { Width = 3, CornerRadius = new CornerRadius(2), Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(accent)!), HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Stretch, Margin = new Thickness(-7, 0, 9, 0) };
+        var shell = new Grid();
+        shell.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        shell.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        Grid.SetColumn(stripe, 0);
+        Grid.SetColumn(layout, 1);
+        shell.Children.Add(stripe);
+        shell.Children.Add(layout);
+        card.Child = shell;
         card.Tag = notification;
         _items[notification.Id] = card;
         ItemsPanel.Children.Insert(0, card);

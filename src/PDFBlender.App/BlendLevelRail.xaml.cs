@@ -52,6 +52,7 @@ public partial class BlendLevelRail : UserControl
                 Text = level.Name,
                 FontSize = 11,
                 Foreground = (Brush)FindResource("MutedTextBrush"),
+                FontWeight = FontWeights.Medium,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 TextAlignment = TextAlignment.Center
             });
@@ -90,6 +91,13 @@ public partial class BlendLevelRail : UserControl
         SelectionText.Text = item.Name;
         SelectionSummaryText.Text = item.Summary;
         SelectionText.ToolTip = item.Summary;
+        for (var index = 0; index < LabelsPanel.Children.Count; index++)
+        {
+            if (LabelsPanel.Children[index] is not TextBlock label) continue;
+            var selected = index == SelectedIndex;
+            label.Foreground = (Brush)FindResource(selected ? "AccentBrush" : "MutedTextBrush");
+            label.FontWeight = selected ? FontWeights.SemiBold : FontWeights.Medium;
+        }
     }
 }
 
