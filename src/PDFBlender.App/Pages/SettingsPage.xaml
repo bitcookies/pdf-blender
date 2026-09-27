@@ -7,30 +7,53 @@
             <TextBlock x:Name="TitleText" Style="{StaticResource PageTitleTextStyle}" />
             <TextBlock x:Name="SubtitleText" Style="{StaticResource PageDescriptionTextStyle}" />
             <TextBlock x:Name="AppearanceHeader" Style="{StaticResource SectionTitleTextStyle}" />
-            <ui:Card Padding="14" Margin="0,0,0,8" MinHeight="88">
-                <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="34" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
+            <StackPanel Margin="0,0,0,16">
+            <ui:Card Padding="10" Margin="0" MinHeight="72">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
                     <ui:SymbolIcon Symbol="Color24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="ThemeLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="ThemeHint" Style="{StaticResource SmallMutedTextStyle}" /></StackPanel>
                     <ComboBox x:Name="ThemeOptions" Grid.Column="2" VerticalAlignment="Center" SelectionChanged="ThemeOptions_SelectionChanged" />
                 </Grid>
             </ui:Card>
-            <ui:Card Padding="14" Margin="0,0,0,8" MinHeight="88">
-                <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="34" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
+            <ui:Card Padding="10" Margin="0" MinHeight="72">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
                     <ui:SymbolIcon Symbol="LocalLanguage24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="LanguageLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="LanguageHint" Style="{StaticResource SmallMutedTextStyle}" /></StackPanel>
                     <ComboBox x:Name="LanguageOptions" Grid.Column="2" VerticalAlignment="Center" SelectionChanged="LanguageOptions_SelectionChanged" />
                 </Grid>
             </ui:Card>
-            <ui:Card Padding="14" Margin="0,0,0,8" MinHeight="88">
-                <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="34" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
+            </StackPanel>
+            <TextBlock x:Name="StorageHeader" Style="{StaticResource SectionTitleTextStyle}" />
+            <ui:Card Padding="10" Margin="0,0,0,2" MinHeight="72">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <ui:SymbolIcon Symbol="Settings24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,14,0"><TextBlock x:Name="SettingsFileLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="SettingsFileHint" Style="{StaticResource SmallMutedTextStyle}" /><TextBlock x:Name="SettingsFilePath" Style="{StaticResource SmallMutedTextStyle}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" /></StackPanel>
+                    <ui:Button x:Name="OpenFolderButton" Grid.Column="2" VerticalAlignment="Center" Click="OpenFolderButton_Click" Appearance="Secondary">
+                        <StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="FolderOpen24" Margin="0,0,7,0" /><TextBlock x:Name="OpenFolderButtonText" /></StackPanel>
+                    </ui:Button>
+                </Grid>
+            </ui:Card>
+            <ui:Card Padding="10" Margin="0" MinHeight="72">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
                     <ui:SymbolIcon Symbol="ArrowSync24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="RestorePresetsLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="RestorePresetsHint" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" /></StackPanel>
-                    <ui:Button x:Name="RestorePresetsButton" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Click="RestorePresetsButton_Click" Appearance="Secondary">
-                        <StackPanel Orientation="Horizontal">
-                            <ui:SymbolIcon Symbol="ArrowSync24" Margin="0,0,7,0" />
-                            <TextBlock x:Name="RestorePresetsButtonText" />
-                        </StackPanel>
-                    </ui:Button>
+                    <ui:Button x:Name="RestorePresetsButton" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Click="RestorePresetsButton_Click" Appearance="Secondary"><StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="ArrowSync24" Margin="0,0,7,0" /><TextBlock x:Name="RestorePresetsButtonText" /></StackPanel></ui:Button>
+                </Grid>
+            </ui:Card>
+            <TextBlock x:Name="SoundHeader" Style="{StaticResource SectionTitleTextStyle}" />
+            <ui:Card Padding="10" Margin="0" MinHeight="72">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <ui:SymbolIcon Symbol="Speaker224" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,14,0">
+                        <TextBlock x:Name="ToastSoundLabel" Style="{StaticResource CardTitleTextStyle}" />
+                        <TextBlock x:Name="ToastSoundHint" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <ui:ToggleSwitch x:Name="ToastSoundToggle" Grid.Column="2" VerticalAlignment="Center" Click="ToastSoundToggle_Click" />
                 </Grid>
             </ui:Card>
         </StackPanel>

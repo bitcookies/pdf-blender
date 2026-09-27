@@ -5,5 +5,12 @@
         <Setter Property="MinHeight" Value="34" />
         <Setter Property="Padding" Value="10,6" />
         <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    </Style>
+    <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    </Style>
+    <Style TargetType="ui:ToggleSwitch" BasedOn="{StaticResource {x:Type ui:ToggleSwitch}}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
     </Style>
 </ResourceDictionary>

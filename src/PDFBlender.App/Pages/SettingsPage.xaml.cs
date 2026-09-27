@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using Wpf.Ui.Controls;
@@ -26,11 +28,20 @@ public partial class SettingsPage : Page
         UiText.SetLanguage(_session.Preferences.Language);
         TitleText.Text = UiText.Get("settings");
         SubtitleText.Text = UiText.Get("settingsSubtitle");
-        AppearanceHeader.Text = UiText.Get("appearance");
+        AppearanceHeader.Text = UiText.Get("appearanceAndLanguage");
+        StorageHeader.Text = UiText.Get("storageAndRuntime");
+        SoundHeader.Text = UiText.Get("soundAndNotifications");
         ThemeLabel.Text = UiText.Get("theme");
         ThemeHint.Text = UiText.Get("themeHint");
         LanguageLabel.Text = UiText.Get("language");
         LanguageHint.Text = UiText.Get("languageHint");
+        SettingsFileLabel.Text = UiText.Get("settingsFile");
+        SettingsFileHint.Text = UiText.Get("settingsFileHint");
+        SettingsFilePath.Text = AppPreferencesStore.FilePath;
+        OpenFolderButtonText.Text = UiText.Get("openFolder");
+        ToastSoundLabel.Text = UiText.Get("toastSound");
+        ToastSoundHint.Text = UiText.Get("toastSoundHint");
+        ToastSoundToggle.IsChecked = _session.Preferences.ToastSoundEnabled;
         RestorePresetsLabel.Text = UiText.Get("restorePresets");
         RestorePresetsHint.Text = UiText.Get("restorePresetsHint");
         ThemeOptions.ItemsSource = new[] { UiText.Get("system"), UiText.Get("light"), UiText.Get("dark") };
@@ -51,6 +62,25 @@ public partial class SettingsPage : Page
     {
         if (!_initializing && LanguageOptions.SelectedIndex >= 0)
             _session.ApplyPreferences(language: (UiLanguage)LanguageOptions.SelectedIndex);
+    }
+
+    private void ToastSoundToggle_Click(object sender, RoutedEventArgs e)
+    {
+        if (!_initializing)
+            _session.ApplyPreferences(toastSoundEnabled: ToastSoundToggle.IsChecked == true);
+    }
+
+    private void OpenFolderButton_Click(object sender, RoutedEventArgs e)
+    {
+        var folder = Path.GetDirectoryName(AppPreferencesStore.FilePath);
+        if (string.IsNullOrWhiteSpace(folder)) return;
+        Directory.CreateDirectory(folder);
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = "explorer.exe",
+            Arguments = $"/select,\"{AppPreferencesStore.FilePath}\"",
+            UseShellExecute = true
+        });
     }
 
     private async void RestorePresetsButton_Click(object sender, RoutedEventArgs e)

@@ -15,7 +15,8 @@ public sealed record AppPreferences(
     ThemePreference Theme = ThemePreference.System,
     UiLanguage Language = UiLanguage.System,
     int SelectedBlendLevel = 1,
-    bool RestorePresets = false);
+    bool RestorePresets = false,
+    bool ToastSoundEnabled = true);
 
 internal static class AppPreferencesStore
 {
@@ -25,7 +26,7 @@ internal static class AppPreferencesStore
         Converters = { new JsonStringEnumConverter() }
     };
 
-    private static string FilePath => Path.Combine(
+    internal static string FilePath => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "PDF Blender",
         "preferences.json");

@@ -6,9 +6,17 @@
         <Setter Property="Padding" Value="16,9" />
         <Setter Property="MinWidth" Value="136" />
         <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
     </Style>
     <Style x:Key="SecondaryActionButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
         <Setter Property="Appearance" Value="Secondary" />
         <Setter Property="Padding" Value="13,8" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    </Style>
+    <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    </Style>
+    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
     </Style>
 </ResourceDictionary>

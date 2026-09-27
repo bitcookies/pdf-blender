@@ -5,6 +5,7 @@
     <FontFamily x:Key="AppFontFamily">Segoe UI, Microsoft YaHei UI, Microsoft YaHei, Noto Sans SC</FontFamily>
     <Style TargetType="Control">
         <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
     </Style>
     <Style TargetType="TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />

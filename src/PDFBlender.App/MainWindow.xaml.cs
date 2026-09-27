@@ -26,7 +26,7 @@ public partial class MainWindow : FluentWindow
     {
         InitializeComponent();
         _dialogs = new DialogService(RootDialogHost);
-        _notifications = new UiNotificationService(SnackbarPresenter);
+        _notifications = new UiNotificationService(AppNotificationHost, _session);
         ApplicationThemeManager.Apply(this);
         ApplyTheme();
         ApplyLanguage();
