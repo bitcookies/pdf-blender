@@ -15,36 +15,6 @@
                 <ResourceDictionary Source="/PDFBlender.App;component/Resources/Buttons.xaml" />
                 <ResourceDictionary Source="/PDFBlender.App;component/Resources/Inputs.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <Style TargetType="ui:ToggleSwitch">
-                <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
-                <Setter Property="Width" Value="54" />
-                <Setter Property="Height" Value="28" />
-                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                <Setter Property="Focusable" Value="True" />
-                <Setter Property="KeyboardNavigation.IsTabStop" Value="True" />
-                <Setter Property="Cursor" Value="Hand" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="ui:ToggleSwitch">
-                            <Border x:Name="SwitchTrack" Width="54" Height="28" CornerRadius="14" Background="{DynamicResource BorderBrush}" ClipToBounds="True">
-                                <Canvas Width="54" Height="28">
-                                    <Ellipse x:Name="SwitchThumb" Width="20" Height="20" Fill="White" Canvas.Left="4" Canvas.Top="4">
-                                        <Ellipse.RenderTransform><TranslateTransform x:Name="SwitchThumbTransform" /></Ellipse.RenderTransform>
-                                    </Ellipse>
-                                </Canvas>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsChecked" Value="True">
-                                    <Setter TargetName="SwitchTrack" Property="Background" Value="{DynamicResource AccentBrush}" />
-                                    <Trigger.EnterActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="SwitchThumbTransform" Storyboard.TargetProperty="X" To="26" Duration="0:0:0.16" /></Storyboard></BeginStoryboard></Trigger.EnterActions>
-                                    <Trigger.ExitActions><BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="SwitchThumbTransform" Storyboard.TargetProperty="X" To="0" Duration="0:0:0.16" /></Storyboard></BeginStoryboard></Trigger.ExitActions>
-                                </Trigger>
-                                <Trigger Property="IsEnabled" Value="False"><Setter TargetName="SwitchTrack" Property="Opacity" Value="0.5" /></Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

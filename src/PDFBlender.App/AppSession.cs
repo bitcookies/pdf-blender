@@ -179,6 +179,16 @@ internal sealed class AppSession
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
+    public int RestorePresetsNow()
+    {
+        var before = _userConfigurations.Count;
+        RestoreMissingPresets();
+        var added = _userConfigurations.Count - before;
+        SaveAll();
+        Changed?.Invoke(this, EventArgs.Empty);
+        return added;
+    }
+
     private void RestoreMissingPresets()
     {
         foreach (var preset in BuiltInConfigurations)

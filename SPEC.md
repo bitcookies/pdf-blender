@@ -1,6 +1,6 @@
 # PDF Blender Product Specification
 
-Status: v0.5.0 configuration preset implementation baseline
+Status: v0.5.0 WPF-UI visual standardization baseline
 Product: PDF Blender  
 Slogan: `DO NOT PLAGIARIZE MY PDF.`
 
@@ -21,11 +21,11 @@ PDF Blender creates a new, ordinarily readable PDF from a source PDF while raisi
 This release refines the WPF shell, reusable visual resources, page layouts, and lightweight motion. It does not add PDF protection algorithms, change output semantics, or add network services.
 
 - Compact single-window home layout at `820×600`, with a `760×540` minimum and a compact icon-and-label navigation rail.
-- Settings-only theme and language controls, supporting System/Light/Dark and System/English/简体中文.
+- Settings-only theme and language controls, supporting System/Light/Dark and System/English/简体中文, plus a confirmed one-shot Restore presets button.
 - A snapped, keyboard-accessible Blend level rail showing the validated `STIR`, `BLEND`, and `PULSE` presets.
 - Local preferences and configuration cards at the roaming AppData folder named PDF Blender, with safe defaults for malformed values.
 - Logo-derived multi-size `logo.ico` used by the WPF window and executable.
-- Shared color, typography, surface, navigation, button, and input resource dictionaries.
+- Shared color, typography, surface, button, and input resource dictionaries layered over WPF-UI theme/control dictionaries.
 - Compact logo-led home header, bordered PDF drop surface, setting rows, and theme-aware notification cards.
 - Page transitions adapt to Windows client-area animation and the active WPF render tier.
 
@@ -92,7 +92,7 @@ Cloud processing, accounts, DRM, guaranteed copy prevention, custom update check
 
 ## v0.5.0 Configuration Presets
 
-Configuration is organized as cards. The page shows five Home blend slots first, a separator, then one merged `Blend configurations` section. On first use the application seeds three editable configurations named with the localized `Preset`/`预设` prefix. Users can create, rename, edit, lock, unlock, and delete any configuration. A locked configuration cannot be edited or deleted. Settings provides a restore toggle that adds missing default preset IDs without replacing existing edits.
+Configuration is organized as cards. The page shows five Home blend slots first, a separator, then one merged `Blend configurations` section. On first use the application seeds three editable configurations named with the localized `Preset`/`预设` prefix. Users can create, rename, edit, lock, unlock, and delete any configuration. A locked configuration cannot be edited or deleted. Settings provides a confirmation action that adds missing default preset IDs without replacing existing edits.
 
 Each configuration owns its enabled features and feature-specific values. Only enabled features expand their detail controls. The implemented feature set is Normalize Content Width, Flatten, Watermark, and conservative Pixel Noise. Deferred protection and prompt-injection ideas remain absent from the working controls.
 

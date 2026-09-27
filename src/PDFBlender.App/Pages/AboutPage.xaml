@@ -3,7 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="20,18,20,24" MaxWidth="760">
+        <StackPanel Margin="24,20,24,24" MaxWidth="760">
             <StackPanel Orientation="Horizontal">
                 <Border Width="58" Height="58" CornerRadius="14" Background="{DynamicResource LogoTileBrush}" Padding="6">
                     <Image Source="/PDFBlender.App;component/Assets/logo.png" Stretch="Uniform" />
@@ -13,20 +13,20 @@
                     <TextBlock x:Name="VersionText" Margin="0,4,0,0" Foreground="{DynamicResource MutedTextBrush}" />
                 </StackPanel>
             </StackPanel>
-            <Border Style="{StaticResource SurfaceCardStyle}" Padding="16" Margin="0,20,0,0">
+            <ui:Card Padding="16" Margin="0,20,0,0">
                 <StackPanel>
                     <TextBlock x:Name="TechnologyText" FontSize="15" FontWeight="SemiBold" />
                     <TextBlock x:Name="LocalProcessingText" Margin="0,8,0,0" Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap" />
                     <TextBlock x:Name="StoreText" Margin="0,8,0,0" Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap" />
                 </StackPanel>
-            </Border>
+            </ui:Card>
             <TextBlock x:Name="LegalHeader" FontSize="16" FontWeight="SemiBold" Margin="0,24,0,8" />
-            <Border Style="{StaticResource SurfaceCardStyle}" Padding="16">
+            <ui:Card Padding="16">
                 <StackPanel>
                     <TextBlock x:Name="LicenseText" TextWrapping="Wrap" />
                     <TextBlock x:Name="ThirdPartyText" Margin="0,12,0,0" TextWrapping="Wrap" />
                 </StackPanel>
-            </Border>
+            </ui:Card>
         </StackPanel>
     </ScrollViewer>
 </Page>

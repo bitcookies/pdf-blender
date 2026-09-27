@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using PDFBlender.Core.Models;
+using UiCard = Wpf.Ui.Controls.CardControl;
 using UiButton = Wpf.Ui.Controls.Button;
 using ControlAppearance = Wpf.Ui.Controls.ControlAppearance;
 
@@ -13,11 +14,13 @@ namespace PDFBlender.App.Pages;
 public partial class ConfigurationPage : Page
 {
     private readonly AppSession _session;
+    private readonly DialogService _dialogs;
     private Point _dragStart;
 
-    internal ConfigurationPage(AppSession session)
+    internal ConfigurationPage(AppSession session, DialogService dialogs)
     {
         _session = session;
+        _dialogs = dialogs;
         InitializeComponent();
         RefreshFromSession();
     }
@@ -50,9 +53,9 @@ public partial class ConfigurationPage : Page
         }
     }
 
-    private Border CreateSlot(BlendConfiguration? configuration, int index)
+    private UiCard CreateSlot(BlendConfiguration? configuration, int index)
     {
-        var border = new Border
+        var card = new UiCard
         {
             Margin = new Thickness(index == 0 ? 0 : 5, 0, index == 4 ? 0 : 5, 0), Padding = new Thickness(9, 8, 9, 8), MinHeight = 72,
             Background = (Brush)FindResource(configuration is null ? "SurfaceMutedBrush" : "CardBrush"), BorderBrush = (Brush)FindResource(configuration is null ? "BorderBrush" : "AccentBrush"),
@@ -73,25 +76,25 @@ public partial class ConfigurationPage : Page
         root.Children.Add(header);
         root.Children.Add(new TextBlock { Text = configuration?.Name ?? UiText.Get("emptySlot"), FontSize = 12, FontWeight = FontWeights.SemiBold, Foreground = (Brush)FindResource(configuration is null ? "MutedTextBrush" : "TextBrush"), TextTrimming = TextTrimming.CharacterEllipsis, Margin = new Thickness(0, 4, 0, 0) });
         if (configuration is not null) root.Children.Add(new TextBlock { Text = $"{UiText.Get("intensity")} {configuration.Intensity}", FontSize = 10, Foreground = IntensityBrush(configuration.Intensity), Margin = new Thickness(0, 3, 0, 0) });
-        border.Child = root;
-        border.DragOver += Slot_DragOver;
-        border.DragLeave += (_, _) => ResetSlotVisual(border);
-        border.Drop += Slot_Drop;
+        card.Content = root;
+        card.DragOver += Slot_DragOver;
+        card.DragLeave += (_, _) => ResetSlotVisual(card);
+        card.Drop += Slot_Drop;
         if (configuration is not null)
         {
-            border.MouseLeftButtonDown += (_, e) => _dragStart = e.GetPosition(border);
-            border.MouseMove += (_, e) =>
+            card.MouseLeftButtonDown += (_, e) => _dragStart = e.GetPosition(card);
+            card.MouseMove += (_, e) =>
             {
-                if (e.LeftButton == MouseButtonState.Pressed && (e.GetPosition(border) - _dragStart).Length >= SystemParameters.MinimumHorizontalDragDistance)
+                if (e.LeftButton == MouseButtonState.Pressed && (e.GetPosition(card) - _dragStart).Length >= SystemParameters.MinimumHorizontalDragDistance)
                 {
-                    border.BeginAnimation(OpacityProperty, new DoubleAnimation(1, 0.58, TimeSpan.FromMilliseconds(120)));
-                    DragDrop.DoDragDrop(border, configuration.Id, DragDropEffects.Move);
-                    border.BeginAnimation(OpacityProperty, null);
-                    border.Opacity = 1;
+                    card.BeginAnimation(OpacityProperty, new DoubleAnimation(1, 0.58, TimeSpan.FromMilliseconds(120)));
+                    DragDrop.DoDragDrop(card, configuration.Id, DragDropEffects.Move);
+                    card.BeginAnimation(OpacityProperty, null);
+                    card.Opacity = 1;
                 }
             };
         }
-        return border;
+        return card;
     }
 
     private void BuildCards(IEnumerable<BlendConfiguration> configurations)
@@ -101,9 +104,9 @@ public partial class ConfigurationPage : Page
             ConfigurationCardsPanel.Children.Add(CreateCard(configuration));
     }
 
-    private Border CreateCard(BlendConfiguration configuration)
+    private UiCard CreateCard(BlendConfiguration configuration)
     {
-        var card = new Border { Margin = new Thickness(0, 0, 8, 8), Padding = new Thickness(12, 10, 10, 10), MinHeight = 126, Background = (Brush)FindResource("CardBrush"), BorderBrush = IntensityBrush(configuration.Intensity), BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), ToolTip = UiText.Get("dragToSlots") };
+        var card = new UiCard { Margin = new Thickness(0, 0, 8, 8), Padding = new Thickness(12, 10, 10, 10), MinHeight = 126, Background = (Brush)FindResource("CardBrush"), BorderBrush = IntensityBrush(configuration.Intensity), BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), ToolTip = UiText.Get("dragToSlots") };
         var grid = new Grid();
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -115,8 +118,19 @@ public partial class ConfigurationPage : Page
         var actions = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
         var edit = MakeIconAction("Edit24", UiText.Get("edit"), !configuration.IsLocked); edit.Click += (_, _) => OpenEditor(configuration, false);
         var lockButton = MakeIconAction(configuration.IsLocked ? "LockClosed24" : "LockOpen24", configuration.IsLocked ? UiText.Get("unlock") : UiText.Get("lock"), true); lockButton.Click += (_, _) => _session.SetConfigurationLocked(configuration.Id, !configuration.IsLocked);
-        var delete = MakeIconAction("Delete24", UiText.Get("delete"), !configuration.IsLocked); delete.Click += (_, _) => { if (!configuration.IsLocked && MessageBox.Show(UiText.Get("deleteConfigurationConfirm"), UiText.Get("configuration"), MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) _session.DeleteConfiguration(configuration.Id); };
-        actions.Children.Add(edit); actions.Children.Add(lockButton); actions.Children.Add(delete); Grid.SetColumn(actions, 1); grid.Children.Add(actions); card.Child = grid;
+        var delete = MakeIconAction("Delete24", UiText.Get("delete"), !configuration.IsLocked);
+        delete.Click += async (_, _) =>
+        {
+            if (configuration.IsLocked) return;
+            var confirmed = await _dialogs.ShowConfirmationAsync(
+                UiText.Get("delete"),
+                UiText.Get("deleteConfigurationConfirm"),
+                UiText.Get("delete"),
+                UiText.Get("cancel"),
+                Wpf.Ui.Controls.SymbolRegular.Delete24);
+            if (confirmed) _session.DeleteConfiguration(configuration.Id);
+        };
+        actions.Children.Add(edit); actions.Children.Add(lockButton); actions.Children.Add(delete); Grid.SetColumn(actions, 1); grid.Children.Add(actions); card.Content = grid;
         card.MouseLeftButtonDown += (_, e) => _dragStart = e.GetPosition(card);
         card.MouseMove += (_, e) =>
         {
@@ -140,9 +154,9 @@ public partial class ConfigurationPage : Page
     }
 
     private void AddButton_Click(object sender, RoutedEventArgs e) => OpenEditor(null, true);
-    private void Slot_DragOver(object sender, DragEventArgs e) { if (sender is Border border) { border.Opacity = 0.82; border.BorderBrush = (Brush)FindResource("AccentDarkBrush"); } e.Effects = e.Data.GetDataPresent(DataFormats.StringFormat) ? DragDropEffects.Move : DragDropEffects.None; e.Handled = true; }
-    private void Slot_Drop(object sender, DragEventArgs e) { if (sender is Border border && border.Tag is int target && e.Data.GetData(DataFormats.StringFormat) is string id) _session.AddToSlots(id, target); if (sender is Border dropped) ResetSlotVisual(dropped); e.Handled = true; }
-    private void ResetSlotVisual(Border border) { border.Opacity = 1; border.BorderBrush = (Brush)FindResource(_session.SlotConfigurations.ElementAtOrDefault((int)border.Tag!) is null ? "BorderBrush" : "AccentBrush"); }
+    private void Slot_DragOver(object sender, DragEventArgs e) { if (sender is UiCard card) { card.Opacity = 0.82; card.BorderBrush = (Brush)FindResource("AccentDarkBrush"); } e.Effects = e.Data.GetDataPresent(DataFormats.StringFormat) ? DragDropEffects.Move : DragDropEffects.None; e.Handled = true; }
+    private void Slot_Drop(object sender, DragEventArgs e) { if (sender is UiCard card && card.Tag is int target && e.Data.GetData(DataFormats.StringFormat) is string id) _session.AddToSlots(id, target); if (sender is UiCard dropped) ResetSlotVisual(dropped); e.Handled = true; }
+    private void ResetSlotVisual(UiCard card) { card.Opacity = 1; card.BorderBrush = (Brush)FindResource(_session.SlotConfigurations.ElementAtOrDefault((int)card.Tag!) is null ? "BorderBrush" : "AccentBrush"); }
     private UiButton MakeIconAction(string symbol, string tooltip, bool enabled)
     {
         var button = new UiButton { Content = new Wpf.Ui.Controls.SymbolIcon { Symbol = Enum.Parse<Wpf.Ui.Controls.SymbolRegular>(symbol), FontSize = 16 }, ToolTip = tooltip, IsEnabled = enabled, Appearance = ControlAppearance.Transparent, Padding = new Thickness(7), Margin = new Thickness(2, 0, 0, 0) };

@@ -25,6 +25,7 @@ internal static class ThemeManager
         if (dark)
         {
             SetBrush(resources, "WindowBackgroundBrush", "#202020");
+            SetBrush(resources, "ShellChromeBrush", "#1A1A1A");
             SetBrush(resources, "SidebarBrush", "#1C1C1C");
             SetBrush(resources, "TitleBarBrush", "#1A1A1A");
             SetBrush(resources, "SurfaceBrush", "#262626");
@@ -52,6 +53,7 @@ internal static class ThemeManager
         else
         {
             SetBrush(resources, "WindowBackgroundBrush", "#F7F7F7");
+            SetBrush(resources, "ShellChromeBrush", "#FDFDFD");
             SetBrush(resources, "SidebarBrush", "#FAFAFA");
             SetBrush(resources, "TitleBarBrush", "#FDFDFD");
             SetBrush(resources, "SurfaceBrush", "#FFFFFF");

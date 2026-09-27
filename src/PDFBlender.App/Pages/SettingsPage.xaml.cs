@@ -1,16 +1,21 @@
 using System.Windows;
 using System.Windows.Controls;
+using Wpf.Ui.Controls;
 
 namespace PDFBlender.App.Pages;
 
 public partial class SettingsPage : Page
 {
     private readonly AppSession _session;
+    private readonly DialogService _dialogs;
+    private readonly UiNotificationService _notifications;
     private bool _initializing;
 
-    internal SettingsPage(AppSession session)
+    internal SettingsPage(AppSession session, DialogService dialogs, UiNotificationService notifications)
     {
         _session = session;
+        _dialogs = dialogs;
+        _notifications = notifications;
         InitializeComponent();
         RefreshFromSession();
     }
@@ -32,7 +37,7 @@ public partial class SettingsPage : Page
         LanguageOptions.ItemsSource = new[] { UiText.Get("system"), "English", "简体中文" };
         ThemeOptions.SelectedIndex = (int)_session.Preferences.Theme;
         LanguageOptions.SelectedIndex = (int)_session.Preferences.Language;
-        RestorePresetsToggle.IsChecked = _session.Preferences.RestorePresets;
+        RestorePresetsButtonText.Text = UiText.Get("restore");
         _initializing = false;
     }
 
@@ -48,9 +53,20 @@ public partial class SettingsPage : Page
             _session.ApplyPreferences(language: (UiLanguage)LanguageOptions.SelectedIndex);
     }
 
-    private void RestorePresetsToggle_Changed(object sender, RoutedEventArgs e)
+    private async void RestorePresetsButton_Click(object sender, RoutedEventArgs e)
     {
-        if (!_initializing)
-            _session.ApplyPreferences(restorePresets: RestorePresetsToggle.IsChecked == true);
+        var confirmed = await _dialogs.ShowConfirmationAsync(
+            UiText.Get("restorePresets"),
+            UiText.Get("restorePresetsConfirm"),
+            UiText.Get("restore"),
+            UiText.Get("cancel"),
+            SymbolRegular.ArrowSync24);
+        if (!confirmed) return;
+
+        var added = _session.RestorePresetsNow();
+        _notifications.Show(
+            added > 0 ? UiNotificationKind.Success : UiNotificationKind.Info,
+            UiText.Get("restorePresets"),
+            added > 0 ? string.Format(UiText.Get("restorePresetsSuccess"), added) : UiText.Get("restorePresetsNone"));
     }
 }

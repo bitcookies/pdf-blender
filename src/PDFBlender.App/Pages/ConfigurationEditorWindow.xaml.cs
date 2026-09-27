@@ -2,6 +2,8 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using PDFBlender.Core.Models;
+using UiCard = Wpf.Ui.Controls.Card;
+using UiTextBox = Wpf.Ui.Controls.TextBox;
 using UiToggleSwitch = Wpf.Ui.Controls.ToggleSwitch;
 
 namespace PDFBlender.App.Pages;
@@ -13,10 +15,10 @@ public partial class ConfigurationEditorWindow : Wpf.Ui.Controls.FluentWindow
     private readonly UiToggleSwitch _flatten = new();
     private readonly UiToggleSwitch _watermark = new();
     private readonly UiToggleSwitch _noise = new();
-    private readonly TextBox _width = new();
+    private readonly UiTextBox _width = new();
     private readonly ComboBox _dpi = new();
     private readonly ComboBox _watermarkType = new();
-    private readonly TextBox _watermarkText = new();
+    private readonly UiTextBox _watermarkText = new();
     private readonly ComboBox _noiseLevel = new();
 
     public string ConfigurationName => NameBox.Text.Trim();
@@ -53,14 +55,14 @@ public partial class ConfigurationEditorWindow : Wpf.Ui.Controls.FluentWindow
 
     private void AddFeature(string title, string hint, UiToggleSwitch toggle, IEnumerable<UIElement> details)
     {
-        var border = new Border { Style = (Style)FindResource("SettingRowStyle"), Padding = new Thickness(12), Margin = new Thickness(0, 0, 0, 8) };
+        var card = new UiCard { Padding = new Thickness(12), Margin = new Thickness(0, 0, 0, 8), MinHeight = 72 };
         var root = new StackPanel();
         var header = new DockPanel();
         var labels = new StackPanel(); labels.Children.Add(new TextBlock { Text = title, FontWeight = FontWeights.SemiBold }); labels.Children.Add(new TextBlock { Text = hint, Foreground = (System.Windows.Media.Brush)FindResource("MutedTextBrush"), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 3, 10, 0) });
         DockPanel.SetDock(toggle, Dock.Right); header.Children.Add(toggle); header.Children.Add(labels); root.Children.Add(header);
         var detail = new StackPanel { Visibility = toggle.IsChecked == true ? Visibility.Visible : Visibility.Collapsed, Margin = new Thickness(0, 8, 0, 0) }; foreach (var item in details) detail.Children.Add(item); root.Children.Add(detail);
         toggle.Checked += (_, _) => detail.Visibility = Visibility.Visible; toggle.Unchecked += (_, _) => detail.Visibility = Visibility.Collapsed;
-        border.Child = root; FeaturePanel.Children.Add(border);
+        card.Content = root; FeaturePanel.Children.Add(card);
     }
 
     private UIElement Labeled(string label, Control control)
@@ -83,7 +85,8 @@ public partial class ConfigurationEditorWindow : Wpf.Ui.Controls.FluentWindow
             Noise = _noise.IsChecked == true ? (NoiseStrength)(_noiseLevel.SelectedIndex + 1) : NoiseStrength.Off
         };
         var errors = SettingsValidator.Validate(settings);
-        if (errors.Count > 0) { MessageBox.Show(string.Join("\n", errors), UiText.Get("invalidSettings"), MessageBoxButton.OK, MessageBoxImage.Warning); return; }
+        ErrorText.Text = string.Empty;
+        if (errors.Count > 0) { ErrorText.Text = string.Join("\n", errors); return; }
         Settings = settings; DialogResult = true;
     }
 

@@ -3,7 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:local="clr-namespace:PDFBlender.App">
-    <Grid Margin="20,16,20,18" UseLayoutRounding="True">
+    <Grid Margin="24,20,24,24" UseLayoutRounding="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="76" />
             <RowDefinition Height="10" />
@@ -15,7 +15,6 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" ClipToBounds="True">
-            <Path Fill="{DynamicResource AccentSoftBrush}" Opacity="0.55" Stretch="Fill" HorizontalAlignment="Right" Width="420" Data="M 0,54 C 94,4 160,72 246,30 S 380,2 480,38 L 480,90 L 0,90 Z" />
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <Border Width="44" Height="44" CornerRadius="12" Background="{DynamicResource LogoTileBrush}" Padding="5">
                     <Image Source="/PDFBlender.App;component/Assets/logo.png" Stretch="Uniform" />
@@ -27,7 +26,7 @@
             </StackPanel>
         </Grid>
 
-        <Border Grid.Row="2" Style="{StaticResource SurfaceCardStyle}" Padding="16" AllowDrop="True" DragOver="DropTarget_DragOver" Drop="DropTarget_Drop" AutomationProperties.Name="PDF drop area">
+        <ui:Card Grid.Row="2" Padding="16" AllowDrop="True" DragOver="DropTarget_DragOver" Drop="DropTarget_Drop" AutomationProperties.Name="PDF drop area">
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="72" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                 <Border Width="54" Height="54" CornerRadius="14" Background="{DynamicResource AccentSoftBrush}" VerticalAlignment="Center" HorizontalAlignment="Left">
@@ -43,7 +42,7 @@
                     <StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="FolderOpen24" Margin="0,0,7,0" /><TextBlock x:Name="BrowseButtonText" /></StackPanel>
                 </ui:Button>
             </Grid>
-        </Border>
+        </ui:Card>
 
         <Grid Grid.Row="4">
             <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>

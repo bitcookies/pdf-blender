@@ -1,6 +1,6 @@
 # PDF Blender Architecture
 
-Status: v0.5.0 configuration preset implementation baseline
+Status: v0.5.0 WPF-UI visual standardization baseline
 
 ## Design Goals
 
@@ -42,15 +42,15 @@ Flatten is both the MVP primary protection method and the raster reconstruction 
 
 The App project owns presentation state and persistence adapters. Core owns typed settings and preset definitions. The PDF layer exposes narrow interfaces such as document inspection, page rendering, and document writing so a library can be replaced without changing view models or preset semantics.
 
-The v0.5.0 shell is `MainWindow` (`FluentWindow`) with a compact rail, shared `AppSession`, reusable visual resource dictionaries, reduced-motion page transitions, and a right-aligned `UiNotificationHost`. `HomePage` owns the PDF workflow, `ConfigurationPage` presents five ordered slots followed by one merged "Blend configurations" section rendered as a three-column card grid, and `ConfigurationEditorWindow` provides modal editing. `SettingsPage` applies appearance and preset-restore preferences immediately, while `AboutPage` exposes version and legal information. Core owns `BlendConfiguration`, the feature catalog, default definitions, and intensity calculation. Resource dictionaries are grouped under `Resources/` by colors, typography, surfaces, navigation, buttons, and inputs. `WPF-UI` is pinned to 4.3.0 and is limited to presentation concerns.
+The v0.5.0 shell is `MainWindow` (`FluentWindow`) with a compact 74 px navigation rail, a shared `AppSession`, reusable visual resource dictionaries, reduced-motion page transitions, `SnackbarPresenter`, and `ContentDialogHost`. `HomePage` owns the PDF workflow, `ConfigurationPage` presents five ordered slots followed by one merged "Blend configurations" section rendered as a three-column card grid, and `ConfigurationEditorWindow` provides modal editing. `SettingsPage` applies appearance immediately and uses a confirmed one-shot restore command, while `AboutPage` exposes version and legal information. Core owns `BlendConfiguration`, the feature catalog, default definitions, and intensity calculation. Resource dictionaries are grouped under `Resources/` by colors, typography, surfaces, buttons, inputs, and navigation. WPF-UI is pinned to 4.3.0 and supplies the default control templates, icons, cards, dialogs, and snackbars.
 
-Page navigation uses cached page instances and a short opacity transition. Theme resources are centralized in `App.xaml` and `ThemeManager`; the palette follows the UCDT neutral light/dark structure while the accent remains PDF Blender coral/red. Toast updates are dispatched through `UiNotificationService` and do not contain document contents.
+Page navigation uses cached page instances and a short opacity transition. The rail buttons call the shell navigation method directly and animate a shared left selection indicator. Theme resources are centralized in `App.xaml` and `ThemeManager`; WPF-UI theme dictionaries load before project overrides, and the palette follows the UCDT neutral light/dark structure while the accent remains PDF Blender coral/red. `UiNotificationService` dispatches snackbars and does not contain document contents. `DialogService` routes confirmation dialogs through `ContentDialogHost`.
 
 Keep startup work minimal: load theme/language and lightweight preferences first; initialize heavyweight PDF components only when a file is selected or processing begins. All long operations run off the UI thread; progress events are marshaled through the WPF dispatcher.
 
 ## Persistence and Privacy
 
-Store non-secret configurations in the roaming AppData folder named PDF Blender with schema versioning. Preferences and configurations are stored separately. The first run seeds three editable configurations named with the localized `Preset`/`预设` prefix. The Settings restore toggle adds missing default IDs without overwriting edits. The MVP has no secret-key subsystem. Do not persist temporary page images after an operation, send document data over the network, or include document content in diagnostics. Configuration saves use temporary files followed by replacement and normalize unknown IDs, duplicate slots, and the five-slot limit.
+Store non-secret configurations in the roaming AppData folder named PDF Blender with schema versioning. Preferences and configurations are stored separately. The first run seeds three editable configurations named with the localized `Preset`/`预设` prefix. The Settings restore command adds missing default IDs without overwriting edits. The legacy `RestorePresets` preference remains readable for compatibility but is not exposed as a toggle. The MVP has no secret-key subsystem. Do not persist temporary page images after an operation, send document data over the network, or include document content in diagnostics. Configuration saves use temporary files followed by replacement and normalize unknown IDs, duplicate slots, and the five-slot limit.
 
 ## Packaging and Build
 

@@ -1,10 +1,10 @@
 # PDF Blender Interface Specification
 
-Status: v0.5.0 configuration interface redesign
+Status: v0.5.0 WPF-UI visual standardization
 
 ## Visual Direction
 
-Use Windows 11 and Fluent design conventions: clear hierarchy, restrained surfaces, crisp typography, purposeful motion, and accessible contrast. The UI should have a distinctive PDF Blender identity without resembling a security product. Use the supplied logo from `assets/`. Reference screenshots remain local and ignored. Implement the visual system with WPF-UI 4.3.0 controls and themes; keep application-specific layout and behavior in the App project.
+Use Windows 11 and Fluent design conventions: clear hierarchy, restrained surfaces, crisp typography, purposeful motion, and accessible contrast. The UI should have a distinctive PDF Blender identity without resembling a security product. Use the supplied logo from `assets/`. Reference screenshots remain local and ignored. Implement the visual system with WPF-UI 4.3.0 controls and themes; keep application-specific layout and behavior in the App project. Load WPF-UI theme/control dictionaries first, then project color, typography, surface, button, and input resources. Do not replace WPF-UI button, toggle, card, navigation, dialog, or popup templates unless a documented accessibility or product requirement cannot be met otherwise.
 
 Use translucency only where it improves hierarchy and remains legible in both themes. Prefer compact, aligned settings rows for repeated toggles; reserve cards for distinct repeated items or genuinely framed tools. Support system, light, and dark appearance. Respect reduced-motion and high-contrast system settings where practical. Keep any HWND-hosted legacy controls isolated because WPF interop has airspace, clipping, and input limitations.
 
@@ -23,7 +23,7 @@ The first screen is the working tool, not a marketing page. The compact 820×600
 
 The main workflow is `Drop/Browse -> choose Blend level -> Blend PDF`. v0.5.0 handles one PDF at a time. Reject unsupported file types clearly and do not start processing before a valid PDF is selected. The output is written beside the input as `<source>_blended.pdf`; the destination is not exposed as a home control. Theme and language controls are absent from the home screen and available in Settings.
 
-The shell is a single WPF-UI `FluentWindow` with a compact icon-and-label rail and a content `Frame`. Home, Configuration, Settings, and About are pages sharing one `AppSession`; changes are applied immediately and persisted locally.
+The shell is a single WPF-UI `FluentWindow` with a fixed title bar, a 74 px compact navigation rail, and a content `Frame`. The title bar and rail use one shell surface; the content surface has a 12 px top-left radius. Home, Configuration, Settings, and About are pages sharing one `AppSession`; changes are applied immediately and persisted locally.
 
 ### BlendLevelRail
 
@@ -31,11 +31,11 @@ The shell is a single WPF-UI `FluentWindow` with a compact icon-and-label rail a
 
 ## Configuration and Settings
 
-Configuration exposes Format, Protection, Watermark, and Image controls for the selected blend level, arranged as icon-led setting rows. Settings exposes only Appearance (theme and language), also using icon-led setting rows. Only implemented controls should appear as active settings. Future features may be documented elsewhere but must not be presented as working toggles.
+Configuration exposes Format, Protection, Watermark, and Image controls for the selected blend level, arranged as WPF-UI cards and controls. Settings exposes only Appearance (theme and language) plus a WPF-UI Restore presets button and confirmation dialog. Only implemented controls should appear as active settings. Future features may be documented elsewhere but must not be presented as working toggles.
 
-The shell uses a compact icon-and-label rail, a custom application palette derived from the PDF Blender logo, and shared WPF-UI ComboBox resources with a bordered popup surface. Navigation has hover, selected, pressed, and keyboard-focus states. Processing notifications appear in a right-aligned, theme-aware Toast host with a maximum of three visible items.
+The shell uses a compact icon-and-label rail with direct navigation-item click handlers, a custom application palette derived from the PDF Blender logo, and native WPF `ComboBox` controls using the application/WPF-UI theme resources. The rail provides animated hover, selected, pressed, keyboard-focus, and left-indicator states. Processing notifications appear in a right-aligned WPF-UI `SnackbarPresenter`; confirmations use `ContentDialogHost` and `ContentDialog`.
 
-Preferences and configurations are stored under the roaming AppData folder named PDF Blender. Theme, language, selected slot, and the restore-missing-presets choice restore across restarts. A malformed file is ignored and replaced by safe defaults.
+Preferences and configurations are stored under the roaming AppData folder named PDF Blender. Theme, language, and selected slot restore across restarts; Restore presets is a one-shot command and is not persisted as a UI toggle. A malformed file is ignored and replaced by safe defaults.
 
 - Format: Normalize Content Width toggle and configurable target width in millimeters. Clarify that it scales content proportionally rather than converting pages to A4 or equal heights.
 - Protection: mutually exclusive method selector. The current MVP enables Flatten; future methods must be visibly unavailable or absent.
@@ -55,4 +55,4 @@ Support keyboard access for import, selectors, settings, and the primary action.
 
 ## v0.5.0 Configuration Cards
 
-The Configuration page is ordered as five fixed Home blend slots, a separator, and one merged "Blend configurations" section. The first run creates three editable cards named with the localized `Preset`/`预设` prefix. Every card shows only enabled features and provides edit, lock, delete, and drag actions; a lock disables edit and delete. Editing opens a modal editor and only enabled features reveal detail controls. Dragging onto an occupied slot replaces that slot, while dragging a configuration from one slot to another leaves its old position empty. Cards render three per row. Settings can restore missing default presets without overwriting existing edits. Preferences and configurations use the roaming AppData folder named PDF Blender.
+The Configuration page is ordered as five fixed Home blend slots, a separator, and one merged "Blend configurations" section. The first run creates three editable cards named with the localized `Preset`/`预设` prefix. Every card shows only enabled features and provides edit, lock, delete, and drag actions; a lock disables edit and delete. Editing opens a modal editor and only enabled features reveal detail controls. Dragging onto an occupied slot replaces that slot, while dragging a configuration from one slot to another leaves its old position empty. Cards render three per row. Settings can restore missing default presets through a confirmed action without overwriting existing edits. Preferences and configurations use the roaming AppData folder named PDF Blender.

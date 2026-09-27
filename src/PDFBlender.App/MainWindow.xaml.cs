@@ -12,6 +12,7 @@ namespace PDFBlender.App;
 public partial class MainWindow : FluentWindow
 {
     private readonly AppSession _session = new();
+    private readonly DialogService _dialogs;
     private readonly UiNotificationService _notifications;
     private HomePage? _homePage;
     private ConfigurationPage? _configurationPage;
@@ -24,7 +25,8 @@ public partial class MainWindow : FluentWindow
     public MainWindow()
     {
         InitializeComponent();
-        _notifications = new UiNotificationService(AppNotificationHost);
+        _dialogs = new DialogService(RootDialogHost);
+        _notifications = new UiNotificationService(SnackbarPresenter);
         ApplicationThemeManager.Apply(this);
         ApplyTheme();
         ApplyLanguage();
@@ -43,8 +45,8 @@ public partial class MainWindow : FluentWindow
         _currentPage = page;
         ContentFrame.Content = page switch
         {
-            "configuration" => _configurationPage ??= new ConfigurationPage(_session),
-            "settings" => _settingsPage ??= new SettingsPage(_session),
+            "configuration" => _configurationPage ??= new ConfigurationPage(_session, _dialogs),
+            "settings" => _settingsPage ??= new SettingsPage(_session, _dialogs, _notifications),
             "about" => _aboutPage ??= new AboutPage(),
             _ => _homePage ??= new HomePage(_session, _notifications, () => NavigateTo("configuration"))
         };
@@ -153,9 +155,6 @@ public partial class MainWindow : FluentWindow
         button.Foreground = selected
             ? (Brush)Application.Current.Resources["AccentBrush"]
             : (Brush)Application.Current.Resources["NavTextBrush"];
-
-        // Keep the active rail marker explicit as a fallback for template/resource
-        // reloads. This mirrors the reference app's independent indicator.
         button.ApplyTemplate();
         if (button.Template.FindName("ActiveSurface", button) is UIElement activeSurface)
         {

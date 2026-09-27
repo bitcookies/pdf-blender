@@ -3,31 +3,36 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <StackPanel Margin="20,16,20,22" MaxWidth="760">
+        <StackPanel Margin="24,20,24,24" MaxWidth="760">
             <TextBlock x:Name="TitleText" Style="{StaticResource PageTitleTextStyle}" />
             <TextBlock x:Name="SubtitleText" Style="{StaticResource PageDescriptionTextStyle}" />
             <TextBlock x:Name="AppearanceHeader" Style="{StaticResource SectionTitleTextStyle}" />
-            <Border Style="{StaticResource SettingRowStyle}">
+            <ui:Card Padding="14" Margin="0,0,0,8" MinHeight="88">
                 <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="34" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
                     <ui:SymbolIcon Symbol="Color24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="ThemeLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="ThemeHint" Style="{StaticResource SmallMutedTextStyle}" /></StackPanel>
                     <ComboBox x:Name="ThemeOptions" Grid.Column="2" VerticalAlignment="Center" SelectionChanged="ThemeOptions_SelectionChanged" />
                 </Grid>
-            </Border>
-            <Border Style="{StaticResource SettingRowStyle}">
+            </ui:Card>
+            <ui:Card Padding="14" Margin="0,0,0,8" MinHeight="88">
                 <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="34" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
                     <ui:SymbolIcon Symbol="LocalLanguage24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="LanguageLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="LanguageHint" Style="{StaticResource SmallMutedTextStyle}" /></StackPanel>
                     <ComboBox x:Name="LanguageOptions" Grid.Column="2" VerticalAlignment="Center" SelectionChanged="LanguageOptions_SelectionChanged" />
                 </Grid>
-            </Border>
-            <Border Style="{StaticResource SettingRowStyle}">
+            </ui:Card>
+            <ui:Card Padding="14" Margin="0,0,0,8" MinHeight="88">
                 <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="34" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
                     <ui:SymbolIcon Symbol="ArrowSync24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="RestorePresetsLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="RestorePresetsHint" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" /></StackPanel>
-                    <ui:ToggleSwitch x:Name="RestorePresetsToggle" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Checked="RestorePresetsToggle_Changed" Unchecked="RestorePresetsToggle_Changed" />
+                    <ui:Button x:Name="RestorePresetsButton" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Click="RestorePresetsButton_Click" Appearance="Secondary">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="ArrowSync24" Margin="0,0,7,0" />
+                            <TextBlock x:Name="RestorePresetsButtonText" />
+                        </StackPanel>
+                    </ui:Button>
                 </Grid>
-            </Border>
+            </ui:Card>
         </StackPanel>
     </ScrollViewer>
 </Page>

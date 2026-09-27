@@ -1,6 +1,6 @@
 # PDF Blender Design Overview
 
-Status: v0.5.0 configuration card visual refinement
+Status: v0.5.0 WPF-UI visual standardization
 Detailed requirements: `SPEC.md`  
 Architecture boundaries: `ARCHITECTURE.md`  
 Interface and localization: `INTERFACE.md`
@@ -23,7 +23,7 @@ Use small translucent surfaces only where they improve hierarchy. Do not rely on
 
 ## Home Layout
 
-The main window is 820×600 with a 760×540 minimum. It contains a 74 px compact rail with icon and label navigation, a bordered white/dark drag-and-drop surface with selected-file summary, the three-level Blend rail, a Configuration shortcut, and a bottom action row with progress and Cancel. A restrained coral wave sits behind the compact logo/title header. The home screen does not expose profile, output, theme, or language controls.
+The main window is 820×600 with a 760×540 minimum. It uses a compact 74 px icon-and-label rail beside the content frame. The title bar and rail share one shell surface; the content surface has a 12 px top-left radius and square remaining corners. Home contains a bordered white/dark drag-and-drop surface with selected-file summary, the three-level Blend rail, a Configuration shortcut, and a bottom action row with progress and Cancel. The home screen does not expose profile, output, theme, or language controls.
 
 ## Blend Level Rail
 
@@ -31,7 +31,7 @@ The main window is 820×600 with a 760×540 minimum. It contains a 74 px compact
 
 ## Settings and Preferences
 
-Settings contains software preferences: System/Light/Dark, System/English/Simplified Chinese, and a restore-missing-presets toggle. Theme and language changes apply immediately. Configuration cards own their feature values. Preferences and configurations are stored under the roaming AppData folder named PDF Blender; malformed or out-of-range values fall back to safe defaults.
+Settings contains software preferences: System/Light/Dark, System/English/Simplified Chinese, and a Restore presets button with confirmation. Theme and language changes apply immediately. Configuration cards own their feature values. Preferences and configurations are stored under the roaming AppData folder named PDF Blender; malformed or out-of-range values fall back to safe defaults.
 
 The initial presets are `STIR`, `BLEND`, and `PULSE`. `CRUSH` and `OVERBLEND` remain future/experimental until their quality and behavior are validated. Users can independently toggle supported options, and manual edits turn the selected preset into a modified/custom configuration.
 
@@ -39,7 +39,7 @@ The application uses the pinned `WPF-UI` 4.3.0 package for Fluent controls, them
 
 ## v0.5.0 Interaction Patterns
 
-The shell follows the compact rail and neutral light/dark palette used by the local UCDT reference. PDF Blender uses a coral/red accent derived from its logo. Pages fade in with a short translation, the rail selection uses a coral surface and leading indicator, and buttons provide restrained hover and press feedback. Transitions respect Windows client-area animation and render-tier settings.
+The shell follows the Microsoft Store/UCDT compact rail and neutral light/dark palette. PDF Blender uses a coral/red accent derived from its logo. Pages fade in with a short translation; the rail uses a small project-owned template for its compact selected, hover, focus, and animated indicator states, while WPF-UI owns buttons, cards, dialogs, and snackbars. Transitions respect Windows client-area animation and render-tier settings.
 
 Processing feedback appears in the page status area and in a right-aligned stack of up to three Toast notifications. Toasts support information, success, warning, error, and progress states without logging document content.
 
@@ -63,6 +63,6 @@ The sole release channel is Microsoft Store, packaged as MSIX with the reserved 
 
 ## v0.5.0 Configuration Card Pattern
 
-The Configuration page is ordered as five fixed Home blend slots, a separator, and one merged "Blend configurations" section. Initial use seeds three editable configurations with localized `Preset`/`预设` prefixes; all cards use the same edit, lock, delete, and drag actions. Cards show a name, enabled-feature summary, and a ten-step intensity bar in a three-column grid. Dragging a card to a slot preserves that exact position; dropping onto an occupied slot replaces its occupant. Empty positions remain visible and disabled on Home. Settings can restore missing default IDs without overwriting existing edits.
+The Configuration page is ordered as five fixed Home blend slots, a separator, and one merged "Blend configurations" section. Initial use seeds three editable configurations with localized `Preset`/`预设` prefixes; all cards use the same edit, lock, delete, and drag actions. Cards show a name, enabled-feature summary, and a ten-step intensity bar in a three-column grid. Dragging a card to a slot preserves that exact position; dropping onto an occupied slot replaces its occupant. Empty positions remain visible and disabled on Home. Settings can restore missing default IDs through a confirmed action without overwriting existing edits.
 
 Feature rows in the modal editor follow progressive disclosure. A disabled feature occupies one compact row. Enabling it reveals only that feature's detail controls below the row. Watermark text and all other values belong to the selected configuration, so two configurations can use different values. A configuration becomes non-editable and non-deletable only while its lock is enabled.

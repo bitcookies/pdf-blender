@@ -5,11 +5,12 @@
                   Title="Edit configuration" Width="520" Height="620" MinWidth="480" MinHeight="520"
                   WindowStartupLocation="CenterOwner" WindowBackdropType="Mica" WindowCornerPreference="Round"
                   Background="{DynamicResource WindowBackgroundBrush}" TextElement.FontFamily="{DynamicResource AppFontFamily}">
-    <Grid Margin="22">
+    <Grid Margin="24,20,24,24">
         <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
         <StackPanel>
             <TextBlock x:Name="TitleText" Style="{StaticResource PageTitleTextStyle}" />
-            <TextBox x:Name="NameBox" Margin="0,12,0,14" />
+            <ui:TextBox x:Name="NameBox" Margin="0,12,0,6" AutomationProperties.Name="Configuration name" />
+            <TextBlock x:Name="ErrorText" Foreground="{DynamicResource AccentBrush}" TextWrapping="Wrap" Margin="0,0,0,8" />
         </StackPanel>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"><StackPanel x:Name="FeaturePanel" /></ScrollViewer>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
