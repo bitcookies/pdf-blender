@@ -13,12 +13,14 @@ internal sealed record ConfigurationDocument(
 
 internal static class ConfigurationStore
 {
-    private const int CurrentSchemaVersion = 2;
+    private const int CurrentSchemaVersion = 3;
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         WriteIndented = true,
         Converters = { new JsonStringEnumConverter() }
     };
+
+    internal static bool Exists => File.Exists(FilePath);
 
     private static string FilePath => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -32,7 +34,7 @@ internal static class ConfigurationStore
             if (File.Exists(FilePath))
             {
                 var document = JsonSerializer.Deserialize<ConfigurationDocument>(File.ReadAllText(FilePath), SerializerOptions);
-                if (document is not null && document.SchemaVersion is 1 or CurrentSchemaVersion)
+                if (document is not null && document.SchemaVersion is 1 or 2 or CurrentSchemaVersion)
                 {
                     return Normalize(document with { SchemaVersion = CurrentSchemaVersion });
                 }
@@ -59,9 +61,13 @@ internal static class ConfigurationStore
     {
         var user = document.UserConfigurations ?? [];
         var uniqueUser = user
-            .Where(configuration => !configuration.IsBuiltIn && !string.IsNullOrWhiteSpace(configuration.Id))
+            .Where(configuration => !string.IsNullOrWhiteSpace(configuration.Id))
             .GroupBy(configuration => configuration.Id, StringComparer.OrdinalIgnoreCase)
-            .Select(group => group.First() with { Name = string.IsNullOrWhiteSpace(group.First().Name) ? "Custom" : group.First().Name.Trim() })
+            .Select(group => group.First() with
+            {
+                IsBuiltIn = false,
+                Name = string.IsNullOrWhiteSpace(group.First().Name) ? "Custom" : group.First().Name.Trim()
+            })
             .ToList();
         var validIds = new HashSet<string>(BuiltInConfigurations.All.Select(configuration => configuration.Id), StringComparer.OrdinalIgnoreCase);
         foreach (var configuration in uniqueUser) validIds.Add(configuration.Id);

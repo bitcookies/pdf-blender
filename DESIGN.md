@@ -31,7 +31,7 @@ The main window is 820×600 with a 760×540 minimum. It contains a 74 px compact
 
 ## Settings and Preferences
 
-Settings contains Appearance only: System/Light/Dark and System/English/Simplified Chinese. Theme and language changes apply immediately. Configuration cards own their feature values. Preferences and configurations are stored under the roaming AppData folder named PDF Blender; malformed or out-of-range values fall back to safe defaults.
+Settings contains software preferences: System/Light/Dark, System/English/Simplified Chinese, and a restore-missing-presets toggle. Theme and language changes apply immediately. Configuration cards own their feature values. Preferences and configurations are stored under the roaming AppData folder named PDF Blender; malformed or out-of-range values fall back to safe defaults.
 
 The initial presets are `STIR`, `BLEND`, and `PULSE`. `CRUSH` and `OVERBLEND` remain future/experimental until their quality and behavior are validated. Users can independently toggle supported options, and manual edits turn the selected preset into a modified/custom configuration.
 
@@ -63,6 +63,6 @@ The sole release channel is Microsoft Store, packaged as MSIX with the reserved 
 
 ## v0.5.0 Configuration Card Pattern
 
-The Configuration page is ordered as five fixed Home blend slots, user configurations, then built-in presets. Cards show a name, enabled-feature summary, and a ten-step intensity bar. Dragging a card to a slot preserves that exact position; dropping onto an occupied slot replaces its occupant. Empty positions remain visible and disabled on Home.
+The Configuration page is ordered as five fixed Home blend slots, a separator, and one merged "Blend configurations" section. Initial use seeds three editable configurations with localized `Preset`/`预设` prefixes; all cards use the same edit, lock, delete, and drag actions. Cards show a name, enabled-feature summary, and a ten-step intensity bar in a three-column grid. Dragging a card to a slot preserves that exact position; dropping onto an occupied slot replaces its occupant. Empty positions remain visible and disabled on Home. Settings can restore missing default IDs without overwriting existing edits.
 
-Feature rows in the modal editor follow progressive disclosure. A disabled feature occupies one compact row. Enabling it reveals only that feature's detail controls below the row. Watermark text and all other values belong to the selected configuration, so two configurations can use different values. Built-in cards remain locked and cannot open the editor.
+Feature rows in the modal editor follow progressive disclosure. A disabled feature occupies one compact row. Enabling it reveals only that feature's detail controls below the row. Watermark text and all other values belong to the selected configuration, so two configurations can use different values. A configuration becomes non-editable and non-deletable only while its lock is enabled.

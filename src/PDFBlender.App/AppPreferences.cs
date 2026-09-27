@@ -14,7 +14,8 @@ public enum ThemePreference
 public sealed record AppPreferences(
     ThemePreference Theme = ThemePreference.System,
     UiLanguage Language = UiLanguage.System,
-    int SelectedBlendLevel = 1);
+    int SelectedBlendLevel = 1,
+    bool RestorePresets = false);
 
 internal static class AppPreferencesStore
 {

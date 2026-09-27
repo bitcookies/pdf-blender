@@ -21,6 +21,13 @@
                     <ComboBox x:Name="LanguageOptions" Grid.Column="2" VerticalAlignment="Center" SelectionChanged="LanguageOptions_SelectionChanged" />
                 </Grid>
             </Border>
+            <Border Style="{StaticResource SettingRowStyle}">
+                <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="34" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
+                    <ui:SymbolIcon Symbol="ArrowSync24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="RestorePresetsLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="RestorePresetsHint" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" /></StackPanel>
+                    <ui:ToggleSwitch x:Name="RestorePresetsToggle" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Checked="RestorePresetsToggle_Changed" Unchecked="RestorePresetsToggle_Changed" />
+                </Grid>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>

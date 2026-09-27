@@ -35,7 +35,7 @@ Configuration exposes Format, Protection, Watermark, and Image controls for the 
 
 The shell uses a compact icon-and-label rail, a custom application palette derived from the PDF Blender logo, and shared WPF-UI ComboBox resources with a bordered popup surface. Navigation has hover, selected, pressed, and keyboard-focus states. Processing notifications appear in a right-aligned, theme-aware Toast host with a maximum of three visible items.
 
-Preferences and configurations are stored under the roaming AppData folder named PDF Blender. Theme, language, and selected slot restore across restarts. A malformed file is ignored and replaced by safe defaults.
+Preferences and configurations are stored under the roaming AppData folder named PDF Blender. Theme, language, selected slot, and the restore-missing-presets choice restore across restarts. A malformed file is ignored and replaced by safe defaults.
 
 - Format: Normalize Content Width toggle and configurable target width in millimeters. Clarify that it scales content proportionally rather than converting pages to A4 or equal heights.
 - Protection: mutually exclusive method selector. The current MVP enables Flatten; future methods must be visibly unavailable or absent.
@@ -55,4 +55,4 @@ Support keyboard access for import, selectors, settings, and the primary action.
 
 ## v0.5.0 Configuration Cards
 
-The Configuration page is ordered as five fixed Home blend slots, user configurations, then built-in presets. Each user card shows only enabled features and provides edit, lock, and delete actions. Editing opens a modal editor; only enabled features reveal detail controls. Built-in presets are permanently locked. Dragging onto an occupied slot replaces that slot, while dragging a configuration from one slot to another leaves its old position empty. Preferences and configurations use the roaming AppData folder named PDF Blender.
+The Configuration page is ordered as five fixed Home blend slots, a separator, and one merged "Blend configurations" section. The first run creates three editable cards named with the localized `Preset`/`预设` prefix. Every card shows only enabled features and provides edit, lock, delete, and drag actions; a lock disables edit and delete. Editing opens a modal editor and only enabled features reveal detail controls. Dragging onto an occupied slot replaces that slot, while dragging a configuration from one slot to another leaves its old position empty. Cards render three per row. Settings can restore missing default presets without overwriting existing edits. Preferences and configurations use the roaming AppData folder named PDF Blender.

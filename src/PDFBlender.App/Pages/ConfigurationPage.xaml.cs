@@ -29,15 +29,12 @@ public partial class ConfigurationPage : Page
         SubtitleText.Text = UiText.Get("configurationSubtitle");
         SlotsHeader.Text = UiText.Get("blendSlots");
         SlotsHint.Text = UiText.Get("blendSlotsHint");
-        UserHeader.Text = UiText.Get("userConfigurations");
+        ConfigurationsHeader.Text = UiText.Get("blendConfigurations");
         AddButtonText.Text = UiText.Get("addConfiguration");
-        UserEmptyText.Text = _session.UserConfigurations.Count == 0 ? UiText.Get("noUserConfigurations") : string.Empty;
-        BuiltInHeader.Text = UiText.Get("builtInPresets");
-        BuiltInHint.Text = UiText.Get("builtInPresetsHint");
+        EmptyText.Text = _session.AllConfigurations.Count == 0 ? UiText.Get("noConfigurations") : string.Empty;
         ErrorText.Text = string.Empty;
         BuildSlots();
-        BuildCards(UserCardsPanel, _session.UserConfigurations, true);
-        BuildCards(BuiltInCardsPanel, _session.BuiltInConfigurations, false);
+        BuildCards(_session.AllConfigurations);
     }
 
     private void BuildSlots()
@@ -97,15 +94,16 @@ public partial class ConfigurationPage : Page
         return border;
     }
 
-    private void BuildCards(Panel panel, IEnumerable<BlendConfiguration> configurations, bool editable)
+    private void BuildCards(IEnumerable<BlendConfiguration> configurations)
     {
-        panel.Children.Clear();
-        foreach (var configuration in configurations) panel.Children.Add(CreateCard(configuration, editable));
+        ConfigurationCardsPanel.Children.Clear();
+        foreach (var configuration in configurations)
+            ConfigurationCardsPanel.Children.Add(CreateCard(configuration));
     }
 
-    private Border CreateCard(BlendConfiguration configuration, bool editable)
+    private Border CreateCard(BlendConfiguration configuration)
     {
-        var card = new Border { Margin = new Thickness(0, 0, 0, 8), Padding = new Thickness(12, 10, 10, 10), Background = (Brush)FindResource("CardBrush"), BorderBrush = IntensityBrush(configuration.Intensity), BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), ToolTip = UiText.Get("dragToSlots") };
+        var card = new Border { Margin = new Thickness(0, 0, 8, 8), Padding = new Thickness(12, 10, 10, 10), MinHeight = 126, Background = (Brush)FindResource("CardBrush"), BorderBrush = IntensityBrush(configuration.Intensity), BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), ToolTip = UiText.Get("dragToSlots") };
         var grid = new Grid();
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -115,9 +113,9 @@ public partial class ConfigurationPage : Page
         details.Children.Add(CreateIntensityBar(configuration.Intensity));
         Grid.SetColumn(details, 0); grid.Children.Add(details);
         var actions = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
-        var edit = MakeIconAction("Edit24", UiText.Get("edit"), editable && !configuration.IsLocked); edit.Click += (_, _) => OpenEditor(configuration, false);
-        var lockButton = MakeIconAction(configuration.IsLocked ? "LockClosed24" : "LockOpen24", configuration.IsLocked ? UiText.Get("unlock") : UiText.Get("lock"), editable); lockButton.Click += (_, _) => { if (editable) _session.SetConfigurationLocked(configuration.Id, !configuration.IsLocked); };
-        var delete = MakeIconAction("Delete24", UiText.Get("delete"), editable && !configuration.IsLocked); delete.Click += (_, _) => { if (editable && !configuration.IsLocked && MessageBox.Show(UiText.Get("deleteConfigurationConfirm"), UiText.Get("configuration"), MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) _session.DeleteConfiguration(configuration.Id); };
+        var edit = MakeIconAction("Edit24", UiText.Get("edit"), !configuration.IsLocked); edit.Click += (_, _) => OpenEditor(configuration, false);
+        var lockButton = MakeIconAction(configuration.IsLocked ? "LockClosed24" : "LockOpen24", configuration.IsLocked ? UiText.Get("unlock") : UiText.Get("lock"), true); lockButton.Click += (_, _) => _session.SetConfigurationLocked(configuration.Id, !configuration.IsLocked);
+        var delete = MakeIconAction("Delete24", UiText.Get("delete"), !configuration.IsLocked); delete.Click += (_, _) => { if (!configuration.IsLocked && MessageBox.Show(UiText.Get("deleteConfigurationConfirm"), UiText.Get("configuration"), MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) _session.DeleteConfiguration(configuration.Id); };
         actions.Children.Add(edit); actions.Children.Add(lockButton); actions.Children.Add(delete); Grid.SetColumn(actions, 1); grid.Children.Add(actions); card.Child = grid;
         card.MouseLeftButtonDown += (_, e) => _dragStart = e.GetPosition(card);
         card.MouseMove += (_, e) =>
@@ -137,7 +135,8 @@ public partial class ConfigurationPage : Page
         var dialog = new ConfigurationEditorWindow(initial) { Owner = Window.GetWindow(this) };
         if (dialog.ShowDialog() != true) return;
         if (isNew) _session.AddUserConfiguration(dialog.ConfigurationName, dialog.Settings);
-        else { _session.RenameConfiguration(initial.Id, dialog.ConfigurationName); _session.UpdateConfiguration(initial.Id, dialog.Settings); }
+        else if (!_session.RenameConfiguration(initial.Id, dialog.ConfigurationName) || !_session.UpdateConfiguration(initial.Id, dialog.Settings))
+            ErrorText.Text = UiText.Get("configurationUpdateFailed");
     }
 
     private void AddButton_Click(object sender, RoutedEventArgs e) => OpenEditor(null, true);

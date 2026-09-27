@@ -92,7 +92,7 @@ Cloud processing, accounts, DRM, guaranteed copy prevention, custom update check
 
 ## v0.5.0 Configuration Presets
 
-Configuration is organized as cards. The page shows Home blend slots first, user configurations second, and the three read-only built-in presets last. Users can create, rename, edit, lock, unlock, and delete user configurations. Locked user configurations cannot be edited or deleted. Built-in configurations can be viewed and dragged into slots but cannot be changed or deleted.
+Configuration is organized as cards. The page shows five Home blend slots first, a separator, then one merged `Blend configurations` section. On first use the application seeds three editable configurations named with the localized `Preset`/`预设` prefix. Users can create, rename, edit, lock, unlock, and delete any configuration. A locked configuration cannot be edited or deleted. Settings provides a restore toggle that adds missing default preset IDs without replacing existing edits.
 
 Each configuration owns its enabled features and feature-specific values. Only enabled features expand their detail controls. The implemented feature set is Normalize Content Width, Flatten, Watermark, and conservative Pixel Noise. Deferred protection and prompt-injection ideas remain absent from the working controls.
 

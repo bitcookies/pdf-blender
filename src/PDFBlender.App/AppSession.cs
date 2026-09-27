@@ -9,10 +9,8 @@ internal sealed class AppSession
     private List<string?> _slotIds;
     private string? _selectedConfigurationId;
 
-    public IReadOnlyList<BlendPreset> Presets { get; } = PDFBlender.Core.Models.Presets.All;
     public IReadOnlyList<BlendConfiguration> BuiltInConfigurations { get; } = PDFBlender.Core.Models.BuiltInConfigurations.All;
-    public IReadOnlyList<BlendConfiguration> UserConfigurations => _userConfigurations;
-    public IReadOnlyList<BlendConfiguration> AllConfigurations => BuiltInConfigurations.Concat(_userConfigurations).ToList();
+    public IReadOnlyList<BlendConfiguration> AllConfigurations => _userConfigurations;
     public IReadOnlyList<BlendConfiguration?> SlotConfigurations => _slotIds.Select(id => id is null ? null : GetConfiguration(id)).ToList();
     public IReadOnlyList<string?> SlotIds => _slotIds;
     public AppPreferences Preferences { get; private set; }
@@ -26,8 +24,11 @@ internal sealed class AppSession
     public AppSession()
     {
         Preferences = AppPreferencesStore.Load();
+        UiText.SetLanguage(Preferences.Language);
         var document = ConfigurationStore.Load();
         _userConfigurations = document.UserConfigurations ?? [];
+        if ((!ConfigurationStore.Exists && _userConfigurations.Count == 0) || Preferences.RestorePresets)
+            RestoreMissingPresets();
         _slotIds = document.SlotIds ?? [];
         _selectedConfigurationId = document.SelectedConfigurationId;
         _slotIds = NormalizeSlots(_slotIds);
@@ -36,7 +37,7 @@ internal sealed class AppSession
     }
 
     public BlendConfiguration? GetConfiguration(string id) =>
-        BuiltInConfigurations.Concat(_userConfigurations).FirstOrDefault(configuration => string.Equals(configuration.Id, id, StringComparison.OrdinalIgnoreCase));
+        _userConfigurations.FirstOrDefault(configuration => string.Equals(configuration.Id, id, StringComparison.OrdinalIgnoreCase));
 
     public void SetInputPath(string? path)
     {
@@ -145,13 +146,6 @@ internal sealed class AppSession
         return true;
     }
 
-    public void ApplyPreferences(ThemePreference? theme = null, UiLanguage? language = null)
-    {
-        Preferences = Preferences with { Theme = theme ?? Preferences.Theme, Language = language ?? Preferences.Language };
-        SavePreferences();
-        Changed?.Invoke(this, EventArgs.Empty);
-    }
-
     public void SavePreferences()
     {
         try { AppPreferencesStore.Save(Preferences); }
@@ -165,9 +159,50 @@ internal sealed class AppSession
         EnsureSelectedSlot();
         Preferences = Preferences with { SelectedBlendLevel = SelectedBlendLevel };
         SavePreferences();
-        try { ConfigurationStore.Save(new ConfigurationDocument(2, _userConfigurations, _slotIds, _selectedConfigurationId)); }
+        try { ConfigurationStore.Save(new ConfigurationDocument(3, _userConfigurations, _slotIds, _selectedConfigurationId)); }
         catch (IOException) { }
         catch (UnauthorizedAccessException) { }
+    }
+
+    public void ApplyPreferences(ThemePreference? theme = null, UiLanguage? language = null, bool? restorePresets = null)
+    {
+        Preferences = Preferences with
+        {
+            Theme = theme ?? Preferences.Theme,
+            Language = language ?? Preferences.Language,
+            RestorePresets = restorePresets ?? Preferences.RestorePresets
+        };
+        UiText.SetLanguage(Preferences.Language);
+        if (restorePresets == true)
+            RestoreMissingPresets();
+        SaveAll();
+        Changed?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void RestoreMissingPresets()
+    {
+        foreach (var preset in BuiltInConfigurations)
+        {
+            if (_userConfigurations.Any(configuration => string.Equals(configuration.Id, preset.Id, StringComparison.OrdinalIgnoreCase))) continue;
+            _userConfigurations.Add(preset with
+            {
+                Name = LocalizedPresetName(preset),
+                IsBuiltIn = false,
+                IsLocked = false
+            });
+        }
+    }
+
+    private static string LocalizedPresetName(BlendConfiguration preset)
+    {
+        var name = preset.Id switch
+        {
+            "builtin-light" => UiText.Get("light"),
+            "builtin-medium" => UiText.Get("medium"),
+            "builtin-heavy" => UiText.Get("heavy"),
+            _ => preset.Name
+        };
+        return $"{UiText.Get("presetPrefix")} {name}";
     }
 
     private static List<string?> NormalizeSlots(IEnumerable<string?> slots)

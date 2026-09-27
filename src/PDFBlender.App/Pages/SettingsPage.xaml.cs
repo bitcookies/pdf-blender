@@ -26,10 +26,13 @@ public partial class SettingsPage : Page
         ThemeHint.Text = UiText.Get("themeHint");
         LanguageLabel.Text = UiText.Get("language");
         LanguageHint.Text = UiText.Get("languageHint");
+        RestorePresetsLabel.Text = UiText.Get("restorePresets");
+        RestorePresetsHint.Text = UiText.Get("restorePresetsHint");
         ThemeOptions.ItemsSource = new[] { UiText.Get("system"), UiText.Get("light"), UiText.Get("dark") };
         LanguageOptions.ItemsSource = new[] { UiText.Get("system"), "English", "简体中文" };
         ThemeOptions.SelectedIndex = (int)_session.Preferences.Theme;
         LanguageOptions.SelectedIndex = (int)_session.Preferences.Language;
+        RestorePresetsToggle.IsChecked = _session.Preferences.RestorePresets;
         _initializing = false;
     }
 
@@ -43,5 +46,11 @@ public partial class SettingsPage : Page
     {
         if (!_initializing && LanguageOptions.SelectedIndex >= 0)
             _session.ApplyPreferences(language: (UiLanguage)LanguageOptions.SelectedIndex);
+    }
+
+    private void RestorePresetsToggle_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_initializing)
+            _session.ApplyPreferences(restorePresets: RestorePresetsToggle.IsChecked == true);
     }
 }
