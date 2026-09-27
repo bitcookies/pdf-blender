@@ -1,0 +1,20 @@
+<ui:FluentWindow x:Class="PDFBlender.App.Pages.ConfigurationEditorWindow"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                  Title="Edit configuration" Width="520" Height="620" MinWidth="480" MinHeight="520"
+                  WindowStartupLocation="CenterOwner" WindowBackdropType="Mica" WindowCornerPreference="Round"
+                  Background="{DynamicResource WindowBackgroundBrush}" TextElement.FontFamily="{DynamicResource AppFontFamily}">
+    <Grid Margin="22">
+        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+        <StackPanel>
+            <TextBlock x:Name="TitleText" Style="{StaticResource PageTitleTextStyle}" />
+            <TextBox x:Name="NameBox" Margin="0,12,0,14" />
+        </StackPanel>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"><StackPanel x:Name="FeaturePanel" /></ScrollViewer>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <ui:Button x:Name="CancelButton" Appearance="Secondary" Content="Cancel" Click="CancelButton_Click" Margin="0,0,8,0" />
+            <ui:Button x:Name="SaveButton" Appearance="Primary" Content="Save" Click="SaveButton_Click" />
+        </StackPanel>
+    </Grid>
+</ui:FluentWindow>

@@ -3,24 +3,12 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <StackPanel Margin="20,16,20,24" MaxWidth="780">
+        <StackPanel Margin="20,16,20,24" MaxWidth="800">
             <TextBlock x:Name="TitleText" Style="{StaticResource PageTitleTextStyle}" />
             <TextBlock x:Name="SubtitleText" Style="{StaticResource PageDescriptionTextStyle}" Margin="0,3,0,14" />
-
-            <Border Style="{StaticResource SurfaceCardStyle}" Padding="14" AllowDrop="True"
-                    DragOver="Slots_DragOver" Drop="Slots_Drop">
-                <StackPanel>
-                    <Grid>
-                        <StackPanel>
-                            <TextBlock x:Name="SlotsHeader" Style="{StaticResource CardTitleTextStyle}" />
-                            <TextBlock x:Name="SlotsHint" Style="{StaticResource SmallMutedTextStyle}" Margin="0,3,0,0" />
-                        </StackPanel>
-                        <TextBlock x:Name="SlotsCountText" HorizontalAlignment="Right" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold" />
-                    </Grid>
-                    <WrapPanel x:Name="SlotsPanel" Margin="0,12,0,0" />
-                </StackPanel>
-            </Border>
-
+            <TextBlock x:Name="SlotsHeader" Style="{StaticResource SectionTitleTextStyle}" />
+            <TextBlock x:Name="SlotsHint" Style="{StaticResource SmallMutedTextStyle}" Margin="0,3,0,10" />
+            <Grid x:Name="SlotsPanel" />
             <Grid Margin="0,18,0,8">
                 <TextBlock x:Name="UserHeader" Style="{StaticResource SectionTitleTextStyle}" />
                 <ui:Button x:Name="AddButton" HorizontalAlignment="Right" Padding="12,6" Click="AddButton_Click">
@@ -28,14 +16,11 @@
                 </ui:Button>
             </Grid>
             <TextBlock x:Name="UserEmptyText" Style="{StaticResource SmallMutedTextStyle}" Margin="0,0,0,8" />
-            <WrapPanel x:Name="UserCardsPanel" />
-            <Border x:Name="EditorBorder" Style="{StaticResource SurfaceCardStyle}" Padding="16" Margin="0,12,0,0" Visibility="Collapsed">
-                <StackPanel x:Name="EditorPanel" />
-            </Border>
-
-            <TextBlock x:Name="BuiltInHeader" Style="{StaticResource SectionTitleTextStyle}" Margin="0,22,0,8" />
-            <TextBlock x:Name="BuiltInHint" Style="{StaticResource SmallMutedTextStyle}" Margin="0,0,0,8" />
-            <WrapPanel x:Name="BuiltInCardsPanel" />
+            <StackPanel x:Name="UserCardsPanel" />
+            <Separator Margin="0,18,0,16" />
+            <TextBlock x:Name="BuiltInHeader" Style="{StaticResource SectionTitleTextStyle}" />
+            <TextBlock x:Name="BuiltInHint" Style="{StaticResource SmallMutedTextStyle}" Margin="0,3,0,8" />
+            <StackPanel x:Name="BuiltInCardsPanel" />
             <TextBlock x:Name="ErrorText" Foreground="{DynamicResource AccentBrush}" TextWrapping="Wrap" Margin="0,10,0,0" />
         </StackPanel>
     </ScrollViewer>

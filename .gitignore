@@ -16,6 +16,7 @@ ucdt-computing-core/
 *.suo
 *.userosscache
 *.csproj.user
+*_wpftmp.csproj
 
 # NuGet and generated package files
 packages/

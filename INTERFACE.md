@@ -27,7 +27,7 @@ The shell is a single WPF-UI `FluentWindow` with a compact icon-and-label rail a
 
 ### BlendLevelRail
 
-`BlendLevelRail` exposes `Levels`, `SelectedIndex`, and `SelectionChanged`. It uses a snapped WPF `Slider`, supports mouse and keyboard navigation, and renders the selected preset name and summary. The shipped list contains `STIR`, `BLEND`, and `PULSE`; future one-to-five-level data is an extension point only.
+`BlendLevelRail` exposes `Levels`, `SelectedIndex`, and `SelectionChanged`. It uses a snapped WPF `Slider`, supports mouse and keyboard navigation, and renders five ordered positions. Empty positions are disabled and skipped when dragging or using the keyboard; occupied positions retain their configuration order.
 
 ## Configuration and Settings
 
@@ -55,4 +55,4 @@ Support keyboard access for import, selectors, settings, and the primary action.
 
 ## v0.5.0 Configuration Cards
 
-The Configuration page is ordered as Home blend slots, user configurations, then built-in presets. A selected card opens an inline editor. Each implemented feature is a compact toggle row; only enabled features reveal detail controls. Built-in presets are read-only. User configurations support custom names, duplication, deletion, and feature-specific values. Slot cards accept up to five unique configurations by drag and drop and are saved in low-to-high intensity order. Preferences and configurations use the roaming AppData folder named PDF Blender.
+The Configuration page is ordered as five fixed Home blend slots, user configurations, then built-in presets. Each user card shows only enabled features and provides edit, lock, and delete actions. Editing opens a modal editor; only enabled features reveal detail controls. Built-in presets are permanently locked. Dragging onto an occupied slot replaces that slot, while dragging a configuration from one slot to another leaves its old position empty. Preferences and configurations use the roaming AppData folder named PDF Blender.

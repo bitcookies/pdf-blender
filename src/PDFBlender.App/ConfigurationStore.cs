@@ -8,12 +8,12 @@ namespace PDFBlender.App;
 internal sealed record ConfigurationDocument(
     int SchemaVersion,
     List<BlendConfiguration> UserConfigurations,
-    List<string> SlotIds,
+    List<string?> SlotIds,
     string? SelectedConfigurationId);
 
 internal static class ConfigurationStore
 {
-    private const int CurrentSchemaVersion = 1;
+    private const int CurrentSchemaVersion = 2;
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         WriteIndented = true,
@@ -32,9 +32,9 @@ internal static class ConfigurationStore
             if (File.Exists(FilePath))
             {
                 var document = JsonSerializer.Deserialize<ConfigurationDocument>(File.ReadAllText(FilePath), SerializerOptions);
-                if (document is not null && document.SchemaVersion == CurrentSchemaVersion)
+                if (document is not null && document.SchemaVersion is 1 or CurrentSchemaVersion)
                 {
-                    return Normalize(document);
+                    return Normalize(document with { SchemaVersion = CurrentSchemaVersion });
                 }
             }
         }
@@ -42,7 +42,7 @@ internal static class ConfigurationStore
         catch (IOException) { }
         catch (UnauthorizedAccessException) { }
 
-        return new ConfigurationDocument(CurrentSchemaVersion, [], ["builtin-medium"], "builtin-medium");
+        return new ConfigurationDocument(CurrentSchemaVersion, [], [null, "builtin-medium", null, null, null], "builtin-medium");
     }
 
     public static void Save(ConfigurationDocument document)
@@ -66,11 +66,12 @@ internal static class ConfigurationStore
         var validIds = new HashSet<string>(BuiltInConfigurations.All.Select(configuration => configuration.Id), StringComparer.OrdinalIgnoreCase);
         foreach (var configuration in uniqueUser) validIds.Add(configuration.Id);
 
+        var seenSlots = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var slots = (document.SlotIds ?? [])
-            .Where(id => validIds.Contains(id))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
             .Take(5)
+            .Select(id => id is not null && validIds.Contains(id) && seenSlots.Add(id) ? id : null)
             .ToList();
+        while (slots.Count < 5) slots.Add(null);
         var selected = document.SelectedConfigurationId is not null && validIds.Contains(document.SelectedConfigurationId)
             ? document.SelectedConfigurationId
             : slots.FirstOrDefault();

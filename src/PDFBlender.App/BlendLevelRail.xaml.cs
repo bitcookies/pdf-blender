@@ -5,7 +5,7 @@ using System.Windows.Media;
 
 namespace PDFBlender.App;
 
-public sealed record BlendLevelItem(string Name, string Summary);
+public sealed record BlendLevelItem(string Name, string Summary, bool IsAvailable = true);
 
 public partial class BlendLevelRail : UserControl
 {
@@ -19,6 +19,7 @@ public partial class BlendLevelRail : UserControl
     public BlendLevelRail()
     {
         InitializeComponent();
+        LevelSlider.PreviewKeyDown += LevelSlider_PreviewKeyDown;
         SetLevels([]);
     }
 
@@ -41,7 +42,7 @@ public partial class BlendLevelRail : UserControl
         _updating = true;
         LevelSlider.Minimum = 0;
         LevelSlider.Maximum = Math.Max(0, levels.Count - 1);
-        LevelSlider.IsEnabled = levels.Count > 1;
+        LevelSlider.IsEnabled = levels.Count(level => level.IsAvailable) > 1;
         LevelSlider.Value = levels.Count == 0 ? 0 : Math.Clamp(SelectedIndex, 0, levels.Count - 1);
         LabelsPanel.Children.Clear();
         LabelsPanel.Columns = Math.Max(1, levels.Count);
@@ -72,10 +73,56 @@ public partial class BlendLevelRail : UserControl
     private void LevelSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
         UpdateSelectionText();
+        if (!_updating && _levels.Count > 0 && !_levels[SelectedIndex].IsAvailable)
+        {
+            var nearest = Enumerable.Range(0, _levels.Count)
+                .Where(index => _levels[index].IsAvailable)
+                .OrderBy(index => Math.Abs(index - SelectedIndex))
+                .FirstOrDefault(-1);
+            if (nearest >= 0)
+            {
+                _updating = true;
+                LevelSlider.Value = nearest;
+                _updating = false;
+                UpdateSelectionText();
+                SelectionChanged?.Invoke(this, new BlendLevelChangedEventArgs(nearest, _levels[nearest]));
+            }
+            return;
+        }
         if (!_updating && _levels.Count > 0)
         {
             SelectionChanged?.Invoke(this, new BlendLevelChangedEventArgs(SelectedIndex, _levels[SelectedIndex]));
         }
+    }
+
+    private void LevelSlider_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (_levels.Count == 0) return;
+        var available = _levels
+            .Select((level, index) => (level, index))
+            .Where(item => item.level.IsAvailable)
+            .Select(item => item.index)
+            .ToArray();
+        if (available.Length == 0) return;
+
+        var current = SelectedIndex;
+        var target = e.Key switch
+        {
+            System.Windows.Input.Key.Home => available[0],
+            System.Windows.Input.Key.End => available[^1],
+            System.Windows.Input.Key.Left or System.Windows.Input.Key.Down => available.LastOrDefault(index => index < current, current),
+            System.Windows.Input.Key.Right or System.Windows.Input.Key.Up => available.FirstOrDefault(index => index > current, current),
+            _ => current
+        };
+        if (target == current && e.Key is not (System.Windows.Input.Key.Home or System.Windows.Input.Key.End)) return;
+
+        _updating = true;
+        LevelSlider.Value = target;
+        _updating = false;
+        UpdateSelectionText();
+        if (target != current)
+            SelectionChanged?.Invoke(this, new BlendLevelChangedEventArgs(target, _levels[target]));
+        e.Handled = true;
     }
 
     private void UpdateSelectionText()
@@ -88,14 +135,15 @@ public partial class BlendLevelRail : UserControl
         }
 
         var item = _levels[SelectedIndex];
-        SelectionText.Text = item.Name;
-        SelectionSummaryText.Text = item.Summary;
+        SelectionText.Text = item.IsAvailable ? item.Name : string.Empty;
+        SelectionSummaryText.Text = item.IsAvailable ? item.Summary : string.Empty;
         SelectionText.ToolTip = item.Summary;
         for (var index = 0; index < LabelsPanel.Children.Count; index++)
         {
             if (LabelsPanel.Children[index] is not TextBlock label) continue;
             var selected = index == SelectedIndex;
-            label.Foreground = (Brush)FindResource(selected ? "AccentBrush" : "MutedTextBrush");
+            var available = _levels[index].IsAvailable;
+            label.Foreground = (Brush)FindResource(selected ? "AccentBrush" : available ? "MutedTextBrush" : "BorderBrush");
             label.FontWeight = selected ? FontWeights.SemiBold : FontWeights.Medium;
         }
     }

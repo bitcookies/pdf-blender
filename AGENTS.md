@@ -12,7 +12,7 @@
 
 - Product display name: **PDF Blender**. Treat the earlier “PDF Bender” mention as a typo.
 - Target: Windows, C# / .NET 10, WPF, and Microsoft Store distribution through MSIX.
-- Current UI milestone is `0.4.0` (package version `0.4.0.0`); the processing MVP began at `0.1.0`. The Store owns update delivery; do not build a custom updater or hard-code an unpublished Store URL.
+- Current UI milestone is `0.5.0` (package version `0.5.0.0`); the processing MVP began at `0.1.0`. The Store owns update delivery; do not build a custom updater or hard-code an unpublished Store URL.
 - Preserve the reserved Store identity documented in `SPEC.md` exactly.
 - `README.md` is maintained by the user. Do not edit it unless explicitly asked.
 - Project documentation is written in English.

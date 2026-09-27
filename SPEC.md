@@ -92,10 +92,10 @@ Cloud processing, accounts, DRM, guaranteed copy prevention, custom update check
 
 ## v0.5.0 Configuration Presets
 
-Configuration is organized as cards. The page shows Home blend slots first, user configurations second, and the three read-only built-in presets last. Users can create, rename, duplicate, edit, and delete user configurations. Built-in configurations can be viewed and dragged into slots but cannot be changed or deleted.
+Configuration is organized as cards. The page shows Home blend slots first, user configurations second, and the three read-only built-in presets last. Users can create, rename, edit, lock, unlock, and delete user configurations. Locked user configurations cannot be edited or deleted. Built-in configurations can be viewed and dragged into slots but cannot be changed or deleted.
 
 Each configuration owns its enabled features and feature-specific values. Only enabled features expand their detail controls. The implemented feature set is Normalize Content Width, Flatten, Watermark, and conservative Pixel Noise. Deferred protection and prompt-injection ideas remain absent from the working controls.
 
-Configuration intensity is the strongest enabled feature weight on a 0-9 scale. Width normalization is 0; text watermark is 3; full-page watermark is 5; flatten and high noise are 6; medium noise is 4; low noise is 2. Home accepts zero to five unique slot configurations, displays an empty state when zero are selected, and sorts saved slots from low to high intensity.
+Configuration intensity is the strongest enabled feature weight on a 0-9 scale. Width normalization is 0; text watermark is 3; full-page watermark is 5; flatten and high noise are 6; medium noise is 4; low noise is 2. Home has five ordered slot positions, preserves empty positions, and displays only occupied positions as selectable levels; empty positions are visibly disabled.
 
 Configuration and preferences are stored under the roaming AppData folder named PDF Blender. The application does not read the removed local PDFBlender folder.

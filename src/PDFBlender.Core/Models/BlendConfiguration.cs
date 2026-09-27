@@ -48,7 +48,7 @@ public static class ConfigurationIntensity
         BlendFeatureCatalog.All.Max(feature => BlendFeatureCatalog.Weight(settings, feature));
 }
 
-public sealed record BlendConfiguration(string Id, string Name, bool IsBuiltIn, BlendSettings Settings)
+public sealed record BlendConfiguration(string Id, string Name, bool IsBuiltIn, BlendSettings Settings, bool IsLocked = false)
 {
     public int Intensity => ConfigurationIntensity.For(Settings);
 
@@ -60,8 +60,8 @@ public static class BuiltInConfigurations
 {
     public static IReadOnlyList<BlendConfiguration> All { get; } =
     [
-        new("builtin-light", "Light", true, Presets.For(BlendMode.Stir)),
-        new("builtin-medium", "Medium", true, Presets.For(BlendMode.Blend)),
-        new("builtin-heavy", "Heavy", true, Presets.For(BlendMode.Pulse))
+        new("builtin-light", "Light", true, Presets.For(BlendMode.Stir), true),
+        new("builtin-medium", "Medium", true, Presets.For(BlendMode.Blend), true),
+        new("builtin-heavy", "Heavy", true, Presets.For(BlendMode.Pulse), true)
     ];
 }

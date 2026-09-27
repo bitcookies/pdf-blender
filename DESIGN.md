@@ -63,6 +63,6 @@ The sole release channel is Microsoft Store, packaged as MSIX with the reserved 
 
 ## v0.5.0 Configuration Card Pattern
 
-The Configuration page is ordered as Home blend slots, user configurations, then built-in presets. Cards show a name, type, enabled-feature summary, and a ten-step intensity bar. Dragging a card to the slot surface adds it to Home; slots accept zero to five unique cards and persist in low-to-high intensity order.
+The Configuration page is ordered as five fixed Home blend slots, user configurations, then built-in presets. Cards show a name, enabled-feature summary, and a ten-step intensity bar. Dragging a card to a slot preserves that exact position; dropping onto an occupied slot replaces its occupant. Empty positions remain visible and disabled on Home.
 
-Feature rows follow the Squash-style progressive disclosure pattern. A disabled feature occupies one compact row. Enabling it reveals only that feature's detail controls below the row. Watermark text and all other values belong to the selected configuration, so two configurations can use different values. Built-in cards use the same visual editor in read-only mode.
+Feature rows in the modal editor follow progressive disclosure. A disabled feature occupies one compact row. Enabling it reveals only that feature's detail controls below the row. Watermark text and all other values belong to the selected configuration, so two configurations can use different values. Built-in cards remain locked and cannot open the editor.

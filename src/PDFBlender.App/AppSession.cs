@@ -6,21 +6,15 @@ namespace PDFBlender.App;
 internal sealed class AppSession
 {
     private readonly List<BlendConfiguration> _userConfigurations;
-    private List<string> _slotIds;
+    private List<string?> _slotIds;
     private string? _selectedConfigurationId;
 
     public IReadOnlyList<BlendPreset> Presets { get; } = PDFBlender.Core.Models.Presets.All;
     public IReadOnlyList<BlendConfiguration> BuiltInConfigurations { get; } = PDFBlender.Core.Models.BuiltInConfigurations.All;
     public IReadOnlyList<BlendConfiguration> UserConfigurations => _userConfigurations;
     public IReadOnlyList<BlendConfiguration> AllConfigurations => BuiltInConfigurations.Concat(_userConfigurations).ToList();
-    public IReadOnlyList<BlendConfiguration> SlotConfigurations => _slotIds
-        .Select(GetConfiguration)
-        .Where(configuration => configuration is not null)
-        .Cast<BlendConfiguration>()
-        .OrderBy(configuration => configuration.Intensity)
-        .ThenBy(configuration => _slotIds.IndexOf(configuration.Id))
-        .ToList();
-    public IReadOnlyList<string> SlotIds => _slotIds;
+    public IReadOnlyList<BlendConfiguration?> SlotConfigurations => _slotIds.Select(id => id is null ? null : GetConfiguration(id)).ToList();
+    public IReadOnlyList<string?> SlotIds => _slotIds;
     public AppPreferences Preferences { get; private set; }
     public int SelectedBlendLevel { get; private set; }
     public string? SelectedConfigurationId => _selectedConfigurationId;
@@ -36,7 +30,9 @@ internal sealed class AppSession
         _userConfigurations = document.UserConfigurations ?? [];
         _slotIds = document.SlotIds ?? [];
         _selectedConfigurationId = document.SelectedConfigurationId;
-        SelectedBlendLevel = Math.Clamp(Preferences.SelectedBlendLevel, 0, Math.Max(0, _slotIds.Count - 1));
+        _slotIds = NormalizeSlots(_slotIds);
+        SelectedBlendLevel = Math.Clamp(Preferences.SelectedBlendLevel, 0, 4);
+        EnsureSelectedSlot();
     }
 
     public BlendConfiguration? GetConfiguration(string id) =>
@@ -50,18 +46,12 @@ internal sealed class AppSession
 
     public void SetBlendLevel(int index)
     {
-        SelectedBlendLevel = _slotIds.Count == 0 ? 0 : Math.Clamp(index, 0, _slotIds.Count - 1);
-        var selected = SlotConfigurations.ElementAtOrDefault(SelectedBlendLevel);
-        _selectedConfigurationId = selected?.Id;
+        var target = Math.Clamp(index, 0, 4);
+        var selected = SlotConfigurations.ElementAtOrDefault(target);
+        if (selected is null) return;
+        SelectedBlendLevel = target;
+        _selectedConfigurationId = selected.Id;
         Preferences = Preferences with { SelectedBlendLevel = SelectedBlendLevel };
-        SaveAll();
-        Changed?.Invoke(this, EventArgs.Empty);
-    }
-
-    public void SelectConfiguration(string? id)
-    {
-        if (id is null || GetConfiguration(id) is null) return;
-        _selectedConfigurationId = id;
         SaveAll();
         Changed?.Invoke(this, EventArgs.Empty);
     }
@@ -82,16 +72,11 @@ internal sealed class AppSession
         return id;
     }
 
-    public string DuplicateConfiguration(string id)
-    {
-        var source = GetConfiguration(id) ?? throw new ArgumentException("Configuration was not found.", nameof(id));
-        return AddUserConfiguration(source.Name + " Copy", source.Settings);
-    }
-
     public bool RenameConfiguration(string id, string name)
     {
         var index = _userConfigurations.FindIndex(configuration => string.Equals(configuration.Id, id, StringComparison.OrdinalIgnoreCase));
         if (index < 0 || string.IsNullOrWhiteSpace(name)) return false;
+        if (_userConfigurations[index].IsLocked) return false;
         _userConfigurations[index] = _userConfigurations[index] with { Name = name.Trim() };
         SaveAll();
         Changed?.Invoke(this, EventArgs.Empty);
@@ -101,7 +86,7 @@ internal sealed class AppSession
     public bool UpdateConfiguration(string id, BlendSettings settings)
     {
         var index = _userConfigurations.FindIndex(configuration => string.Equals(configuration.Id, id, StringComparison.OrdinalIgnoreCase));
-        if (index < 0) return false;
+        if (index < 0 || _userConfigurations[index].IsLocked) return false;
         _userConfigurations[index] = _userConfigurations[index] with { Settings = settings };
         SaveAll();
         Changed?.Invoke(this, EventArgs.Empty);
@@ -110,30 +95,51 @@ internal sealed class AppSession
 
     public bool DeleteConfiguration(string id)
     {
-        var removed = _userConfigurations.RemoveAll(configuration => string.Equals(configuration.Id, id, StringComparison.OrdinalIgnoreCase)) > 0;
+        var configuration = _userConfigurations.FirstOrDefault(item => string.Equals(item.Id, id, StringComparison.OrdinalIgnoreCase));
+        if (configuration is null || configuration.IsLocked) return false;
+        var removed = _userConfigurations.RemoveAll(item => string.Equals(item.Id, id, StringComparison.OrdinalIgnoreCase)) > 0;
         if (!removed) return false;
-        _slotIds.RemoveAll(slotId => string.Equals(slotId, id, StringComparison.OrdinalIgnoreCase));
-        if (string.Equals(_selectedConfigurationId, id, StringComparison.OrdinalIgnoreCase)) _selectedConfigurationId = SlotConfigurations.FirstOrDefault()?.Id;
-        SelectedBlendLevel = Math.Clamp(SelectedBlendLevel, 0, Math.Max(0, _slotIds.Count - 1));
+        for (var index = 0; index < _slotIds.Count; index++)
+            if (string.Equals(_slotIds[index], id, StringComparison.OrdinalIgnoreCase)) _slotIds[index] = null;
+        if (string.Equals(_selectedConfigurationId, id, StringComparison.OrdinalIgnoreCase)) _selectedConfigurationId = SlotConfigurations.FirstOrDefault(configuration => configuration is not null)?.Id;
         SaveAll();
         Changed?.Invoke(this, EventArgs.Empty);
         return true;
     }
 
-    public bool AddToSlots(string id)
+    public bool AddToSlots(string id, int? targetIndex = null)
     {
-        if (GetConfiguration(id) is null || _slotIds.Count >= 5 || _slotIds.Contains(id, StringComparer.OrdinalIgnoreCase)) return false;
-        _slotIds.Add(id);
-        SelectConfiguration(id);
+        if (GetConfiguration(id) is null) return false;
+        var target = targetIndex ?? _slotIds.FindIndex(slot => slot is null);
+        if (target < 0 || target >= 5) return false;
+        var oldIndex = _slotIds.FindIndex(slot => string.Equals(slot, id, StringComparison.OrdinalIgnoreCase));
+        if (oldIndex == target) return true;
+        for (var index = 0; index < _slotIds.Count; index++)
+            if (index != target && string.Equals(_slotIds[index], id, StringComparison.OrdinalIgnoreCase)) _slotIds[index] = null;
+        _slotIds[target] = id;
+        SelectedBlendLevel = target;
+        _selectedConfigurationId = id;
+        SaveAll();
+        Changed?.Invoke(this, EventArgs.Empty);
         return true;
     }
 
     public bool RemoveFromSlots(string id)
     {
-        var removed = _slotIds.RemoveAll(slotId => string.Equals(slotId, id, StringComparison.OrdinalIgnoreCase)) > 0;
+        var removed = false;
+        for (var index = 0; index < _slotIds.Count; index++)
+            if (string.Equals(_slotIds[index], id, StringComparison.OrdinalIgnoreCase)) { _slotIds[index] = null; removed = true; }
         if (!removed) return false;
-        SelectedBlendLevel = Math.Clamp(SelectedBlendLevel, 0, Math.Max(0, _slotIds.Count - 1));
-        _selectedConfigurationId = SlotConfigurations.ElementAtOrDefault(SelectedBlendLevel)?.Id;
+        SaveAll();
+        Changed?.Invoke(this, EventArgs.Empty);
+        return true;
+    }
+
+    public bool SetConfigurationLocked(string id, bool locked)
+    {
+        var index = _userConfigurations.FindIndex(configuration => string.Equals(configuration.Id, id, StringComparison.OrdinalIgnoreCase));
+        if (index < 0) return false;
+        _userConfigurations[index] = _userConfigurations[index] with { IsLocked = locked };
         SaveAll();
         Changed?.Invoke(this, EventArgs.Empty);
         return true;
@@ -155,13 +161,42 @@ internal sealed class AppSession
 
     private void SaveAll()
     {
+        _slotIds = NormalizeSlots(_slotIds);
+        EnsureSelectedSlot();
+        Preferences = Preferences with { SelectedBlendLevel = SelectedBlendLevel };
         SavePreferences();
-        _slotIds = SlotConfigurations.Select(configuration => configuration.Id).ToList();
-        SelectedBlendLevel = Math.Clamp(SelectedBlendLevel, 0, Math.Max(0, _slotIds.Count - 1));
-        if (GetConfiguration(_selectedConfigurationId ?? string.Empty) is null)
-            _selectedConfigurationId = SlotConfigurations.ElementAtOrDefault(SelectedBlendLevel)?.Id;
-        try { ConfigurationStore.Save(new ConfigurationDocument(1, _userConfigurations, _slotIds, _selectedConfigurationId)); }
+        try { ConfigurationStore.Save(new ConfigurationDocument(2, _userConfigurations, _slotIds, _selectedConfigurationId)); }
         catch (IOException) { }
         catch (UnauthorizedAccessException) { }
+    }
+
+    private static List<string?> NormalizeSlots(IEnumerable<string?> slots)
+    {
+        var result = slots.Take(5).ToList();
+        while (result.Count < 5) result.Add(null);
+        return result;
+    }
+
+    private void EnsureSelectedSlot()
+    {
+        SelectedBlendLevel = Math.Clamp(SelectedBlendLevel, 0, 4);
+        var current = SlotConfigurations.ElementAtOrDefault(SelectedBlendLevel);
+        if (current is not null)
+        {
+            _selectedConfigurationId = current.Id;
+            return;
+        }
+
+        for (var index = 0; index < SlotConfigurations.Count; index++)
+        {
+            var configuration = SlotConfigurations[index];
+            if (configuration is null) continue;
+            SelectedBlendLevel = index;
+            _selectedConfigurationId = configuration.Id;
+            return;
+        }
+
+        SelectedBlendLevel = 0;
+        _selectedConfigurationId = null;
     }
 }
