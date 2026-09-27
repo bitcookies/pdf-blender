@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateRange(0, 4)]
+    [ValidateRange(0, 2)]
     [int]$Mode = 0,
 
     [switch]$Force
@@ -23,8 +23,6 @@ function Show-Menu {
     Write-Host 'PDF Blender build menu'
     Write-Host '  1  Portable publish (publish/portable)'
     Write-Host '  2  MSIX installer (publish/installer)'
-    Write-Host '  3  Release build'
-    Write-Host '  4  Release tests'
     Write-Host '  0  Exit'
     Write-Host ''
 }
@@ -59,9 +57,9 @@ function Invoke-Dotnet([string[]]$Arguments, [int]$FailureCode) {
 if ($Mode -eq 0) {
     Show-Menu
     $selection = Read-Host 'Choose an action number'
-    if (-not [int]::TryParse($selection, [ref]$Mode) -or $Mode -notin 1..4) {
+    if (-not [int]::TryParse($selection, [ref]$Mode) -or $Mode -notin 1..2) {
         if ($selection -eq '0') { exit 0 }
-        Write-Host 'Invalid action. Choose 1, 2, 3, or 4.' -ForegroundColor Red
+        Write-Host 'Invalid action. Choose 1, 2, or 0.' -ForegroundColor Red
         exit 2
     }
 }
@@ -82,14 +80,6 @@ switch ($Mode) {
         New-Item -ItemType Directory -Path $publishRoot -Force | Out-Null
         Invoke-Dotnet @('msbuild', $packagingProject, '/p:Configuration=Release', "/p:OutDir=$installerOutput\") 40
         Write-Host "MSIX installer written to $installerOutput" -ForegroundColor Green
-    }
-    3 {
-        Invoke-Dotnet @('build', $solution, '--configuration', 'Release') 10
-        Write-Host 'Release build completed.' -ForegroundColor Green
-    }
-    4 {
-        Invoke-Dotnet @('test', $solution, '--configuration', 'Release', '--no-restore') 20
-        Write-Host 'Release tests completed.' -ForegroundColor Green
     }
 }
 

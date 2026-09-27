@@ -36,7 +36,6 @@ public partial class SettingsPage : Page
         LanguageLabel.Text = UiText.Get("language");
         LanguageHint.Text = UiText.Get("languageHint");
         SettingsFileLabel.Text = UiText.Get("settingsFile");
-        SettingsFileHint.Text = UiText.Get("settingsFileHint");
         SettingsFilePath.Text = AppPreferencesStore.FilePath;
         OpenFolderButtonText.Text = UiText.Get("openFolder");
         ToastSoundLabel.Text = UiText.Get("toastSound");

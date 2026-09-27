@@ -42,11 +42,11 @@
                         </Button>
                     </StackPanel>
                     <StackPanel Grid.Row="1">
-                        <Button x:Name="SettingsNavigationButton" Style="{StaticResource RailButtonStyle}" Click="SettingsNavigationItem_Click" AutomationProperties.Name="Settings" Margin="0,1,0,12">
-                            <StackPanel><ui:SymbolIcon Symbol="Settings24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="Settings" Style="{StaticResource RailLabelTextStyle}" /></StackPanel>
-                        </Button>
                         <Button x:Name="AboutNavigationButton" Style="{StaticResource RailButtonStyle}" Click="AboutNavigationItem_Click" AutomationProperties.Name="About">
                             <StackPanel><ui:SymbolIcon Symbol="Info24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="About" Style="{StaticResource RailLabelTextStyle}" /></StackPanel>
+                        </Button>
+                        <Button x:Name="SettingsNavigationButton" Style="{StaticResource RailButtonStyle}" Click="SettingsNavigationItem_Click" AutomationProperties.Name="Settings" Margin="0,1,0,12">
+                            <StackPanel><ui:SymbolIcon Symbol="Settings24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="Settings" Style="{StaticResource RailLabelTextStyle}" /></StackPanel>
                         </Button>
                     </StackPanel>
                     <Border x:Name="RailSelectionIndicator" Width="4" Height="24" CornerRadius="2" Background="{DynamicResource AccentBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False" Panel.ZIndex="10">

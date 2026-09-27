@@ -2,50 +2,64 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <Page.Resources>
+        <Style x:Key="SettingsCardStyle" TargetType="Border">
+            <Setter Property="Height" Value="84" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="Padding" Value="14,12" />
+            <Setter Property="Background" Value="{DynamicResource CardBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+        </Style>
+    </Page.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="24,20,24,24" MaxWidth="760">
             <TextBlock x:Name="TitleText" Style="{StaticResource PageTitleTextStyle}" />
             <TextBlock x:Name="SubtitleText" Style="{StaticResource PageDescriptionTextStyle}" />
             <TextBlock x:Name="AppearanceHeader" Style="{StaticResource SectionTitleTextStyle}" />
             <StackPanel Margin="0,0,0,16">
-            <ui:Card Padding="10" Margin="0" MinHeight="72">
+            <Border Style="{StaticResource SettingsCardStyle}">
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
                     <ui:SymbolIcon Symbol="Color24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="ThemeLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="ThemeHint" Style="{StaticResource SmallMutedTextStyle}" /></StackPanel>
                     <ComboBox x:Name="ThemeOptions" Grid.Column="2" VerticalAlignment="Center" SelectionChanged="ThemeOptions_SelectionChanged" />
                 </Grid>
-            </ui:Card>
-            <ui:Card Padding="10" Margin="0" MinHeight="72">
+            </Border>
+            <Border Style="{StaticResource SettingsCardStyle}">
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
                     <ui:SymbolIcon Symbol="LocalLanguage24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="LanguageLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="LanguageHint" Style="{StaticResource SmallMutedTextStyle}" /></StackPanel>
                     <ComboBox x:Name="LanguageOptions" Grid.Column="2" VerticalAlignment="Center" SelectionChanged="LanguageOptions_SelectionChanged" />
                 </Grid>
-            </ui:Card>
+            </Border>
             </StackPanel>
             <TextBlock x:Name="StorageHeader" Style="{StaticResource SectionTitleTextStyle}" />
-            <ui:Card Padding="10" Margin="0,0,0,2" MinHeight="72">
+            <StackPanel Margin="0,0,0,16">
+            <Border Style="{StaticResource SettingsCardStyle}">
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <ui:SymbolIcon Symbol="Settings24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,14,0"><TextBlock x:Name="SettingsFileLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="SettingsFileHint" Style="{StaticResource SmallMutedTextStyle}" /><TextBlock x:Name="SettingsFilePath" Style="{StaticResource SmallMutedTextStyle}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" /></StackPanel>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,14,0"><TextBlock x:Name="SettingsFileLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="SettingsFilePath" Style="{StaticResource SmallMutedTextStyle}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" /></StackPanel>
                     <ui:Button x:Name="OpenFolderButton" Grid.Column="2" VerticalAlignment="Center" Click="OpenFolderButton_Click" Appearance="Secondary">
                         <StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="FolderOpen24" Margin="0,0,7,0" /><TextBlock x:Name="OpenFolderButtonText" /></StackPanel>
                     </ui:Button>
                 </Grid>
-            </ui:Card>
-            <ui:Card Padding="10" Margin="0" MinHeight="72">
+            </Border>
+            <Border Style="{StaticResource SettingsCardStyle}">
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
                     <ui:SymbolIcon Symbol="ArrowSync24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="RestorePresetsLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="RestorePresetsHint" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" /></StackPanel>
                     <ui:Button x:Name="RestorePresetsButton" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Click="RestorePresetsButton_Click" Appearance="Secondary"><StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="ArrowSync24" Margin="0,0,7,0" /><TextBlock x:Name="RestorePresetsButtonText" /></StackPanel></ui:Button>
                 </Grid>
-            </ui:Card>
+            </Border>
+            </StackPanel>
             <TextBlock x:Name="SoundHeader" Style="{StaticResource SectionTitleTextStyle}" />
-            <ui:Card Padding="10" Margin="0" MinHeight="72">
+            <Border Style="{StaticResource SettingsCardStyle}">
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <ui:SymbolIcon Symbol="Speaker224" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
@@ -55,7 +69,7 @@
                     </StackPanel>
                     <ui:ToggleSwitch x:Name="ToastSoundToggle" Grid.Column="2" VerticalAlignment="Center" Click="ToastSoundToggle_Click" />
                 </Grid>
-            </ui:Card>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>
