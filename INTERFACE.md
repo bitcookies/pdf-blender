@@ -1,6 +1,6 @@
 # PDF Blender Interface Specification
 
-Status: v0.4.0 interface redesign
+Status: v0.5.0 configuration interface redesign
 
 ## Visual Direction
 
@@ -21,7 +21,7 @@ The first screen is the working tool, not a marketing page. The compact 820×600
 3. The discrete Blend level rail and a Configuration shortcut.
 4. A clear primary `Blend PDF` action.
 
-The main workflow is `Drop/Browse -> choose Blend level -> Blend PDF`. v0.4.0 handles one PDF at a time. Reject unsupported file types clearly and do not start processing before a valid PDF is selected. The output is written beside the input as `<source>_blended.pdf`; the destination is not exposed as a home control. Theme and language controls are absent from the home screen and available in Settings.
+The main workflow is `Drop/Browse -> choose Blend level -> Blend PDF`. v0.5.0 handles one PDF at a time. Reject unsupported file types clearly and do not start processing before a valid PDF is selected. The output is written beside the input as `<source>_blended.pdf`; the destination is not exposed as a home control. Theme and language controls are absent from the home screen and available in Settings.
 
 The shell is a single WPF-UI `FluentWindow` with a compact icon-and-label rail and a content `Frame`. Home, Configuration, Settings, and About are pages sharing one `AppSession`; changes are applied immediately and persisted locally.
 
@@ -35,7 +35,7 @@ Configuration exposes Format, Protection, Watermark, and Image controls for the 
 
 The shell uses a compact icon-and-label rail, a custom application palette derived from the PDF Blender logo, and shared WPF-UI ComboBox resources with a bordered popup surface. Navigation has hover, selected, pressed, and keyboard-focus states. Processing notifications appear in a right-aligned, theme-aware Toast host with a maximum of three visible items.
 
-Preferences are local to the device and stored at `%LOCALAPPDATA%\\PDFBlender\\preferences.json`. Theme, language, and Blend level restore across restarts. A malformed file is ignored and replaced by default values.
+Preferences and configurations are stored under the roaming AppData folder named PDF Blender. Theme, language, and selected slot restore across restarts. A malformed file is ignored and replaced by safe defaults.
 
 - Format: Normalize Content Width toggle and configurable target width in millimeters. Clarify that it scales content proportionally rather than converting pages to A4 or equal heights.
 - Protection: mutually exclusive method selector. The current MVP enables Flatten; future methods must be visibly unavailable or absent.
@@ -52,3 +52,7 @@ Represent empty, file selected, validating, processing, cancelling, completed, a
 ## Accessibility and Responsiveness
 
 Support keyboard access for import, selectors, settings, and the primary action. Provide accessible names for controls and meaningful focus order. Keep controls stable in size and labels from clipping across supported text lengths and Windows scaling settings. Do not block the UI thread during rendering, conversion, or file writing.
+
+## v0.5.0 Configuration Cards
+
+The Configuration page is ordered as Home blend slots, user configurations, then built-in presets. A selected card opens an inline editor. Each implemented feature is a compact toggle row; only enabled features reveal detail controls. Built-in presets are read-only. User configurations support custom names, duplication, deletion, and feature-specific values. Slot cards accept up to five unique configurations by drag and drop and are saved in low-to-high intensity order. Preferences and configurations use the roaming AppData folder named PDF Blender.

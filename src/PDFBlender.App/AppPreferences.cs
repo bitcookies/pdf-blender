@@ -25,8 +25,8 @@ internal static class AppPreferencesStore
     };
 
     private static string FilePath => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "PDFBlender",
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "PDF Blender",
         "preferences.json");
 
     public static AppPreferences Load()
@@ -51,7 +51,7 @@ internal static class AppPreferencesStore
     {
         Theme = Enum.IsDefined(preferences.Theme) ? preferences.Theme : ThemePreference.System,
         Language = Enum.IsDefined(preferences.Language) ? preferences.Language : UiLanguage.System,
-        SelectedBlendLevel = Math.Clamp(preferences.SelectedBlendLevel, 0, 2)
+        SelectedBlendLevel = Math.Clamp(preferences.SelectedBlendLevel, 0, 4)
     };
 
     public static void Save(AppPreferences preferences)

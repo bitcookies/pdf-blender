@@ -1,6 +1,6 @@
 # PDF Blender Architecture
 
-Status: v0.4.0 implementation baseline
+Status: v0.5.0 configuration preset implementation baseline
 
 ## Design Goals
 
@@ -42,7 +42,7 @@ Flatten is both the MVP primary protection method and the raster reconstruction 
 
 The App project owns presentation state and persistence adapters. Core owns typed settings and preset definitions. The PDF layer exposes narrow interfaces such as document inspection, page rendering, and document writing so a library can be replaced without changing view models or preset semantics.
 
-The v0.4.0 shell is `MainWindow` (`FluentWindow`) with a compact rail, shared `AppSession`, reusable visual resource dictionaries, reduced-motion page transitions, and a right-aligned `UiNotificationHost`. `HomePage` owns the PDF workflow, `ConfigurationPage` applies processing settings per blend level, `SettingsPage` applies appearance settings immediately, and `AboutPage` exposes version and legal information. Resource dictionaries are grouped under `Resources/` by colors, typography, surfaces, navigation, buttons, and inputs. `WPF-UI` is pinned to 4.3.0 and is limited to presentation concerns.
+The v0.5.0 shell is `MainWindow` (`FluentWindow`) with a compact rail, shared `AppSession`, reusable visual resource dictionaries, reduced-motion page transitions, and a right-aligned `UiNotificationHost`. `HomePage` owns the PDF workflow, `ConfigurationPage` presents slots, user cards, built-in cards, and an inline feature editor, `SettingsPage` applies appearance settings immediately, and `AboutPage` exposes version and legal information. Core owns `BlendConfiguration`, the feature catalog, built-in definitions, and intensity calculation. Resource dictionaries are grouped under `Resources/` by colors, typography, surfaces, navigation, buttons, and inputs. `WPF-UI` is pinned to 4.3.0 and is limited to presentation concerns.
 
 Page navigation uses cached page instances and a short opacity transition. Theme resources are centralized in `App.xaml` and `ThemeManager`; the palette follows the UCDT neutral light/dark structure while the accent remains PDF Blender coral/red. Toast updates are dispatched through `UiNotificationService` and do not contain document contents.
 
@@ -50,7 +50,7 @@ Keep startup work minimal: load theme/language and lightweight preferences first
 
 ## Persistence and Privacy
 
-Store non-secret Configurations in app-local settings storage with schema versioning. The MVP has no secret-key subsystem. Do not persist temporary page images after an operation, send document data over the network, or include document content in diagnostics.
+Store non-secret configurations in the roaming AppData folder named PDF Blender with schema versioning. Preferences and configurations are stored separately. The MVP has no secret-key subsystem. Do not persist temporary page images after an operation, send document data over the network, or include document content in diagnostics. Configuration saves use temporary files followed by replacement and normalize unknown IDs, duplicate slots, and the five-slot limit.
 
 ## Packaging and Build
 

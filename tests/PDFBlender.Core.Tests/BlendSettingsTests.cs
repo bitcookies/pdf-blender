@@ -31,4 +31,34 @@ public sealed class BlendSettingsTests
 
         Assert.Equal(2, errors.Count);
     }
+
+    [Fact]
+    public void BuiltInConfigurationsAreReadOnlyAndUseStableIntensityLevels()
+    {
+        Assert.Equal(3, BuiltInConfigurations.All.Count);
+        Assert.All(BuiltInConfigurations.All, configuration => Assert.True(configuration.IsBuiltIn));
+        Assert.Equal(0, BuiltInConfigurations.All[0].Intensity);
+        Assert.Equal(6, BuiltInConfigurations.All[1].Intensity);
+        Assert.Equal(6, BuiltInConfigurations.All[2].Intensity);
+    }
+
+    [Fact]
+    public void ConfigurationIntensityUsesTheStrongestEnabledFeature()
+    {
+        var widthOnly = new BlendSettings
+        {
+            NormalizeContentWidth = true,
+            Protection = ProtectionMethod.None,
+            Watermark = WatermarkStyle.None,
+            Noise = NoiseStrength.Off
+        };
+        Assert.Equal(0, ConfigurationIntensity.For(widthOnly));
+
+        var fullPageWatermarkAndLowNoise = widthOnly with
+        {
+            Watermark = WatermarkStyle.FullPage,
+            Noise = NoiseStrength.Low
+        };
+        Assert.Equal(5, ConfigurationIntensity.For(fullPageWatermarkAndLowNoise));
+    }
 }

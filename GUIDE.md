@@ -92,7 +92,7 @@ PDFBlender/
 ├─ AGENTS.md               AI 在本仓库中工作时必须遵守的规则
 ├─ THIRD-PARTY-NOTICES.md  第三方依赖和许可证说明
 ├─ PDFBlender.slnx         .NET 解决方案
-├─ Directory.Build.props   统一版本号，目前是 0.4.0 / 0.4.0.0
+├─ Directory.Build.props   统一版本号，目前是 0.5.0 / 0.5.0.0
 └─ build.ps1               数字构建入口
 ```
 
@@ -106,3 +106,17 @@ PDFBlender/
 4. 提交前确认 `git status` 中没有 `publish/`、`bin/`、`obj/`、参考项目或本地 PDF。
 
 PDF 处理完全在本机执行。不要把 PDF 内容、提取文字或个人文档信息写入日志，也不要把 `PDF-Poisoning/` 或 `参考图/` 加入发布包。
+
+## v0.5.0 配置页面
+
+配置页面从上到下分为三部分：顶部是首页搅拌挡位槽位，中间是我的配置，底部是内置预设。可以把任意用户配置或内置预设拖到顶部，最多五个；槽位会按强度从弱到强保存。没有槽位时首页会提示先去配置页面添加挡位。
+
+内置预设是轻度、中度、重度，只能查看、不能改名、修改或删除。我的配置可以新建、重命名、复制、编辑和删除。删除被槽位使用的配置时，引用会一起移除。
+
+每个配置自己保存功能开关和详情。关闭功能时只显示一行；打开后才展开对应设置，例如目标宽度、DPI、水印文字或噪点强度。水印文字属于当前配置，不同配置可以使用不同内容。
+
+配置和界面偏好保存在：
+
+    C:\Users\<用户名>\AppData\Roaming\PDF Blender
+
+主要文件是 configurations.json 和 preferences.json。v0.5.0 不读取旧的 AppData\Local\PDFBlender 路径。

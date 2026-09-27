@@ -44,6 +44,10 @@ public partial class HomePage : Page
         BlendLevelRailControl.SetLevels(BuildLevelItems());
         BlendLevelRailControl.SelectedIndex = _session.SelectedBlendLevel;
         SetInputPath(_session.InputPath, notify: false);
+        if (_session.SlotConfigurations.Count == 0)
+        {
+            StatusText.Text = UiText.Get("noBlendSlots");
+        }
         _initializing = false;
     }
 
@@ -72,6 +76,7 @@ public partial class HomePage : Page
     private async void BlendButton_Click(object sender, RoutedEventArgs e)
     {
         if (_session.InputPath is null) { StatusText.Text = UiText.Get("ready"); return; }
+        if (_session.SlotConfigurations.Count == 0) { StatusText.Text = UiText.Get("noBlendSlots"); return; }
         if (_processingCts is not null) return;
 
         var inputPath = _session.InputPath;
@@ -117,7 +122,7 @@ public partial class HomePage : Page
 
     private void BlendLevelRailControl_SelectionChanged(object? sender, BlendLevelChangedEventArgs e)
     {
-        if (_initializing || e.SelectedIndex < 0 || e.SelectedIndex >= _session.Presets.Count) return;
+        if (_initializing || e.SelectedIndex < 0 || e.SelectedIndex >= _session.SlotConfigurations.Count) return;
         _session.SetBlendLevel(e.SelectedIndex);
         StatusText.Text = e.Item.Summary;
     }
@@ -128,13 +133,15 @@ public partial class HomePage : Page
         var hasFile = path is not null;
         ReadyText.Text = hasFile ? UiText.Get("selected") : UiText.Get("ready");
         FileNameText.Text = hasFile ? Path.GetFileName(path) : string.Empty;
-        BlendButton.IsEnabled = hasFile;
-        StatusText.Text = hasFile ? Path.GetFileName(path) : UiText.Get("ready");
+        BlendButton.IsEnabled = hasFile && _session.SlotConfigurations.Count > 0;
+        StatusText.Text = _session.SlotConfigurations.Count == 0
+            ? UiText.Get("noBlendSlots")
+            : hasFile ? Path.GetFileName(path) : UiText.Get("ready");
     }
 
     private void SetProcessingState(bool processing)
     {
-        BlendButton.IsEnabled = !processing && _session.InputPath is not null;
+        BlendButton.IsEnabled = !processing && _session.InputPath is not null && _session.SlotConfigurations.Count > 0;
         BrowseButton.IsEnabled = !processing;
         ConfigurationButton.IsEnabled = !processing;
         BlendLevelRailControl.IsEnabled = !processing;
@@ -144,11 +151,9 @@ public partial class HomePage : Page
     }
 
     private IReadOnlyList<BlendLevelItem> BuildLevelItems() =>
-    [
-        new(_session.Presets[0].DisplayName, UiText.Get("stirSummary")),
-        new(_session.Presets[1].DisplayName, UiText.Get("blendSummary")),
-        new(_session.Presets[2].DisplayName, UiText.Get("pulseSummary"))
-    ];
+        _session.SlotConfigurations
+            .Select(configuration => new BlendLevelItem(configuration.Name, $"{UiText.Get("intensity")} {configuration.Intensity}"))
+            .ToList();
 
     private static bool HasPdfDrop(DragEventArgs e) => e.Data.GetDataPresent(DataFormats.FileDrop) && e.Data.GetData(DataFormats.FileDrop) is string[] files && files.Any(path => string.Equals(Path.GetExtension(path), ".pdf", StringComparison.OrdinalIgnoreCase));
 }

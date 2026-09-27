@@ -1,6 +1,6 @@
 # PDF Blender Product Specification
 
-Status: v0.4.0 implementation baseline
+Status: v0.5.0 configuration preset implementation baseline
 Product: PDF Blender  
 Slogan: `DO NOT PLAGIARIZE MY PDF.`
 
@@ -12,18 +12,18 @@ PDF Blender creates a new, ordinarily readable PDF from a source PDF while raisi
 
 - Windows desktop application, C# / .NET 10, WPF, Fluent-inspired UI.
 - Microsoft Store is the sole release channel; release packaging is MSIX. Development builds may include a portable package.
-- Current version: `0.4.0`; package version: `0.4.0.0`.
+- Current version: `0.5.0`; package version: `0.5.0.0`.
 - Microsoft Store handles updates. No custom update service is in scope.
 - Preserve the reserved Store identity: Package Identity Name `57335Bitcookies.PDFBlender`; Publisher `CN=53636128-C1AF-456C-8B82-AC0D583B730C`; Publisher display name `Bitcookies`; Store ID `9P65BNNQRGVZ`. Do not change it or hard-code a Store URL before publication.
 
-## v0.4.0 Scope
+## v0.5.0 Scope
 
 This release refines the WPF shell, reusable visual resources, page layouts, and lightweight motion. It does not add PDF protection algorithms, change output semantics, or add network services.
 
 - Compact single-window home layout at `820×600`, with a `760×540` minimum and a compact icon-and-label navigation rail.
 - Settings-only theme and language controls, supporting System/Light/Dark and System/English/简体中文.
 - A snapped, keyboard-accessible Blend level rail showing the validated `STIR`, `BLEND`, and `PULSE` presets.
-- Local preferences at `%LOCALAPPDATA%\\PDFBlender\\preferences.json`, with safe defaults for malformed values.
+- Local preferences and configuration cards at the roaming AppData folder named PDF Blender, with safe defaults for malformed values.
 - Logo-derived multi-size `logo.ico` used by the WPF window and executable.
 - Shared color, typography, surface, navigation, button, and input resource dictionaries.
 - Compact logo-led home header, bordered PDF drop surface, setting rows, and theme-aware notification cards.
@@ -89,3 +89,13 @@ Do not block v0.1.0 on Text Scrambling, PDF permission restrictions, keyed/dynam
 ## Explicitly Out of Scope
 
 Cloud processing, accounts, DRM, guaranteed copy prevention, custom update checks, and advanced experimental protection features are not part of the initial release.
+
+## v0.5.0 Configuration Presets
+
+Configuration is organized as cards. The page shows Home blend slots first, user configurations second, and the three read-only built-in presets last. Users can create, rename, duplicate, edit, and delete user configurations. Built-in configurations can be viewed and dragged into slots but cannot be changed or deleted.
+
+Each configuration owns its enabled features and feature-specific values. Only enabled features expand their detail controls. The implemented feature set is Normalize Content Width, Flatten, Watermark, and conservative Pixel Noise. Deferred protection and prompt-injection ideas remain absent from the working controls.
+
+Configuration intensity is the strongest enabled feature weight on a 0-9 scale. Width normalization is 0; text watermark is 3; full-page watermark is 5; flatten and high noise are 6; medium noise is 4; low noise is 2. Home accepts zero to five unique slot configurations, displays an empty state when zero are selected, and sorts saved slots from low to high intensity.
+
+Configuration and preferences are stored under the roaming AppData folder named PDF Blender. The application does not read the removed local PDFBlender folder.

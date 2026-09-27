@@ -1,6 +1,6 @@
 # PDF Blender Design Overview
 
-Status: v0.4.0 UI visual refinement
+Status: v0.5.0 configuration card visual refinement
 Detailed requirements: `SPEC.md`  
 Architecture boundaries: `ARCHITECTURE.md`  
 Interface and localization: `INTERFACE.md`
@@ -11,7 +11,7 @@ PDF Blender helps authors publish documents that remain readable to everyone whi
 
 The product uses a hands-on Blender metaphor: users select a blend level, optionally tune its Configuration, and blend a PDF. Blend levels are named presets over normal settings. They do not represent security levels. The application should feel like a focused Windows utility with a recognizable identity, not a generic PDF editor or security dashboard.
 
-## v0.4.0 Product Shape
+## v0.5.0 Product Shape
 
 The home screen is a compact single-window tool. It centers the PDF drop/browse action and keeps the recurring path short: select a file, select a Blend level, then blend. Theme and language are software settings, not home-screen workflow controls. Detailed processing options live in Configuration; Settings only contains theme and language.
 
@@ -27,17 +27,17 @@ The main window is 820×600 with a 760×540 minimum. It contains a 74 px compact
 
 ## Blend Level Rail
 
-`BlendLevelRail` is a data-driven WPF control backed by a snapped `Slider`. v0.4.0 exposes only the validated `STIR`, `BLEND`, and `PULSE` presets. It supports mouse dragging, arrow keys, Home, End, visible name/summary text, keyboard focus, and an accessible slider name. The control API leaves room for one to five data items without presenting future algorithms.
+`BlendLevelRail` is a data-driven WPF control backed by a snapped `Slider`. v0.5.0 exposes only the validated `STIR`, `BLEND`, and `PULSE` presets. It supports mouse dragging, arrow keys, Home, End, visible name/summary text, keyboard focus, and an accessible slider name. The control API leaves room for one to five data items without presenting future algorithms.
 
 ## Settings and Preferences
 
-Settings contains Appearance only: System/Light/Dark and System/English/Simplified Chinese. Theme and language changes apply immediately. Configuration contains Format, Protection, Watermark, and Image controls. `AppPreferencesStore` persists theme, language, and selected Blend level at `%LOCALAPPDATA%\\PDFBlender\\preferences.json`; malformed or out-of-range values fall back to safe defaults. Existing profile files remain compatible and now store optional per-level overrides.
+Settings contains Appearance only: System/Light/Dark and System/English/Simplified Chinese. Theme and language changes apply immediately. Configuration cards own their feature values. Preferences and configurations are stored under the roaming AppData folder named PDF Blender; malformed or out-of-range values fall back to safe defaults.
 
 The initial presets are `STIR`, `BLEND`, and `PULSE`. `CRUSH` and `OVERBLEND` remain future/experimental until their quality and behavior are validated. Users can independently toggle supported options, and manual edits turn the selected preset into a modified/custom configuration.
 
 The application uses the pinned `WPF-UI` 4.3.0 package for Fluent controls, themes, and icons. PDF processing remains in the existing Core/Pdf projects; the UI dependency does not alter output or protection semantics.
 
-## v0.4.0 Interaction Patterns
+## v0.5.0 Interaction Patterns
 
 The shell follows the compact rail and neutral light/dark palette used by the local UCDT reference. PDF Blender uses a coral/red accent derived from its logo. Pages fade in with a short translation, the rail selection uses a coral surface and leading indicator, and buttons provide restrained hover and press feedback. Transitions respect Windows client-area animation and render-tier settings.
 
@@ -60,3 +60,9 @@ Text scrambling, permission restrictions, keyed watermarking, secret management,
 ## Store and Operations
 
 The sole release channel is Microsoft Store, packaged as MSIX with the reserved identity recorded in `SPEC.md`. Store delivery handles application updates. A portable build is for development/testing only. The WPF shell should start promptly and defer heavy PDF initialization until required. The UI supports system/light/dark themes and Simplified Chinese/English. WPF's mature .NET desktop stack avoids a Windows App SDK runtime dependency; use HWND interop only behind isolated adapters where necessary because hosted controls have airspace constraints.
+
+## v0.5.0 Configuration Card Pattern
+
+The Configuration page is ordered as Home blend slots, user configurations, then built-in presets. Cards show a name, type, enabled-feature summary, and a ten-step intensity bar. Dragging a card to the slot surface adds it to Home; slots accept zero to five unique cards and persist in low-to-high intensity order.
+
+Feature rows follow the Squash-style progressive disclosure pattern. A disabled feature occupies one compact row. Enabling it reveals only that feature's detail controls below the row. Watermark text and all other values belong to the selected configuration, so two configurations can use different values. Built-in cards use the same visual editor in read-only mode.
