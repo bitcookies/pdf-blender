@@ -90,7 +90,7 @@ PDFBlender/
 ├─ DESIGN.md               AI 使用的视觉和产品设计约束
 ├─ INTERFACE.md            AI 使用的 UI、交互和本地化约束
 ├─ AGENTS.md               AI 在本仓库中工作时必须遵守的规则
-├─ THIRD-PARTY-NOTICES.md  第三方依赖和许可证说明
+├─ LICENSE                 项目许可证
 ├─ PDFBlender.slnx         .NET 解决方案
 ├─ Directory.Build.props   统一版本号，目前是 0.5.0 / 0.5.0.0
 └─ build.ps1               数字构建入口

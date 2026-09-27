@@ -112,11 +112,19 @@ internal static class UiText
         ["high"] = "High",
         ["heavy"] = "Heavy",
         ["technology"] = ".NET 10 · WPF · WPF-UI",
+        ["projectHeader"] = "Project",
+        ["projectDescriptionAbout"] = "PDF Blender is a local Windows tool for adding friction to casual PDF reuse while keeping documents readable.",
+        ["githubProject"] = "GitHub project",
+        ["feedback"] = "Feedback",
+        ["feedbackHint"] = "Issues and public feedback channels will be available when the project is released publicly.",
+        ["privacyHeader"] = "Privacy and distribution",
         ["localProcessingAbout"] = "PDF Blender processes files locally. Your document content is not uploaded or sent to a service.",
         ["storeAbout"] = "Distributed through Microsoft Store. Updates are delivered by the Store.",
         ["legal"] = "Legal and acknowledgements",
-        ["licenseAbout"] = "PDF Blender is provided under the project license included with this installation.",
-        ["thirdPartyAbout"] = "Third-party notices are included in THIRD-PARTY-NOTICES.md."
+        ["copyrightAbout"] = "Copyright © 2026 BIT COOKIES.",
+        ["licenseAbout"] = "PDF Blender is provided under the GNU General Public License v3.0. The full license is included with the project source.",
+        ["thirdPartyHeader"] = "Third-party software",
+        ["thirdPartyAbout"] = "PDFtoImage 5.4.0 — MIT License\nhttps://github.com/sungaila/PDFtoImage\n\nSkiaSharp 4.150.1 — MIT License\nhttps://github.com/mono/SkiaSharp\n\nbblanchon.PDFium.Win32 152.0.7961 — package license and upstream PDFium terms\n\nWPF-UI 4.3.0 — MIT License\nhttps://github.com/lepoco/wpfui\n\nWPF-UI.Abstractions 4.3.0 — MIT License\nhttps://github.com/lepoco/wpfui"
     };
 
     private static readonly IReadOnlyDictionary<string, string> Chinese = new Dictionary<string, string>
@@ -220,11 +228,19 @@ internal static class UiText
         ["high"] = "高",
         ["heavy"] = "重",
         ["technology"] = ".NET 10 · WPF · WPF-UI",
+        ["projectHeader"] = "项目",
+        ["projectDescriptionAbout"] = "PDF Blender 是一个本地 Windows 工具，在保持文档可读性的同时，提高 PDF 被随意复用的成本。",
+        ["githubProject"] = "GitHub 项目",
+        ["feedback"] = "问题反馈",
+        ["feedbackHint"] = "项目公开发布后，我们会开放 Issues 和公开反馈渠道。",
+        ["privacyHeader"] = "隐私与发布",
         ["localProcessingAbout"] = "PDF Blender 在本机处理文件，不会上传或发送文档内容。",
         ["storeAbout"] = "通过 Microsoft Store 发布，更新由 Store 自动提供。",
         ["legal"] = "法律与致谢",
-        ["licenseAbout"] = "PDF Blender 遵循项目中随附的许可证发布。",
-        ["thirdPartyAbout"] = "第三方声明位于 THIRD-PARTY-NOTICES.md。"
+        ["copyrightAbout"] = "版权所有 © 2026 BIT COOKIES。",
+        ["licenseAbout"] = "PDF Blender 按 GNU 通用公共许可证第 3 版发布。完整许可证随项目源代码提供。",
+        ["thirdPartyHeader"] = "第三方软件",
+        ["thirdPartyAbout"] = "PDFtoImage 5.4.0 — MIT 许可证\nhttps://github.com/sungaila/PDFtoImage\n\nSkiaSharp 4.150.1 — MIT 许可证\nhttps://github.com/mono/SkiaSharp\n\nbblanchon.PDFium.Win32 152.0.7961 — 遵循软件包许可证和上游 PDFium 条款\n\nWPF-UI 4.3.0 — MIT 许可证\nhttps://github.com/lepoco/wpfui\n\nWPF-UI.Abstractions 4.3.0 — MIT 许可证\nhttps://github.com/lepoco/wpfui"
     };
 
     public static IReadOnlyDictionary<string, string> Current { get; private set; } = English;

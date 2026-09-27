@@ -17,6 +17,7 @@
   <ItemGroup>
     <Resource Include="Assets\logo.png" />
     <Resource Include="Assets\logo.ico" />
+    <Resource Include="..\..\assets\bitcookies-words.png" Link="Assets\bitcookies-words.png" />
     <Content Include="..\..\assets\sounds\toast.mp3" Link="Assets\sounds\toast.mp3" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
