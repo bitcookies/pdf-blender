@@ -24,13 +24,13 @@ internal static class ThemeManager
         var resources = Application.Current.Resources;
         if (dark)
         {
-            SetBrush(resources, "WindowBackgroundBrush", "#202020");
-            SetBrush(resources, "ShellChromeBrush", "#1A1A1A");
-            SetBrush(resources, "SidebarBrush", "#1C1C1C");
-            SetBrush(resources, "TitleBarBrush", "#1A1A1A");
+            SetBrush(resources, "WindowBackgroundBrush", "#272727");
+            SetBrush(resources, "ShellChromeBrush", "#202020");
+            SetBrush(resources, "SidebarBrush", "#202020");
+            SetBrush(resources, "TitleBarBrush", "#202020");
             SetBrush(resources, "SurfaceBrush", "#262626");
-            SetBrush(resources, "CardBrush", "#262626");
-            SetBrush(resources, "SettingItemBrush", "#292929");
+            SetBrush(resources, "CardBrush", "#323232");
+            SetBrush(resources, "SettingItemBrush", "#323232");
             SetBrush(resources, "LogoTileBrush", "#3B252B");
             SetBrush(resources, "SurfaceRaisedBrush", "#343434");
             SetBrush(resources, "SurfaceMutedBrush", "#292929");
@@ -43,7 +43,12 @@ internal static class ThemeManager
             SetBrush(resources, "AccentSoftBrush", "#35F06A73");
             SetBrush(resources, "NavHoverBrush", "#18FFFFFF");
             SetBrush(resources, "NavSelectedBrush", "#3B252B");
-            SetBrush(resources, "NavTextBrush", "#D8D8D8");
+            SetBrush(resources, "NavTextBrush", "#9A9A9A");
+            SetBrush(resources, "NavigationViewItemForeground", "#9A9A9A");
+            SetBrush(resources, "NavigationViewItemForegroundPointerOver", "#9A9A9A");
+            SetBrush(resources, "NavigationViewItemForegroundPressed", "#9A9A9A");
+            SetBrush(resources, "NavigationViewItemForegroundLeftFluent", "#F06A73");
+            SetBrush(resources, "NavigationViewItemForegroundPointerOverLeftFluent", "#9A9A9A");
             SetBrush(resources, "PillBrush", "#343434");
             SetBrush(resources, "PillTextBrush", "#F0F0F0");
             SetBrush(resources, "NotificationBrush", "#2D2D2D");
@@ -52,13 +57,13 @@ internal static class ThemeManager
         }
         else
         {
-            SetBrush(resources, "WindowBackgroundBrush", "#F7F7F7");
-            SetBrush(resources, "ShellChromeBrush", "#FDFDFD");
-            SetBrush(resources, "SidebarBrush", "#FAFAFA");
-            SetBrush(resources, "TitleBarBrush", "#FDFDFD");
+            SetBrush(resources, "WindowBackgroundBrush", "#F9F9F9");
+            SetBrush(resources, "ShellChromeBrush", "#F3F3F3");
+            SetBrush(resources, "SidebarBrush", "#F3F3F3");
+            SetBrush(resources, "TitleBarBrush", "#F3F3F3");
             SetBrush(resources, "SurfaceBrush", "#FFFFFF");
-            SetBrush(resources, "CardBrush", "#FFFFFF");
-            SetBrush(resources, "SettingItemBrush", "#FFFFFF");
+            SetBrush(resources, "CardBrush", "#FDFDFD");
+            SetBrush(resources, "SettingItemBrush", "#FDFDFD");
             SetBrush(resources, "LogoTileBrush", "#FFF1F3");
             SetBrush(resources, "SurfaceRaisedBrush", "#F6F6F6");
             SetBrush(resources, "SurfaceMutedBrush", "#F8F8F8");
@@ -71,7 +76,12 @@ internal static class ThemeManager
             SetBrush(resources, "AccentSoftBrush", "#25D84F58");
             SetBrush(resources, "NavHoverBrush", "#0F000000");
             SetBrush(resources, "NavSelectedBrush", "#FFF0DDE0");
-            SetBrush(resources, "NavTextBrush", "#202020");
+            SetBrush(resources, "NavTextBrush", "#868686");
+            SetBrush(resources, "NavigationViewItemForeground", "#868686");
+            SetBrush(resources, "NavigationViewItemForegroundPointerOver", "#868686");
+            SetBrush(resources, "NavigationViewItemForegroundPressed", "#868686");
+            SetBrush(resources, "NavigationViewItemForegroundLeftFluent", "#D84F58");
+            SetBrush(resources, "NavigationViewItemForegroundPointerOverLeftFluent", "#868686");
             SetBrush(resources, "PillBrush", "#F6F6F6");
             SetBrush(resources, "PillTextBrush", "#202020");
             SetBrush(resources, "NotificationBrush", "#FCFCFC");
@@ -79,10 +89,17 @@ internal static class ThemeManager
             SetBrush(resources, "NotificationMessageBrush", "#5E5E5E");
         }
         SetBrush(resources, "AccentTextBrush", "#FFFFFF");
+        SetBrushFromResource(resources, "NavigationViewItemForegroundLeftFluent", "NavigationViewSelectionIndicatorForeground");
     }
 
     private static void SetBrush(ResourceDictionary resources, string key, string hex)
     {
         resources[key] = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex)!);
+    }
+
+    private static void SetBrushFromResource(ResourceDictionary resources, string targetKey, string sourceKey)
+    {
+        if (resources[sourceKey] is SolidColorBrush source)
+            resources[targetKey] = source.Clone();
     }
 }

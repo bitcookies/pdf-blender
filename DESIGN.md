@@ -23,7 +23,7 @@ Use small translucent surfaces only where they improve hierarchy. Do not rely on
 
 ## Home Layout
 
-The main window is 820×600 with a 760×540 minimum. It uses a compact 74 px icon-and-label rail beside the content frame. The title bar and rail share one shell surface; the content surface has a 12 px top-left radius and square remaining corners. Home contains a bordered white/dark drag-and-drop surface with selected-file summary, the three-level Blend rail, a Configuration shortcut, and a bottom action row with progress and Cancel. The home screen does not expose profile, output, theme, or language controls.
+The main window is 820×600 with a 760×540 minimum. It uses WPF-UI `NavigationView` in `LeftFluent` mode, fixed to a 74 px rail with no pane expansion. Home and Configuration occupy the main group; About and Settings occupy the footer group. The title bar and rail share a shell surface (`#F3F3F3` light, `#202020` dark); the content surface uses `#F9F9F9` light / `#272727` dark and has a 12 px top-left radius with square remaining corners. Cards use `#FDFDFD` light / `#323232` dark. Home contains a bordered drag-and-drop surface with selected-file summary, the three-level Blend rail, a Configuration shortcut, and a bottom action row with progress and Cancel. The home screen does not expose profile, output, theme, or language controls.
 
 ## Blend Level Rail
 
@@ -39,7 +39,7 @@ The application uses the pinned `WPF-UI` 4.3.0 package for Fluent controls, them
 
 ## v0.5.0 Interaction Patterns
 
-The shell follows the Microsoft Store/UCDT compact rail and neutral light/dark palette. PDF Blender uses a coral/red accent derived from its logo. Pages fade in with a short translation; the rail uses a small project-owned template for its compact selected, hover, focus, and animated indicator states, while WPF-UI owns buttons, cards, dialogs, and snackbars. Transitions respect Windows client-area animation and render-tier settings.
+The shell follows the Microsoft Store compact navigation pattern using WPF-UI `NavigationView` and the neutral light/dark palette. PDF Blender uses a coral/red accent derived from its logo. Pages fade in with a short translation; NavigationView owns item selection, hover, focus, and indicator visuals, while WPF-UI owns buttons, cards, dialogs, and snackbars. Transitions respect Windows client-area animation and render-tier settings.
 
 Processing feedback appears in the page status area and in a right-aligned stack of up to three Toast notifications. Toasts support information, success, warning, error, and progress states without logging document content.
 

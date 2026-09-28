@@ -28,32 +28,48 @@
                 <ui:ImageIcon Source="/PDFBlender.App;component/Assets/logo.ico" Width="16" Height="16" />
             </ui:TitleBar.Icon>
         </ui:TitleBar>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="74" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
-            <Border Grid.Column="0" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0" Padding="8,8,8,12" TextElement.FontFamily="{DynamicResource AppFontFamily}">
-                <Grid x:Name="RailRoot" SizeChanged="RailRoot_SizeChanged">
-                    <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0">
-                        <Button x:Name="HomeNavigationButton" Style="{StaticResource RailButtonStyle}" Click="HomeNavigationItem_Click" AutomationProperties.Name="Home">
-                            <StackPanel><ui:SymbolIcon Symbol="Home24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="Home" Style="{StaticResource RailLabelTextStyle}" /></StackPanel>
-                        </Button>
-                        <Button x:Name="ConfigurationNavigationButton" Style="{StaticResource RailButtonStyle}" Click="ConfigurationNavigationItem_Click" AutomationProperties.Name="Configuration">
-                            <StackPanel><ui:SymbolIcon Symbol="Options24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="Configuration" Style="{StaticResource RailLabelTextStyle}" /></StackPanel>
-                        </Button>
-                    </StackPanel>
-                    <StackPanel Grid.Row="1">
-                        <Button x:Name="AboutNavigationButton" Style="{StaticResource RailButtonStyle}" Click="AboutNavigationItem_Click" AutomationProperties.Name="About">
-                            <StackPanel><ui:SymbolIcon Symbol="Info24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="About" Style="{StaticResource RailLabelTextStyle}" /></StackPanel>
-                        </Button>
-                        <Button x:Name="SettingsNavigationButton" Style="{StaticResource RailButtonStyle}" Click="SettingsNavigationItem_Click" AutomationProperties.Name="Settings" Margin="0,1,0,12">
-                            <StackPanel><ui:SymbolIcon Symbol="Settings24" FontSize="22" Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" HorizontalAlignment="Center" /><TextBlock Text="Settings" Style="{StaticResource RailLabelTextStyle}" /></StackPanel>
-                        </Button>
-                    </StackPanel>
-                    <Border x:Name="RailSelectionIndicator" Width="4" Height="24" CornerRadius="2" Background="{DynamicResource AccentBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False" Panel.ZIndex="10">
-                        <Border.RenderTransform><TranslateTransform Y="0" /></Border.RenderTransform>
-                    </Border>
-                </Grid>
-            </Border>
+        <Grid Grid.Row="1" Background="{DynamicResource SidebarBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="78" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <ui:NavigationView Grid.Column="0" x:Name="ShellNavigationView"
+                               PaneDisplayMode="LeftFluent"
+                               IsPaneOpen="False"
+                               IsPaneToggleVisible="False"
+                               CompactPaneLength="74"
+                               OpenPaneLength="74"
+                               FrameMargin="0"
+                               IsBackButtonVisible="Collapsed"
+                               Width="74"
+                               HorizontalAlignment="Left"
+                               Margin="0,0,4,0"
+                               Focusable="False"
+                               KeyboardNavigation.IsTabStop="False"
+                               FocusVisualStyle="{x:Null}"
+                               Background="{DynamicResource SidebarBrush}"
+                               TextElement.FontFamily="{DynamicResource AppFontFamily}"
+                               TextElement.FontSize="12">
+                <ui:NavigationView.Resources>
+                    <CornerRadius x:Key="ControlCornerRadius">8</CornerRadius>
+                </ui:NavigationView.Resources>
+                <ui:NavigationView.MenuItems>
+                    <ui:NavigationViewItem x:Name="HomeNavigationItem" Content="Home" Tag="home" Margin="0,2" FontSize="11" SizeChanged="NavigationItem_SizeChanged" Click="NavigationItem_Click" Focusable="False" KeyboardNavigation.IsTabStop="False" FocusVisualStyle="{x:Null}" AutomationProperties.Name="Home">
+                        <ui:NavigationViewItem.Icon><ui:SymbolIcon Symbol="Home24" FontSize="24" /></ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                    <ui:NavigationViewItem x:Name="ConfigurationNavigationItem" Content="Configuration" Tag="configuration" Margin="0,2" FontSize="11" SizeChanged="NavigationItem_SizeChanged" Click="NavigationItem_Click" Focusable="False" KeyboardNavigation.IsTabStop="False" FocusVisualStyle="{x:Null}" AutomationProperties.Name="Configuration">
+                        <ui:NavigationViewItem.Icon><ui:SymbolIcon Symbol="Options24" FontSize="24" /></ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                </ui:NavigationView.MenuItems>
+                <ui:NavigationView.FooterMenuItems>
+                    <ui:NavigationViewItem x:Name="AboutNavigationItem" Content="About" Tag="about" Margin="0,2" FontSize="11" SizeChanged="NavigationItem_SizeChanged" Focusable="False" KeyboardNavigation.IsTabStop="False" Click="NavigationItem_Click" FocusVisualStyle="{x:Null}" AutomationProperties.Name="About">
+                        <ui:NavigationViewItem.Icon><ui:SymbolIcon Symbol="Info24" FontSize="24" /></ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                    <ui:NavigationViewItem x:Name="SettingsNavigationItem" Content="Settings" Tag="settings" Margin="0,2" FontSize="11" SizeChanged="NavigationItem_SizeChanged" Focusable="False" KeyboardNavigation.IsTabStop="False" Click="NavigationItem_Click" FocusVisualStyle="{x:Null}" AutomationProperties.Name="Settings">
+                        <ui:NavigationViewItem.Icon><ui:SymbolIcon Symbol="Settings24" FontSize="24" /></ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                </ui:NavigationView.FooterMenuItems>
+            </ui:NavigationView>
             <Border Grid.Column="1" Background="{DynamicResource WindowBackgroundBrush}" CornerRadius="12,0,0,0" ClipToBounds="True">
                 <Grid>
                     <Frame x:Name="ContentFrame" NavigationUIVisibility="Hidden" Margin="0" />

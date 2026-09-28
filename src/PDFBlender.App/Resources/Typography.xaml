@@ -48,12 +48,4 @@
         <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
-    <Style x:Key="RailLabelTextStyle" TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
-        <Setter Property="FontSize" Value="10.5" />
-        <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" />
-        <Setter Property="TextAlignment" Value="Center" />
-        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-        <Setter Property="Margin" Value="0,2,0,0" />
-    </Style>
 </ResourceDictionary>

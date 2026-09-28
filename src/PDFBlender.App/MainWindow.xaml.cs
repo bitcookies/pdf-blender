@@ -19,8 +19,6 @@ public partial class MainWindow : FluentWindow
     private SettingsPage? _settingsPage;
     private AboutPage? _aboutPage;
     private string _currentPage = "home";
-    private bool _railSelectionIndicatorReady;
-    private bool _railIndicatorLayoutDirty = true;
 
     public MainWindow()
     {
@@ -32,15 +30,66 @@ public partial class MainWindow : FluentWindow
         ApplyLanguage();
         NavigateTo("home");
         _session.Changed += Session_Changed;
-        Loaded += (_, _) => Dispatcher.BeginInvoke(() => UpdateRailSelectionIndicator(false), DispatcherPriority.Loaded);
+        Loaded += (_, _) => Dispatcher.BeginInvoke(() => SelectNavigationItem("home"), DispatcherPriority.Loaded);
     }
 
-    private void HomeNavigationItem_Click(object sender, RoutedEventArgs e) => NavigateTo("home");
-    private void ConfigurationNavigationItem_Click(object sender, RoutedEventArgs e) => NavigateTo("configuration");
-    private void SettingsNavigationItem_Click(object sender, RoutedEventArgs e) => NavigateTo("settings");
-    private void AboutNavigationItem_Click(object sender, RoutedEventArgs e) => NavigateTo("about");
+    private void NavigationItem_Click(object sender, RoutedEventArgs e)
+    {
+        e.Handled = true;
 
-    private void NavigateTo(string page)
+        if (sender is Wpf.Ui.Controls.NavigationViewItem item && item.Tag is string page)
+            NavigateTo(page);
+    }
+
+    private void NavigationItem_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (sender is FrameworkElement item && e.NewSize.Width > 0 && e.NewSize.Height > 0)
+        {
+            item.Clip = new RectangleGeometry(new Rect(0, 0, e.NewSize.Width, e.NewSize.Height), 8, 8);
+            item.ApplyTemplate();
+            Dispatcher.BeginInvoke(() => ApplyNavigationItemCornerClip(item), DispatcherPriority.Loaded);
+        }
+    }
+
+    private static void ApplyNavigationItemCornerClip(FrameworkElement item)
+    {
+        if (FindVisualChild<Border>(item, element => element.Name == "MainBorder") is not { } mainBorder)
+            return;
+
+        mainBorder.SizeChanged -= NavigationItemMainBorder_SizeChanged;
+        mainBorder.SizeChanged += NavigationItemMainBorder_SizeChanged;
+        SetRoundedClip(mainBorder);
+    }
+
+    private static void NavigationItemMainBorder_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (sender is Border border)
+            SetRoundedClip(border);
+    }
+
+    private static void SetRoundedClip(FrameworkElement element)
+    {
+        if (element.ActualWidth > 0 && element.ActualHeight > 0)
+            element.Clip = new RectangleGeometry(new Rect(0, 0, element.ActualWidth, element.ActualHeight), 8, 8);
+    }
+
+    private static T? FindVisualChild<T>(DependencyObject parent, Func<T, bool> predicate)
+        where T : FrameworkElement
+    {
+        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+        {
+            var child = VisualTreeHelper.GetChild(parent, i);
+            if (child is T match && predicate(match))
+                return match;
+
+            if (FindVisualChild(child, predicate) is { } nested)
+                return nested;
+        }
+
+        return null;
+    }
+
+    private void NavigateTo(string page, bool synchronizeSelection = true)
     {
         _currentPage = page;
         ContentFrame.Content = page switch
@@ -50,7 +99,8 @@ public partial class MainWindow : FluentWindow
             "about" => _aboutPage ??= new AboutPage(),
             _ => _homePage ??= new HomePage(_session, _notifications, () => NavigateTo("configuration"))
         };
-        SetNavigationState(page);
+        if (synchronizeSelection)
+            SelectNavigationItem(page);
         ShellTitleBar.Title = "PDF Blender";
         AnimateContent();
     }
@@ -59,7 +109,7 @@ public partial class MainWindow : FluentWindow
     {
         ApplyTheme();
         ApplyLanguage();
-        SetNavigationState(_currentPage);
+        SelectNavigationItem(_currentPage);
         _homePage?.RefreshFromSession();
         _configurationPage?.RefreshFromSession();
         _settingsPage?.RefreshFromSession();
@@ -69,10 +119,10 @@ public partial class MainWindow : FluentWindow
     private void ApplyLanguage()
     {
         UiText.SetLanguage(_session.Preferences.Language);
-        SetRailText(HomeNavigationButton, UiText.Get("home"));
-        SetRailText(ConfigurationNavigationButton, UiText.Get("configuration"));
-        SetRailText(SettingsNavigationButton, UiText.Get("settings"));
-        SetRailText(AboutNavigationButton, UiText.Get("about"));
+        HomeNavigationItem.Content = UiText.Get("home");
+        ConfigurationNavigationItem.Content = UiText.Get("configuration");
+        SettingsNavigationItem.Content = UiText.Get("settings");
+        AboutNavigationItem.Content = UiText.Get("about");
         ShellTitleBar.Title = "PDF Blender";
     }
 
@@ -90,89 +140,25 @@ public partial class MainWindow : FluentWindow
         Background = (Brush)Application.Current.Resources["WindowBackgroundBrush"];
     }
 
-    private void SetNavigationState(string page)
+    private void SelectNavigationItem(string page)
     {
-        SetRailButtonState(HomeNavigationButton, page == "home");
-        SetRailButtonState(ConfigurationNavigationButton, page == "configuration");
-        SetRailButtonState(SettingsNavigationButton, page == "settings");
-        SetRailButtonState(AboutNavigationButton, page == "about");
-        Dispatcher.BeginInvoke(() => UpdateRailSelectionIndicator(true), DispatcherPriority.Loaded);
-    }
-
-    private void RailRoot_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        _railIndicatorLayoutDirty = true;
-        Dispatcher.BeginInvoke(() => UpdateRailSelectionIndicator(false), DispatcherPriority.Loaded);
-    }
-
-    private void UpdateRailSelectionIndicator(bool animate)
-    {
-        var target = _currentPage switch
-        {
-            "configuration" => ConfigurationNavigationButton,
-            "settings" => SettingsNavigationButton,
-            "about" => AboutNavigationButton,
-            _ => HomeNavigationButton
-        };
-
-        if (!target.IsVisible || target.ActualHeight <= 0 || RailSelectionIndicator.ActualHeight <= 0)
-        {
-            Dispatcher.BeginInvoke(() => UpdateRailSelectionIndicator(animate), DispatcherPriority.Loaded);
+        var items = ShellNavigationView.MenuItems
+            .Cast<object>()
+            .Concat(ShellNavigationView.FooterMenuItems.Cast<object>())
+            .OfType<Wpf.Ui.Controls.NavigationViewItem>()
+            .ToArray();
+        var item = items.FirstOrDefault(candidate => string.Equals(candidate.Tag as string, page, StringComparison.Ordinal));
+        if (item is null)
             return;
+
+        foreach (var candidate in items)
+        {
+            candidate.Deactivate(ShellNavigationView);
+            candidate.IsActive = false;
         }
 
-        var targetTop = target.TranslatePoint(new Point(0, 0), RailRoot).Y;
-        var targetY = Math.Max(0, targetTop + (target.ActualHeight - RailSelectionIndicator.ActualHeight) / 2);
-        if (RailSelectionIndicator.RenderTransform is not TranslateTransform translate)
-        {
-            translate = new TranslateTransform();
-            RailSelectionIndicator.RenderTransform = translate;
-        }
-
-        var currentY = translate.Y;
-        translate.BeginAnimation(TranslateTransform.YProperty, null);
-        if (!animate || !_railSelectionIndicatorReady || _railIndicatorLayoutDirty)
-        {
-            translate.Y = targetY;
-            _railSelectionIndicatorReady = true;
-            _railIndicatorLayoutDirty = false;
-            return;
-        }
-
-        var animation = new DoubleAnimation(currentY, targetY, TimeSpan.FromMilliseconds(240))
-        {
-            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
-            FillBehavior = FillBehavior.Stop
-        };
-        animation.Completed += (_, _) => translate.Y = targetY;
-        translate.BeginAnimation(TranslateTransform.YProperty, animation);
-    }
-
-    private static void SetRailButtonState(System.Windows.Controls.Button button, bool selected)
-    {
-        button.Tag = selected;
-        button.Background = Brushes.Transparent;
-        button.Foreground = selected
-            ? (Brush)Application.Current.Resources["AccentBrush"]
-            : (Brush)Application.Current.Resources["NavTextBrush"];
-        button.ApplyTemplate();
-        if (button.Template.FindName("ActiveSurface", button) is UIElement activeSurface)
-        {
-            activeSurface.BeginAnimation(UIElement.OpacityProperty, null);
-            var animation = new DoubleAnimation(selected ? 1 : 0, TimeSpan.FromMilliseconds(180))
-            {
-                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
-                FillBehavior = FillBehavior.Stop
-            };
-            animation.Completed += (_, _) => activeSurface.Opacity = selected ? 1 : 0;
-            activeSurface.BeginAnimation(UIElement.OpacityProperty, animation);
-        }
-    }
-
-    private static void SetRailText(System.Windows.Controls.Button button, string text)
-    {
-        if (button.Content is StackPanel panel && panel.Children.OfType<System.Windows.Controls.TextBlock>().FirstOrDefault() is { } label)
-            label.Text = text;
+        item.Activate(ShellNavigationView);
+        item.IsActive = true;
     }
 
     private void AnimateContent()

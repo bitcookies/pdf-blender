@@ -23,7 +23,7 @@ The first screen is the working tool, not a marketing page. The compact 820×600
 
 The main workflow is `Drop/Browse -> choose Blend level -> Blend PDF`. v0.5.0 handles one PDF at a time. Reject unsupported file types clearly and do not start processing before a valid PDF is selected. The output is written beside the input as `<source>_blended.pdf`; the destination is not exposed as a home control. Theme and language controls are absent from the home screen and available in Settings.
 
-The shell is a single WPF-UI `FluentWindow` with a fixed title bar, a 74 px compact navigation rail, and a content `Frame`. The title bar and rail use one shell surface; the content surface has a 12 px top-left radius. Home, Configuration, Settings, and About are pages sharing one `AppSession`; changes are applied immediately and persisted locally.
+The shell is a single WPF-UI `FluentWindow` with a fixed 44 px title bar, a WPF-UI `NavigationView` in `LeftFluent` mode fixed at 74 px, and a content `Frame`. Pane expansion is disabled. Home and Configuration appear in the main navigation group; About and Settings appear in the footer group. The title bar and navigation rail share one shell surface (`#F3F3F3` light / `#202020` dark); the content surface uses `#F9F9F9` light / `#272727` dark, with a 12 px top-left radius. Cards use `#FDFDFD` light / `#323232` dark. Home, Configuration, Settings, and About share one `AppSession`; language refresh preserves the current selection.
 
 ### BlendLevelRail
 
@@ -33,7 +33,7 @@ The shell is a single WPF-UI `FluentWindow` with a fixed title bar, a 74 px comp
 
 Configuration exposes Format, Protection, Watermark, and Image controls for the selected blend level, arranged as WPF-UI cards and controls. Settings exposes only Appearance (theme and language) plus a WPF-UI Restore presets button and confirmation dialog. Only implemented controls should appear as active settings. Future features may be documented elsewhere but must not be presented as working toggles.
 
-The shell uses a compact icon-and-label rail with direct navigation-item click handlers, a custom application palette derived from the PDF Blender logo, and native WPF `ComboBox` controls using the application/WPF-UI theme resources. The rail provides animated hover, selected, pressed, keyboard-focus, and left-indicator states. Processing notifications appear in a right-aligned WPF-UI `SnackbarPresenter`; confirmations use `ContentDialogHost` and `ContentDialog`.
+The shell uses WPF-UI `NavigationView` item selection, default hover/selected/focus visuals, and localized accessible item names/tooltips. The pane remains fixed and cannot be expanded. The application palette is derived from the PDF Blender logo. Processing notifications appear in a right-aligned notification host; confirmations use `ContentDialogHost` and `ContentDialog`.
 
 Preferences and configurations are stored under the roaming AppData folder named PDF Blender. Theme, language, and selected slot restore across restarts; Restore presets is a one-shot command and is not persisted as a UI toggle. A malformed file is ignored and replaced by safe defaults.
 
