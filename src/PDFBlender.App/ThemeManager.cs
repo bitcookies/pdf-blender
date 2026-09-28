@@ -42,18 +42,18 @@ internal static class ThemeManager
             SetBrush(resources, "AccentDarkBrush", "#D6535D");
             SetBrush(resources, "AccentSoftBrush", "#35F06A73");
             SetBrush(resources, "NavHoverBrush", "#18FFFFFF");
-            SetBrush(resources, "NavSelectedBrush", "#3B252B");
+            SetBrush(resources, "NavSelectedBrush", "#2D2D2D");
             SetBrush(resources, "NavTextBrush", "#9A9A9A");
             SetBrush(resources, "NavigationViewItemForeground", "#9A9A9A");
             SetBrush(resources, "NavigationViewItemForegroundPointerOver", "#9A9A9A");
             SetBrush(resources, "NavigationViewItemForegroundPressed", "#9A9A9A");
-            SetBrush(resources, "NavigationViewItemForegroundLeftFluent", "#F06A73");
+            SetBrush(resources, "NavigationViewItemForegroundLeftFluent", "#9A9A9A");
             SetBrush(resources, "NavigationViewItemForegroundPointerOverLeftFluent", "#9A9A9A");
             SetBrush(resources, "NavigationViewItemBackgroundPointerOver", "#2D2D2D");
             SetBrush(resources, "NavigationViewItemBackgroundPointerOverLeftFluent", "#2D2D2D");
-            SetBrush(resources, "NavigationViewItemBackgroundSelected", "#3B252B");
-            SetBrush(resources, "NavigationViewItemBackgroundSelectedLeftFluent", "#3B252B");
-            SetBrush(resources, "NavigationViewItemBackgroundPressed", "#493038");
+            SetBrush(resources, "NavigationViewItemBackgroundSelected", "#2D2D2D");
+            SetBrush(resources, "NavigationViewItemBackgroundSelectedLeftFluent", "#2D2D2D");
+            SetBrush(resources, "NavigationViewItemBackgroundPressed", "#383838");
             SetBrush(resources, "PillBrush", "#343434");
             SetBrush(resources, "PillTextBrush", "#F0F0F0");
             SetBrush(resources, "NotificationBrush", "#2D2D2D");
@@ -80,18 +80,18 @@ internal static class ThemeManager
             SetBrush(resources, "AccentDarkBrush", "#B63D48");
             SetBrush(resources, "AccentSoftBrush", "#25D84F58");
             SetBrush(resources, "NavHoverBrush", "#0F000000");
-            SetBrush(resources, "NavSelectedBrush", "#FFF0DDE0");
+            SetBrush(resources, "NavSelectedBrush", "#EAEAEA");
             SetBrush(resources, "NavTextBrush", "#868686");
             SetBrush(resources, "NavigationViewItemForeground", "#868686");
             SetBrush(resources, "NavigationViewItemForegroundPointerOver", "#868686");
             SetBrush(resources, "NavigationViewItemForegroundPressed", "#868686");
-            SetBrush(resources, "NavigationViewItemForegroundLeftFluent", "#D84F58");
+            SetBrush(resources, "NavigationViewItemForegroundLeftFluent", "#868686");
             SetBrush(resources, "NavigationViewItemForegroundPointerOverLeftFluent", "#868686");
             SetBrush(resources, "NavigationViewItemBackgroundPointerOver", "#EAEAEA");
             SetBrush(resources, "NavigationViewItemBackgroundPointerOverLeftFluent", "#EAEAEA");
-            SetBrush(resources, "NavigationViewItemBackgroundSelected", "#FFF0DDE0");
-            SetBrush(resources, "NavigationViewItemBackgroundSelectedLeftFluent", "#FFF0DDE0");
-            SetBrush(resources, "NavigationViewItemBackgroundPressed", "#FFE6C9CD");
+            SetBrush(resources, "NavigationViewItemBackgroundSelected", "#EAEAEA");
+            SetBrush(resources, "NavigationViewItemBackgroundSelectedLeftFluent", "#EAEAEA");
+            SetBrush(resources, "NavigationViewItemBackgroundPressed", "#DEDEDE");
             SetBrush(resources, "PillBrush", "#F6F6F6");
             SetBrush(resources, "PillTextBrush", "#202020");
             SetBrush(resources, "NotificationBrush", "#FCFCFC");
@@ -99,7 +99,6 @@ internal static class ThemeManager
             SetBrush(resources, "NotificationMessageBrush", "#5E5E5E");
         }
         SetBrush(resources, "AccentTextBrush", "#FFFFFF");
-        SetBrushFromResource(resources, "NavigationViewItemForegroundLeftFluent", "NavigationViewSelectionIndicatorForeground");
     }
 
     private static void SetBrush(ResourceDictionary resources, string key, string hex)
@@ -107,9 +106,4 @@ internal static class ThemeManager
         resources[key] = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex)!);
     }
 
-    private static void SetBrushFromResource(ResourceDictionary resources, string targetKey, string sourceKey)
-    {
-        if (resources[sourceKey] is SolidColorBrush source)
-            resources[targetKey] = source.Clone();
-    }
 }

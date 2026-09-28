@@ -43,6 +43,21 @@ public partial class MainWindow : FluentWindow
             NavigateTo(page, synchronizeSelection: false);
     }
 
+    private void NavigationItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Wpf.Ui.Controls.NavigationViewItem { Tag: string page })
+        {
+            SelectNavigationItem(page);
+            NavigateTo(page, synchronizeSelection: false);
+        }
+    }
+
+    private void NavigationItem_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (sender is FrameworkElement item && e.NewSize.Width > 0 && e.NewSize.Height > 0)
+            item.Clip = new RectangleGeometry(new Rect(0, 0, e.NewSize.Width, e.NewSize.Height), 8, 8);
+    }
+
     private void NavigateTo(string page, bool synchronizeSelection = true)
     {
         _currentPage = page;
@@ -103,6 +118,9 @@ public partial class MainWindow : FluentWindow
         var item = items.FirstOrDefault(candidate => string.Equals(candidate.Tag as string, page, StringComparison.Ordinal));
         if (item is null)
             return;
+
+        foreach (var activeItem in items.Where(candidate => candidate.IsActive && !ReferenceEquals(candidate, item)))
+            activeItem.Deactivate(ShellNavigationView);
 
         if (!item.IsActive)
             item.Activate(ShellNavigationView);

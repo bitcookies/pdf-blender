@@ -19,18 +19,18 @@
     <SolidColorBrush x:Key="AccentSoftBrush" Color="#25D84F58" />
     <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
     <SolidColorBrush x:Key="NavHoverBrush" Color="#0F000000" />
-    <SolidColorBrush x:Key="NavSelectedBrush" Color="#FFF5E9EB" />
+    <SolidColorBrush x:Key="NavSelectedBrush" Color="#EAEAEA" />
     <SolidColorBrush x:Key="NavTextBrush" Color="#868686" />
     <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#868686" />
     <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOver" Color="#868686" />
     <SolidColorBrush x:Key="NavigationViewItemForegroundPressed" Color="#868686" />
-    <SolidColorBrush x:Key="NavigationViewItemForegroundLeftFluent" Color="#D84F58" />
+    <SolidColorBrush x:Key="NavigationViewItemForegroundLeftFluent" Color="#868686" />
     <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOverLeftFluent" Color="#868686" />
     <SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOver" Color="#EAEAEA" />
     <SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOverLeftFluent" Color="#EAEAEA" />
-    <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#FFF0DDE0" />
-    <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedLeftFluent" Color="#FFF0DDE0" />
-    <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#FFE6C9CD" />
+    <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#EAEAEA" />
+    <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedLeftFluent" Color="#EAEAEA" />
+    <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#DEDEDE" />
     <CornerRadius x:Key="ControlCornerRadius">8</CornerRadius>
     <SolidColorBrush x:Key="PillBrush" Color="#F6F6F6" />
     <SolidColorBrush x:Key="PillTextBrush" Color="#202020" />
