@@ -28,6 +28,10 @@
     <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOverLeftFluent" Color="#868686" />
     <SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOver" Color="#EAEAEA" />
     <SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOverLeftFluent" Color="#EAEAEA" />
+    <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#FFF0DDE0" />
+    <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedLeftFluent" Color="#FFF0DDE0" />
+    <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#FFE6C9CD" />
+    <CornerRadius x:Key="ControlCornerRadius">8</CornerRadius>
     <SolidColorBrush x:Key="PillBrush" Color="#F6F6F6" />
     <SolidColorBrush x:Key="PillTextBrush" Color="#202020" />
     <SolidColorBrush x:Key="NotificationBrush" Color="#FCFCFC" />

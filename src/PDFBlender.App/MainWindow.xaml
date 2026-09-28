@@ -48,25 +48,25 @@
                                Focusable="False"
                                KeyboardNavigation.IsTabStop="False"
                                FocusVisualStyle="{x:Null}"
+                               SelectionChanged="NavigationView_SelectionChanged"
+                               Transition="FadeInWithSlide"
+                               TransitionDuration="320"
                                Background="{DynamicResource SidebarBrush}"
                                TextElement.FontFamily="{DynamicResource AppFontFamily}"
                                TextElement.FontSize="12">
-                <ui:NavigationView.Resources>
-                    <CornerRadius x:Key="ControlCornerRadius">8</CornerRadius>
-                </ui:NavigationView.Resources>
                 <ui:NavigationView.MenuItems>
-                    <ui:NavigationViewItem x:Name="HomeNavigationItem" Content="Home" Tag="home" Margin="0,2" FontSize="10.5" SizeChanged="NavigationItem_SizeChanged" Click="NavigationItem_Click" Focusable="False" KeyboardNavigation.IsTabStop="False" FocusVisualStyle="{x:Null}" AutomationProperties.Name="Home">
+                    <ui:NavigationViewItem x:Name="HomeNavigationItem" Content="Home" Tag="home" Style="{StaticResource BlenderNavigationItemStyle}" Focusable="True" KeyboardNavigation.IsTabStop="True" AutomationProperties.Name="Home">
                         <ui:NavigationViewItem.Icon><ui:SymbolIcon Symbol="Home24" FontSize="24" /></ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
-                    <ui:NavigationViewItem x:Name="ConfigurationNavigationItem" Content="Configuration" Tag="configuration" Margin="0,2" FontSize="10.5" SizeChanged="NavigationItem_SizeChanged" Click="NavigationItem_Click" Focusable="False" KeyboardNavigation.IsTabStop="False" FocusVisualStyle="{x:Null}" AutomationProperties.Name="Configuration">
+                    <ui:NavigationViewItem x:Name="ConfigurationNavigationItem" Content="Configuration" Tag="configuration" Style="{StaticResource BlenderNavigationItemStyle}" Focusable="True" KeyboardNavigation.IsTabStop="True" AutomationProperties.Name="Configuration">
                         <ui:NavigationViewItem.Icon><ui:SymbolIcon Symbol="Options24" FontSize="24" /></ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
                 </ui:NavigationView.MenuItems>
                 <ui:NavigationView.FooterMenuItems>
-                    <ui:NavigationViewItem x:Name="AboutNavigationItem" Content="About" Tag="about" Margin="0,2" FontSize="10.5" SizeChanged="NavigationItem_SizeChanged" Focusable="False" KeyboardNavigation.IsTabStop="False" Click="NavigationItem_Click" FocusVisualStyle="{x:Null}" AutomationProperties.Name="About">
+                    <ui:NavigationViewItem x:Name="AboutNavigationItem" Content="About" Tag="about" Style="{StaticResource BlenderNavigationItemStyle}" Focusable="True" KeyboardNavigation.IsTabStop="True" AutomationProperties.Name="About">
                         <ui:NavigationViewItem.Icon><ui:SymbolIcon Symbol="Info24" FontSize="24" /></ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
-                    <ui:NavigationViewItem x:Name="SettingsNavigationItem" Content="Settings" Tag="settings" Margin="0,2" FontSize="10.5" SizeChanged="NavigationItem_SizeChanged" Focusable="False" KeyboardNavigation.IsTabStop="False" Click="NavigationItem_Click" FocusVisualStyle="{x:Null}" AutomationProperties.Name="Settings">
+                    <ui:NavigationViewItem x:Name="SettingsNavigationItem" Content="Settings" Tag="settings" Style="{StaticResource BlenderNavigationItemStyle}" Focusable="True" KeyboardNavigation.IsTabStop="True" AutomationProperties.Name="Settings">
                         <ui:NavigationViewItem.Icon><ui:SymbolIcon Symbol="Settings24" FontSize="24" /></ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
                 </ui:NavigationView.FooterMenuItems>

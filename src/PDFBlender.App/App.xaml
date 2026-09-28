@@ -9,6 +9,7 @@
                 <ui:ThemesDictionary Theme="Light" />
                 <ui:ControlsDictionary />
                 <ResourceDictionary Source="/PDFBlender.App;component/Resources/Colors.xaml" />
+                <ResourceDictionary Source="/PDFBlender.App;component/Resources/Navigation.xaml" />
                 <ResourceDictionary Source="/PDFBlender.App;component/Resources/Typography.xaml" />
                 <ResourceDictionary Source="/PDFBlender.App;component/Resources/Surfaces.xaml" />
                 <ResourceDictionary Source="/PDFBlender.App;component/Resources/Buttons.xaml" />

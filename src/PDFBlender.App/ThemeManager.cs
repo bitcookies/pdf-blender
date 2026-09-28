@@ -51,6 +51,9 @@ internal static class ThemeManager
             SetBrush(resources, "NavigationViewItemForegroundPointerOverLeftFluent", "#9A9A9A");
             SetBrush(resources, "NavigationViewItemBackgroundPointerOver", "#2D2D2D");
             SetBrush(resources, "NavigationViewItemBackgroundPointerOverLeftFluent", "#2D2D2D");
+            SetBrush(resources, "NavigationViewItemBackgroundSelected", "#3B252B");
+            SetBrush(resources, "NavigationViewItemBackgroundSelectedLeftFluent", "#3B252B");
+            SetBrush(resources, "NavigationViewItemBackgroundPressed", "#493038");
             SetBrush(resources, "PillBrush", "#343434");
             SetBrush(resources, "PillTextBrush", "#F0F0F0");
             SetBrush(resources, "NotificationBrush", "#2D2D2D");
@@ -86,6 +89,9 @@ internal static class ThemeManager
             SetBrush(resources, "NavigationViewItemForegroundPointerOverLeftFluent", "#868686");
             SetBrush(resources, "NavigationViewItemBackgroundPointerOver", "#EAEAEA");
             SetBrush(resources, "NavigationViewItemBackgroundPointerOverLeftFluent", "#EAEAEA");
+            SetBrush(resources, "NavigationViewItemBackgroundSelected", "#FFF0DDE0");
+            SetBrush(resources, "NavigationViewItemBackgroundSelectedLeftFluent", "#FFF0DDE0");
+            SetBrush(resources, "NavigationViewItemBackgroundPressed", "#FFE6C9CD");
             SetBrush(resources, "PillBrush", "#F6F6F6");
             SetBrush(resources, "PillTextBrush", "#202020");
             SetBrush(resources, "NotificationBrush", "#FCFCFC");

@@ -39,7 +39,7 @@ The application uses the pinned `WPF-UI` 4.3.0 package for Fluent controls, them
 
 ## v0.5.0 Interaction Patterns
 
-The shell follows the Microsoft Store compact navigation pattern using WPF-UI `NavigationView` and the neutral light/dark palette. PDF Blender uses a coral/red accent derived from its logo. Pages fade in with a short translation; NavigationView owns item selection, hover, focus, and indicator visuals, while WPF-UI owns buttons, cards, dialogs, and snackbars. Transitions respect Windows client-area animation and render-tier settings.
+The shell follows the Microsoft Store compact navigation pattern using WPF-UI `NavigationView` and the neutral light/dark palette. PDF Blender uses a coral/red accent derived from its logo. A scoped WPF-UI item template provides consistent four-corner hover and active surfaces plus the red selection indicator; navigation state is driven by `SelectionChanged` rather than visual-tree inspection. Pages fade in with a short vertical translation, while WPF-UI owns buttons, cards, dialogs, and snackbars. Transitions respect Windows client-area animation and render-tier settings.
 
 Processing feedback appears in the page status area and in a right-aligned stack of up to three Toast notifications. Toasts support information, success, warning, error, and progress states without logging document content.
 

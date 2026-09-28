@@ -1,10 +1,10 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using PDFBlender.App.Pages;
 using Wpf.Ui.Appearance;
+using Wpf.Ui.Animations;
 using Wpf.Ui.Controls;
 
 namespace PDFBlender.App;
@@ -33,60 +33,14 @@ public partial class MainWindow : FluentWindow
         Loaded += (_, _) => Dispatcher.BeginInvoke(() => SelectNavigationItem("home"), DispatcherPriority.Loaded);
     }
 
-    private void NavigationItem_Click(object sender, RoutedEventArgs e)
+    private void NavigationView_SelectionChanged(object sender, RoutedEventArgs e)
     {
-        e.Handled = true;
-
-        if (sender is Wpf.Ui.Controls.NavigationViewItem item && item.Tag is string page)
-            NavigateTo(page);
-    }
-
-    private void NavigationItem_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        if (sender is FrameworkElement item && e.NewSize.Width > 0 && e.NewSize.Height > 0)
-        {
-            item.Clip = new RectangleGeometry(new Rect(0, 0, e.NewSize.Width, e.NewSize.Height), 8, 8);
-            item.ApplyTemplate();
-            Dispatcher.BeginInvoke(() => ApplyNavigationItemCornerClip(item), DispatcherPriority.Loaded);
-        }
-    }
-
-    private static void ApplyNavigationItemCornerClip(FrameworkElement item)
-    {
-        if (FindVisualChild<Border>(item, element => element.Name == "MainBorder") is not { } mainBorder)
+        if (sender is not Wpf.Ui.Controls.NavigationView navigationView
+            || navigationView.SelectedItem is not Wpf.Ui.Controls.NavigationViewItem item)
             return;
 
-        mainBorder.SizeChanged -= NavigationItemMainBorder_SizeChanged;
-        mainBorder.SizeChanged += NavigationItemMainBorder_SizeChanged;
-        SetRoundedClip(mainBorder);
-    }
-
-    private static void NavigationItemMainBorder_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        if (sender is Border border)
-            SetRoundedClip(border);
-    }
-
-    private static void SetRoundedClip(FrameworkElement element)
-    {
-        if (element.ActualWidth > 0 && element.ActualHeight > 0)
-            element.Clip = new RectangleGeometry(new Rect(0, 0, element.ActualWidth, element.ActualHeight), 8, 8);
-    }
-
-    private static T? FindVisualChild<T>(DependencyObject parent, Func<T, bool> predicate)
-        where T : FrameworkElement
-    {
-        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
-        {
-            var child = VisualTreeHelper.GetChild(parent, i);
-            if (child is T match && predicate(match))
-                return match;
-
-            if (FindVisualChild(child, predicate) is { } nested)
-                return nested;
-        }
-
-        return null;
+        if (item.Tag is string page && !string.Equals(page, _currentPage, StringComparison.Ordinal))
+            NavigateTo(page, synchronizeSelection: false);
     }
 
     private void NavigateTo(string page, bool synchronizeSelection = true)
@@ -109,7 +63,6 @@ public partial class MainWindow : FluentWindow
     {
         ApplyTheme();
         ApplyLanguage();
-        SelectNavigationItem(_currentPage);
         _homePage?.RefreshFromSession();
         _configurationPage?.RefreshFromSession();
         _settingsPage?.RefreshFromSession();
@@ -151,57 +104,23 @@ public partial class MainWindow : FluentWindow
         if (item is null)
             return;
 
-        foreach (var candidate in items)
-        {
-            candidate.Deactivate(ShellNavigationView);
-            candidate.IsActive = false;
-        }
-
-        item.Activate(ShellNavigationView);
-        item.IsActive = true;
-        ApplyNavigationForeground(items, item);
-    }
-
-    private static void ApplyNavigationForeground(IEnumerable<Wpf.Ui.Controls.NavigationViewItem> items, Wpf.Ui.Controls.NavigationViewItem selected)
-    {
-        var resources = Application.Current.Resources;
-        var activeBrush = resources["NavigationViewSelectionIndicatorForeground"] as Brush
-            ?? resources["AccentBrush"] as Brush;
-        var inactiveBrush = resources["NavTextBrush"] as Brush;
-
-        if (activeBrush is null || inactiveBrush is null)
-            return;
-
-        foreach (var item in items)
-            SetNavigationForeground(item, ReferenceEquals(item, selected) ? activeBrush : inactiveBrush);
-    }
-
-    private static void SetNavigationForeground(DependencyObject node, Brush brush)
-    {
-        if (node is SymbolIcon icon)
-            icon.Foreground = brush;
-        else if (node is System.Windows.Controls.TextBlock textBlock)
-            textBlock.Foreground = brush;
-
-        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(node); i++)
-            SetNavigationForeground(VisualTreeHelper.GetChild(node, i), brush);
+        if (!item.IsActive)
+            item.Activate(ShellNavigationView);
     }
 
     private void AnimateContent()
     {
         var motion = UiMotionPolicy.Resolve();
-        ContentFrame.Opacity = 0;
-        var offset = new TranslateTransform(-motion.Offset, 0);
-        ContentFrame.RenderTransform = offset;
-        var animation = new DoubleAnimation(0, 1, motion.EnterOpacity)
+        if (motion.EnterSlide <= TimeSpan.Zero)
         {
-            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
-        };
-        var slide = new DoubleAnimation(-motion.Offset, 0, motion.EnterSlide)
-        {
-            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
-        };
-        ContentFrame.BeginAnimation(UIElement.OpacityProperty, animation);
-        offset.BeginAnimation(TranslateTransform.XProperty, slide);
+            ContentFrame.Opacity = 1;
+            ContentFrame.RenderTransform = null;
+            return;
+        }
+
+        TransitionAnimationProvider.ApplyTransition(
+            ContentFrame,
+            Transition.FadeInWithSlide,
+            (int)motion.EnterSlide.TotalMilliseconds);
     }
 }

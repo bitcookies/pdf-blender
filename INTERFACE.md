@@ -33,7 +33,7 @@ The shell is a single WPF-UI `FluentWindow` with a fixed 44 px title bar, a WPF-
 
 Configuration exposes Format, Protection, Watermark, and Image controls for the selected blend level, arranged as WPF-UI cards and controls. Settings exposes only Appearance (theme and language) plus a WPF-UI Restore presets button and confirmation dialog. Only implemented controls should appear as active settings. Future features may be documented elsewhere but must not be presented as working toggles.
 
-The shell uses WPF-UI `NavigationView` item selection, default hover/selected/focus visuals, and localized accessible item names/tooltips. The pane remains fixed and cannot be expanded. The application palette is derived from the PDF Blender logo. Processing notifications appear in a right-aligned notification host; confirmations use `ContentDialogHost` and `ContentDialog`.
+The shell uses WPF-UI `NavigationView` item selection with a scoped project template for four-corner hover/active surfaces, a coral selection indicator, and localized accessible item names/tooltips. The pane remains fixed and cannot be expanded. Selection changes are handled through one `SelectionChanged` entry point; page instances remain cached. The application palette is derived from the PDF Blender logo. Processing notifications appear in a right-aligned notification host; confirmations use `ContentDialogHost` and `ContentDialog`.
 
 Preferences and configurations are stored under the roaming AppData folder named PDF Blender. Theme, language, and selected slot restore across restarts; Restore presets is a one-shot command and is not persisted as a UI toggle. A malformed file is ignored and replaced by safe defaults.
 

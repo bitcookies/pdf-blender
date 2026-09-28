@@ -1,11 +1,9 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
-    <!-- Keep Segoe UI for Latin text and use the Windows UI CJK family explicitly. -->
-    <FontFamily x:Key="AppFontFamily">Segoe UI, Microsoft YaHei UI, Microsoft YaHei, Noto Sans SC</FontFamily>
+    <FontFamily x:Key="AppFontFamily">Segoe UI</FontFamily>
     <Style TargetType="Control">
         <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
     </Style>
     <Style TargetType="TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
