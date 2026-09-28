@@ -159,6 +159,32 @@ public partial class MainWindow : FluentWindow
 
         item.Activate(ShellNavigationView);
         item.IsActive = true;
+        ApplyNavigationForeground(items, item);
+    }
+
+    private static void ApplyNavigationForeground(IEnumerable<Wpf.Ui.Controls.NavigationViewItem> items, Wpf.Ui.Controls.NavigationViewItem selected)
+    {
+        var resources = Application.Current.Resources;
+        var activeBrush = resources["NavigationViewSelectionIndicatorForeground"] as Brush
+            ?? resources["AccentBrush"] as Brush;
+        var inactiveBrush = resources["NavTextBrush"] as Brush;
+
+        if (activeBrush is null || inactiveBrush is null)
+            return;
+
+        foreach (var item in items)
+            SetNavigationForeground(item, ReferenceEquals(item, selected) ? activeBrush : inactiveBrush);
+    }
+
+    private static void SetNavigationForeground(DependencyObject node, Brush brush)
+    {
+        if (node is SymbolIcon icon)
+            icon.Foreground = brush;
+        else if (node is System.Windows.Controls.TextBlock textBlock)
+            textBlock.Foreground = brush;
+
+        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(node); i++)
+            SetNavigationForeground(VisualTreeHelper.GetChild(node, i), brush);
     }
 
     private void AnimateContent()
