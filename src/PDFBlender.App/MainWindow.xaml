@@ -60,7 +60,7 @@
                         <ui:NavigationViewItem.Icon><ui:SymbolIcon Symbol="Home24" FontSize="24" /></ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
                     <ui:NavigationViewItem x:Name="ConfigurationNavigationItem" Content="Configuration" Tag="configuration" Style="{StaticResource BlenderNavigationItemStyle}" Click="NavigationItem_Click" Loaded="NavigationItem_Loaded" SizeChanged="NavigationItem_SizeChanged" Focusable="True" KeyboardNavigation.IsTabStop="True" AutomationProperties.Name="Configuration">
-                        <ui:NavigationViewItem.Icon><ui:SymbolIcon Symbol="Options24" FontSize="24" /></ui:NavigationViewItem.Icon>
+                        <ui:NavigationViewItem.Icon><ui:SymbolIcon Symbol="PuzzlePiece24" FontSize="24" /></ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
                 </ui:NavigationView.MenuItems>
                 <ui:NavigationView.FooterMenuItems>
