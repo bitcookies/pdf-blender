@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Input;
 using System.Windows.Threading;
 using PDFBlender.App.Pages;
 using Wpf.Ui.Appearance;
@@ -23,6 +24,7 @@ public partial class MainWindow : FluentWindow
     public MainWindow()
     {
         InitializeComponent();
+        AddHandler(Keyboard.PreviewGotKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnKeyboardFocus), true);
         _dialogs = new DialogService(RootDialogHost);
         _notifications = new UiNotificationService(AppNotificationHost, _session);
         ApplicationThemeManager.Apply(this);
@@ -81,6 +83,7 @@ public partial class MainWindow : FluentWindow
                 surface.CornerRadius = new CornerRadius(8);
                 ApplyNavigationSurfaceGeometry(surface);
                 ApplyNavigationItemSurface(navigationItem, surface);
+                ApplyNavigationItemIcon(navigationItem);
             }
         }
     }
@@ -100,13 +103,37 @@ public partial class MainWindow : FluentWindow
     private static void NavigationItem_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
     {
         if (sender is Wpf.Ui.Controls.NavigationViewItem item)
+        {
             ApplyNavigationItemSurface(item);
+            ApplyNavigationItemIcon(item);
+        }
     }
 
     private static void NavigationItem_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
     {
         if (sender is Wpf.Ui.Controls.NavigationViewItem item)
+        {
             ApplyNavigationItemSurface(item);
+            ApplyNavigationItemIcon(item);
+        }
+    }
+
+    private static void ApplyNavigationItemIcon(Wpf.Ui.Controls.NavigationViewItem item)
+    {
+        if (item.Icon is not IconElement icon)
+            return;
+
+        var key = item.IsActive
+            ? "NavigationViewItemForegroundLeftFluent"
+            : "NavigationViewItemForeground";
+        if (Application.Current.TryFindResource(key) is Brush brush)
+            icon.Foreground = brush;
+    }
+
+    private static void OnKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+    {
+        if (e.NewFocus is Control control)
+            control.FocusVisualStyle = null;
     }
 
     private static void ApplyNavigationItemSurface(Wpf.Ui.Controls.NavigationViewItem item, Border? surface = null)
@@ -173,7 +200,7 @@ public partial class MainWindow : FluentWindow
             _ => ThemeManager.SystemUsesLightTheme() is false
         };
         ApplicationThemeManager.Apply(isDark ? ApplicationTheme.Dark : ApplicationTheme.Light);
-        var accent = (Color)ColorConverter.ConvertFromString("#FF7573")!;
+        var accent = (Color)ColorConverter.ConvertFromString("#C9021E")!;
         ApplicationAccentColorManager.Apply(accent, accent, accent, accent);
         ThemeManager.ApplyPalette(isDark);
         Background = (Brush)Application.Current.Resources["WindowBackgroundBrush"];

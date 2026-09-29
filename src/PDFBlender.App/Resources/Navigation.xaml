@@ -5,7 +5,7 @@
     <Style x:Key="BlenderNavigationItemStyle"
            TargetType="ui:NavigationViewItem"
            BasedOn="{StaticResource {x:Type ui:NavigationViewItem}}">
-        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontSize" Value="9" />
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="Foreground" Value="{DynamicResource NavigationViewItemForeground}" />
         <Setter Property="Background" Value="Transparent" />
