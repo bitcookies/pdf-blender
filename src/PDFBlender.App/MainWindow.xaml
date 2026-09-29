@@ -30,7 +30,7 @@
         </ui:TitleBar>
         <Grid Grid.Row="1" Background="{DynamicResource SidebarBrush}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="78" />
+                <ColumnDefinition Width="72" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <ui:NavigationView Grid.Column="0" x:Name="ShellNavigationView"
@@ -38,13 +38,13 @@
                                IsPaneOpen="False"
                                IsPaneToggleVisible="False"
                                IsFooterSeparatorVisible="False"
-                               CompactPaneLength="74"
-                               OpenPaneLength="74"
+                               CompactPaneLength="72"
+                               OpenPaneLength="72"
                                FrameMargin="0"
                                IsBackButtonVisible="Collapsed"
-                               Width="74"
+                               Width="72"
                                HorizontalAlignment="Left"
-                               Margin="0,0,4,0"
+                               Margin="0"
                                Focusable="False"
                                KeyboardNavigation.IsTabStop="False"
                                FocusVisualStyle="{x:Null}"
@@ -52,6 +52,7 @@
                                Transition="FadeInWithSlide"
                                TransitionDuration="320"
                                Background="{DynamicResource SidebarBrush}"
+                               ClipToBounds="False"
                                TextElement.FontFamily="{DynamicResource AppFontFamily}"
                                TextElement.FontSize="12">
                 <ui:NavigationView.MenuItems>

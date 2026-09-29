@@ -14,7 +14,7 @@
     <SolidColorBrush x:Key="TextBrush" Color="#202020" />
     <SolidColorBrush x:Key="TitleTextBrush" Color="#5E5E5E" />
     <SolidColorBrush x:Key="MutedTextBrush" Color="#666666" />
-    <SolidColorBrush x:Key="AccentBrush" Color="#CF3337" />
+    <SolidColorBrush x:Key="AccentBrush" Color="#FF7573" />
     <SolidColorBrush x:Key="AccentDarkBrush" Color="#E45F60" />
     <SolidColorBrush x:Key="AccentSoftBrush" Color="#25FF7573" />
     <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
@@ -24,7 +24,7 @@
     <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#868686" />
     <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOver" Color="#868686" />
     <SolidColorBrush x:Key="NavigationViewItemForegroundPressed" Color="#868686" />
-    <SolidColorBrush x:Key="NavigationViewItemForegroundLeftFluent" Color="#CF3337" />
+    <SolidColorBrush x:Key="NavigationViewItemForegroundLeftFluent" Color="#FF7573" />
     <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOverLeftFluent" Color="#868686" />
     <SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOver" Color="#EAEAEA" />
     <SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOverLeftFluent" Color="#EAEAEA" />

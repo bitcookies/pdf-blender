@@ -66,15 +66,49 @@ public partial class MainWindow : FluentWindow
 
     private static void ApplyNavigationItemChrome(FrameworkElement item)
     {
-        if (item.ActualWidth > 0 && item.ActualHeight > 0)
-            item.Clip = new RectangleGeometry(new Rect(0, 0, item.ActualWidth, item.ActualHeight), 8, 8);
-
         if (item is Wpf.Ui.Controls.NavigationViewItem navigationItem)
         {
             navigationItem.ApplyTemplate();
+            navigationItem.MouseEnter -= NavigationItem_MouseEnter;
+            navigationItem.MouseEnter += NavigationItem_MouseEnter;
+            navigationItem.MouseLeave -= NavigationItem_MouseLeave;
+            navigationItem.MouseLeave += NavigationItem_MouseLeave;
             if (navigationItem.Template?.FindName("MainBorder", navigationItem) is Border surface)
+            {
                 surface.CornerRadius = new CornerRadius(8);
+                ApplyNavigationItemSurface(navigationItem, surface);
+            }
         }
+    }
+
+    private static void NavigationItem_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        if (sender is Wpf.Ui.Controls.NavigationViewItem item)
+            ApplyNavigationItemSurface(item);
+    }
+
+    private static void NavigationItem_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        if (sender is Wpf.Ui.Controls.NavigationViewItem item)
+            ApplyNavigationItemSurface(item);
+    }
+
+    private static void ApplyNavigationItemSurface(Wpf.Ui.Controls.NavigationViewItem item, Border? surface = null)
+    {
+        surface ??= item.Template?.FindName("MainBorder", item) as Border;
+        if (surface is null)
+            return;
+
+        var key = item.IsActive
+            ? "NavigationViewItemBackgroundSelectedLeftFluent"
+            : item.IsMouseOver
+                ? "NavigationViewItemBackgroundPointerOverLeftFluent"
+                : null;
+
+        surface.Background = key is null
+            ? Brushes.Transparent
+            : Application.Current.TryFindResource(key) as Brush ?? Brushes.Transparent;
+        surface.CornerRadius = new CornerRadius(8);
     }
 
     private void NavigateTo(string page, bool synchronizeSelection = true)
@@ -123,10 +157,20 @@ public partial class MainWindow : FluentWindow
             _ => ThemeManager.SystemUsesLightTheme() is false
         };
         ApplicationThemeManager.Apply(isDark ? ApplicationTheme.Dark : ApplicationTheme.Light);
-        var accent = (Color)ColorConverter.ConvertFromString("#CF3337")!;
+        var accent = (Color)ColorConverter.ConvertFromString("#FF7573")!;
         ApplicationAccentColorManager.Apply(accent, accent, accent, accent);
         ThemeManager.ApplyPalette(isDark);
         Background = (Brush)Application.Current.Resources["WindowBackgroundBrush"];
+        if (IsInitialized)
+        {
+            foreach (var navigationItem in ShellNavigationView.MenuItems
+                         .Cast<object>()
+                         .Concat(ShellNavigationView.FooterMenuItems.Cast<object>())
+                         .OfType<Wpf.Ui.Controls.NavigationViewItem>())
+            {
+                ApplyNavigationItemChrome(navigationItem);
+            }
+        }
     }
 
     private void SelectNavigationItem(string page)
@@ -145,6 +189,9 @@ public partial class MainWindow : FluentWindow
 
         if (!item.IsActive)
             item.Activate(ShellNavigationView);
+
+        foreach (var navigationItem in items)
+            ApplyNavigationItemChrome(navigationItem);
     }
 
     private void AnimateContent()

@@ -38,7 +38,7 @@ internal static class ThemeManager
             SetBrush(resources, "TextBrush", "#F2F2F2");
             SetBrush(resources, "TitleTextBrush", "#D8D8D8");
             SetBrush(resources, "MutedTextBrush", "#B8B8B8");
-            SetBrush(resources, "AccentBrush", "#CF3337");
+            SetBrush(resources, "AccentBrush", "#FF7573");
             SetBrush(resources, "AccentDarkBrush", "#E45F60");
             SetBrush(resources, "AccentSoftBrush", "#35FF7573");
             SetBrush(resources, "NavHoverBrush", "#18FFFFFF");
@@ -47,7 +47,7 @@ internal static class ThemeManager
             SetBrush(resources, "NavigationViewItemForeground", "#9A9A9A");
             SetBrush(resources, "NavigationViewItemForegroundPointerOver", "#9A9A9A");
             SetBrush(resources, "NavigationViewItemForegroundPressed", "#9A9A9A");
-            SetBrush(resources, "NavigationViewItemForegroundLeftFluent", "#9A9A9A");
+            SetBrush(resources, "NavigationViewItemForegroundLeftFluent", "#FF7573");
             SetBrush(resources, "NavigationViewItemForegroundPointerOverLeftFluent", "#9A9A9A");
             SetBrush(resources, "NavigationViewItemBackgroundPointerOver", "#2D2D2D");
             SetBrush(resources, "NavigationViewItemBackgroundPointerOverLeftFluent", "#2D2D2D");
@@ -76,7 +76,7 @@ internal static class ThemeManager
             SetBrush(resources, "TextBrush", "#202020");
             SetBrush(resources, "TitleTextBrush", "#868686");
             SetBrush(resources, "MutedTextBrush", "#666666");
-            SetBrush(resources, "AccentBrush", "#CF3337");
+            SetBrush(resources, "AccentBrush", "#FF7573");
             SetBrush(resources, "AccentDarkBrush", "#E45F60");
             SetBrush(resources, "AccentSoftBrush", "#25FF7573");
             SetBrush(resources, "NavHoverBrush", "#0F000000");
@@ -85,7 +85,7 @@ internal static class ThemeManager
             SetBrush(resources, "NavigationViewItemForeground", "#868686");
             SetBrush(resources, "NavigationViewItemForegroundPointerOver", "#868686");
             SetBrush(resources, "NavigationViewItemForegroundPressed", "#868686");
-            SetBrush(resources, "NavigationViewItemForegroundLeftFluent", "#868686");
+            SetBrush(resources, "NavigationViewItemForegroundLeftFluent", "#FF7573");
             SetBrush(resources, "NavigationViewItemForegroundPointerOverLeftFluent", "#868686");
             SetBrush(resources, "NavigationViewItemBackgroundPointerOver", "#EAEAEA");
             SetBrush(resources, "NavigationViewItemBackgroundPointerOverLeftFluent", "#EAEAEA");
