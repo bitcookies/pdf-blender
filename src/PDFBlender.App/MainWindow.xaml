@@ -55,18 +55,18 @@
                                TextElement.FontFamily="{DynamicResource AppFontFamily}"
                                TextElement.FontSize="12">
                 <ui:NavigationView.MenuItems>
-                    <ui:NavigationViewItem x:Name="HomeNavigationItem" Content="Home" Tag="home" Style="{StaticResource BlenderNavigationItemStyle}" Click="NavigationItem_Click" SizeChanged="NavigationItem_SizeChanged" Focusable="True" KeyboardNavigation.IsTabStop="True" AutomationProperties.Name="Home">
+                    <ui:NavigationViewItem x:Name="HomeNavigationItem" Content="Home" Tag="home" Style="{StaticResource BlenderNavigationItemStyle}" Click="NavigationItem_Click" Loaded="NavigationItem_Loaded" SizeChanged="NavigationItem_SizeChanged" Focusable="True" KeyboardNavigation.IsTabStop="True" AutomationProperties.Name="Home">
                         <ui:NavigationViewItem.Icon><ui:SymbolIcon Symbol="Home24" FontSize="24" /></ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
-                    <ui:NavigationViewItem x:Name="ConfigurationNavigationItem" Content="Configuration" Tag="configuration" Style="{StaticResource BlenderNavigationItemStyle}" Click="NavigationItem_Click" SizeChanged="NavigationItem_SizeChanged" Focusable="True" KeyboardNavigation.IsTabStop="True" AutomationProperties.Name="Configuration">
+                    <ui:NavigationViewItem x:Name="ConfigurationNavigationItem" Content="Configuration" Tag="configuration" Style="{StaticResource BlenderNavigationItemStyle}" Click="NavigationItem_Click" Loaded="NavigationItem_Loaded" SizeChanged="NavigationItem_SizeChanged" Focusable="True" KeyboardNavigation.IsTabStop="True" AutomationProperties.Name="Configuration">
                         <ui:NavigationViewItem.Icon><ui:SymbolIcon Symbol="Options24" FontSize="24" /></ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
                 </ui:NavigationView.MenuItems>
                 <ui:NavigationView.FooterMenuItems>
-                    <ui:NavigationViewItem x:Name="AboutNavigationItem" Content="About" Tag="about" Style="{StaticResource BlenderNavigationItemStyle}" Click="NavigationItem_Click" SizeChanged="NavigationItem_SizeChanged" Focusable="True" KeyboardNavigation.IsTabStop="True" AutomationProperties.Name="About">
+                    <ui:NavigationViewItem x:Name="AboutNavigationItem" Content="About" Tag="about" Style="{StaticResource BlenderNavigationItemStyle}" Click="NavigationItem_Click" Loaded="NavigationItem_Loaded" SizeChanged="NavigationItem_SizeChanged" Focusable="True" KeyboardNavigation.IsTabStop="True" AutomationProperties.Name="About">
                         <ui:NavigationViewItem.Icon><ui:SymbolIcon Symbol="Info24" FontSize="24" /></ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
-                    <ui:NavigationViewItem x:Name="SettingsNavigationItem" Content="Settings" Tag="settings" Style="{StaticResource BlenderNavigationItemStyle}" Click="NavigationItem_Click" SizeChanged="NavigationItem_SizeChanged" Focusable="True" KeyboardNavigation.IsTabStop="True" AutomationProperties.Name="Settings">
+                    <ui:NavigationViewItem x:Name="SettingsNavigationItem" Content="Settings" Tag="settings" Style="{StaticResource BlenderNavigationItemStyle}" Click="NavigationItem_Click" Loaded="NavigationItem_Loaded" SizeChanged="NavigationItem_SizeChanged" Focusable="True" KeyboardNavigation.IsTabStop="True" AutomationProperties.Name="Settings">
                         <ui:NavigationViewItem.Icon><ui:SymbolIcon Symbol="Settings24" FontSize="24" /></ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
                 </ui:NavigationView.FooterMenuItems>

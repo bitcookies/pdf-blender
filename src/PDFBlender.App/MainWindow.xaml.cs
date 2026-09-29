@@ -55,7 +55,26 @@ public partial class MainWindow : FluentWindow
     private void NavigationItem_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         if (sender is FrameworkElement item && e.NewSize.Width > 0 && e.NewSize.Height > 0)
-            item.Clip = new RectangleGeometry(new Rect(0, 0, e.NewSize.Width, e.NewSize.Height), 8, 8);
+            ApplyNavigationItemChrome(item);
+    }
+
+    private void NavigationItem_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement item)
+            ApplyNavigationItemChrome(item);
+    }
+
+    private static void ApplyNavigationItemChrome(FrameworkElement item)
+    {
+        if (item.ActualWidth > 0 && item.ActualHeight > 0)
+            item.Clip = new RectangleGeometry(new Rect(0, 0, item.ActualWidth, item.ActualHeight), 8, 8);
+
+        if (item is Wpf.Ui.Controls.NavigationViewItem navigationItem)
+        {
+            navigationItem.ApplyTemplate();
+            if (navigationItem.Template?.FindName("MainBorder", navigationItem) is Border surface)
+                surface.CornerRadius = new CornerRadius(8);
+        }
     }
 
     private void NavigateTo(string page, bool synchronizeSelection = true)
@@ -104,6 +123,8 @@ public partial class MainWindow : FluentWindow
             _ => ThemeManager.SystemUsesLightTheme() is false
         };
         ApplicationThemeManager.Apply(isDark ? ApplicationTheme.Dark : ApplicationTheme.Light);
+        var accent = (Color)ColorConverter.ConvertFromString("#CF3337")!;
+        ApplicationAccentColorManager.Apply(accent, accent, accent, accent);
         ThemeManager.ApplyPalette(isDark);
         Background = (Brush)Application.Current.Resources["WindowBackgroundBrush"];
     }
