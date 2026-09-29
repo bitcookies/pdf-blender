@@ -3,68 +3,99 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:local="clr-namespace:PDFBlender.App">
-    <Grid Margin="24,20,24,24" UseLayoutRounding="True">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="76" />
-            <RowDefinition Height="10" />
-            <RowDefinition Height="176" />
-            <RowDefinition Height="14" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="12" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  UseLayoutRounding="True">
+        <Grid Margin="24,20,24,24" UseLayoutRounding="True">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="78" />
+                <RowDefinition Height="16" />
+                <RowDefinition Height="206" />
+                <RowDefinition Height="20" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="16" />
+                <RowDefinition Height="56" />
+                <RowDefinition Height="12" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" ClipToBounds="True">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Border Width="44" Height="44" CornerRadius="12" Background="{DynamicResource LogoTileBrush}" Padding="5">
-                    <Image Source="/PDFBlender.App;component/Assets/logo.png" Stretch="Uniform" />
-                </Border>
-                <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                    <TextBlock x:Name="PageTitle" FontSize="22" FontWeight="SemiBold" />
-                    <TextBlock x:Name="PageSubtitle" FontSize="12.5" Foreground="{DynamicResource MutedTextBrush}" Margin="0,3,0,0" />
-                </StackPanel>
-            </StackPanel>
-        </Grid>
-
-        <ui:Card Grid.Row="2" Padding="16" AllowDrop="True" DragOver="DropTarget_DragOver" Drop="DropTarget_Drop" AutomationProperties.Name="PDF drop area">
-            <Grid>
-                <Grid.ColumnDefinitions><ColumnDefinition Width="72" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                <Border Width="54" Height="54" CornerRadius="14" Background="{DynamicResource AccentSoftBrush}" VerticalAlignment="Center" HorizontalAlignment="Left">
-                    <ui:SymbolIcon Symbol="DocumentPdf24" FontSize="28" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                </Border>
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="4,0,18,0">
-                    <TextBlock x:Name="DropTitleText" Style="{StaticResource CardTitleTextStyle}" />
-                    <TextBlock x:Name="DropHintText" Style="{StaticResource CardDescriptionTextStyle}" Margin="0,4,0,0" />
-                    <TextBlock x:Name="ReadyText" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource AccentDarkBrush}" Margin="0,10,0,0" />
-                    <TextBlock x:Name="FileNameText" FontSize="12" Foreground="{DynamicResource MutedTextBrush}" TextTrimming="CharacterEllipsis" MaxWidth="380" />
-                </StackPanel>
-                <ui:Button x:Name="BrowseButton" Grid.Column="2" Style="{StaticResource SecondaryActionButtonStyle}" VerticalAlignment="Center" Click="BrowseButton_Click" AutomationProperties.Name="Browse PDF">
-                    <StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="FolderOpen24" Margin="0,0,7,0" /><TextBlock x:Name="BrowseButtonText" /></StackPanel>
-                </ui:Button>
-            </Grid>
-        </ui:Card>
-
-        <Grid Grid.Row="4">
-            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
-            <local:BlendLevelRail x:Name="BlendLevelRailControl" SelectionChanged="BlendLevelRailControl_SelectionChanged" />
-            <ui:Button Grid.Row="1" x:Name="ConfigurationButton" Style="{StaticResource SecondaryActionButtonStyle}" HorizontalAlignment="Left" Padding="10,5" Margin="0,8,0,0" Click="ConfigurationButton_Click" AutomationProperties.Name="Configuration">
-                <StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="Options24" Margin="0,0,6,0" /><TextBlock x:Name="ConfigurationButtonText" /></StackPanel>
-            </ui:Button>
-        </Grid>
-
-        <Grid Grid.Row="6">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Border Style="{StaticResource PillBorderStyle}" Padding="9,4">
-                    <StackPanel Orientation="Horizontal">
-                        <Ellipse Width="7" Height="7" Fill="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
-                        <TextBlock x:Name="StatusText" Foreground="{DynamicResource PillTextBrush}" FontSize="11.5" VerticalAlignment="Center" />
+            <Grid Grid.Row="0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="54" Height="54" CornerRadius="14" Background="{DynamicResource LogoTileBrush}" Padding="6">
+                        <Image Source="/PDFBlender.App;component/Assets/logo.png" Stretch="Uniform" />
+                    </Border>
+                    <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+                        <TextBlock x:Name="PageTitle" FontSize="24" FontWeight="SemiBold" />
+                        <TextBlock x:Name="PageSlogan" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" Margin="0,3,0,0" />
                     </StackPanel>
-                </Border>
-                <ProgressBar x:Name="ProcessingProgress" Width="120" Height="5" Margin="10,0,8,0" Visibility="Collapsed" />
-                <ui:Button x:Name="CancelButton" Style="{StaticResource SecondaryActionButtonStyle}" Padding="10,5" Visibility="Collapsed" Click="CancelButton_Click"><StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="Dismiss24" Margin="0,0,6,0" /><TextBlock x:Name="CancelButtonText" /></StackPanel></ui:Button>
-            </StackPanel>
-            <ui:Button x:Name="BlendButton" Grid.Column="1" Style="{StaticResource PrimaryActionButtonStyle}" Click="BlendButton_Click" AutomationProperties.Name="Blend PDF"><StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="Play24" Margin="0,0,8,0" /><TextBlock x:Name="BlendButtonText" /></StackPanel></ui:Button>
+                </StackPanel>
+            </Grid>
+
+            <ui:Card x:Name="DropCard" Grid.Row="2" Padding="20" AllowDrop="True" DragEnter="DropCard_DragEnter" DragOver="DropTarget_DragOver" DragLeave="DropCard_DragLeave" Drop="DropTarget_Drop" AutomationProperties.Name="PDF drop area">
+                <Grid>
+                    <Grid x:Name="EmptyDropContent">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="88" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <Border Width="64" Height="64" CornerRadius="16" Background="{DynamicResource AccentSoftBrush}" VerticalAlignment="Center">
+                            <ui:SymbolIcon Symbol="DocumentPdf24" FontSize="32" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,20,0">
+                            <TextBlock x:Name="DropTitleText" Style="{StaticResource CardTitleTextStyle}" FontSize="17" />
+                            <TextBlock x:Name="DropHintText" Style="{StaticResource CardDescriptionTextStyle}" Margin="0,5,0,0" />
+                            <TextBlock x:Name="ReadyText" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" Margin="0,12,0,0" />
+                        </StackPanel>
+                        <ui:Button x:Name="BrowseButton" Grid.Column="2" Style="{StaticResource SecondaryActionButtonStyle}" VerticalAlignment="Center" Click="BrowseButton_Click" AutomationProperties.Name="Browse PDF">
+                            <StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="FolderOpen24" Margin="0,0,7,0" /><TextBlock x:Name="BrowseButtonText" /></StackPanel>
+                        </ui:Button>
+                    </Grid>
+
+                    <Grid x:Name="SelectedDropContent" Visibility="Collapsed">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="176" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <Border Width="136" Height="166" Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" HorizontalAlignment="Left" Padding="8">
+                            <Grid>
+                                <Image x:Name="PreviewImage" Stretch="Uniform" />
+                                <ui:SymbolIcon x:Name="PreviewFallbackIcon" Symbol="DocumentPdf24" FontSize="42" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+                                <Border x:Name="PreviewLoadingOverlay" Background="{DynamicResource SurfaceRaisedBrush}" Opacity="0.92" Visibility="Collapsed">
+                                    <StackPanel VerticalAlignment="Center">
+                                        <ui:ProgressRing IsIndeterminate="True" Width="26" Height="26" HorizontalAlignment="Center" />
+                                        <TextBlock x:Name="PreviewLoadingText" FontSize="11" Foreground="{DynamicResource MutedTextBrush}" HorizontalAlignment="Center" Margin="0,7,0,0" />
+                                    </StackPanel>
+                                </Border>
+                                <ui:Button x:Name="RemovePdfButton" Width="28" Height="28" Padding="0" HorizontalAlignment="Right" VerticalAlignment="Top" Appearance="Transparent" Click="RemovePdfButton_Click" ToolTip="Remove PDF" AutomationProperties.Name="Remove PDF">
+                                    <ui:SymbolIcon Symbol="DismissCircle16" FontSize="16" />
+                                </ui:Button>
+                            </Grid>
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="20,0,20,0">
+                            <TextBlock x:Name="SelectedFileLabel" Style="{StaticResource CardTitleTextStyle}" FontSize="17" />
+                            <TextBlock x:Name="FileNameText" FontSize="14" Foreground="{DynamicResource TextBrush}" TextTrimming="CharacterEllipsis" MaxWidth="420" Margin="0,7,0,0" />
+                            <TextBlock x:Name="PreviewErrorText" FontSize="12" Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap" Visibility="Collapsed" Margin="0,7,0,0" />
+                        </StackPanel>
+                        <ui:Button x:Name="ReplacePdfButton" Grid.Column="2" Style="{StaticResource SecondaryActionButtonStyle}" VerticalAlignment="Center" Click="BrowseButton_Click" AutomationProperties.Name="Replace PDF">
+                            <StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="ArrowSync24" Margin="0,0,7,0" /><TextBlock x:Name="ReplacePdfButtonText" /></StackPanel>
+                        </ui:Button>
+                    </Grid>
+                </Grid>
+            </ui:Card>
+
+            <Grid Grid.Row="4">
+                <local:BlendLevelRail x:Name="BlendLevelRailControl" SelectionChanged="BlendLevelRailControl_SelectionChanged" EditRequested="BlendLevelRailControl_EditRequested" />
+            </Grid>
+
+            <ui:Button x:Name="BlendButton" Grid.Row="6" Style="{StaticResource PrimaryActionButtonStyle}" MinHeight="56" HorizontalAlignment="Stretch" Click="BlendButton_Click" AutomationProperties.Name="Blend PDF">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"><ui:SymbolIcon Symbol="Play24" FontSize="20" Margin="0,0,9,0" /><TextBlock x:Name="BlendButtonText" FontSize="15" /></StackPanel>
+            </ui:Button>
+
+            <Grid x:Name="StatusRow" Grid.Row="8">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Style="{StaticResource PillBorderStyle}" Padding="9,4">
+                        <StackPanel Orientation="Horizontal"><Ellipse Width="7" Height="7" Fill="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,6,0" /><TextBlock x:Name="StatusText" Foreground="{DynamicResource PillTextBrush}" FontSize="11.5" VerticalAlignment="Center" /></StackPanel>
+                    </Border>
+                    <ProgressBar x:Name="ProcessingProgress" Width="140" Height="5" Margin="10,0,8,0" Visibility="Collapsed" />
+                    <ui:Button x:Name="CancelButton" Style="{StaticResource SecondaryActionButtonStyle}" Padding="10,5" Visibility="Collapsed" Click="CancelButton_Click">
+                        <StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="Dismiss24" Margin="0,0,6,0" /><TextBlock x:Name="CancelButtonText" /></StackPanel>
+                    </ui:Button>
+                </StackPanel>
+            </Grid>
         </Grid>
-    </Grid>
+    </ScrollViewer>
 </Page>
