@@ -69,16 +69,32 @@ public partial class MainWindow : FluentWindow
         if (item is Wpf.Ui.Controls.NavigationViewItem navigationItem)
         {
             navigationItem.ApplyTemplate();
+            navigationItem.ClipToBounds = false;
             navigationItem.MouseEnter -= NavigationItem_MouseEnter;
             navigationItem.MouseEnter += NavigationItem_MouseEnter;
             navigationItem.MouseLeave -= NavigationItem_MouseLeave;
             navigationItem.MouseLeave += NavigationItem_MouseLeave;
             if (navigationItem.Template?.FindName("MainBorder", navigationItem) is Border surface)
             {
+                surface.SizeChanged -= NavigationSurface_SizeChanged;
+                surface.SizeChanged += NavigationSurface_SizeChanged;
                 surface.CornerRadius = new CornerRadius(8);
+                ApplyNavigationSurfaceGeometry(surface);
                 ApplyNavigationItemSurface(navigationItem, surface);
             }
         }
+    }
+
+    private static void NavigationSurface_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (sender is Border surface)
+            ApplyNavigationSurfaceGeometry(surface);
+    }
+
+    private static void ApplyNavigationSurfaceGeometry(Border surface)
+    {
+        surface.CornerRadius = new CornerRadius(8);
+        surface.Clip = null;
     }
 
     private static void NavigationItem_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
@@ -108,7 +124,7 @@ public partial class MainWindow : FluentWindow
         surface.Background = key is null
             ? Brushes.Transparent
             : Application.Current.TryFindResource(key) as Brush ?? Brushes.Transparent;
-        surface.CornerRadius = new CornerRadius(8);
+        ApplyNavigationSurfaceGeometry(surface);
     }
 
     private void NavigateTo(string page, bool synchronizeSelection = true)
