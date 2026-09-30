@@ -81,8 +81,8 @@
             </Grid>
         </Grid>
 
-        <ui:Card x:Name="DropCard" Grid.Row="2" Panel.ZIndex="4" Padding="10" AllowDrop="True" DragEnter="DropCard_DragEnter" DragOver="DropTarget_DragOver" DragLeave="DropCard_DragLeave" Drop="DropTarget_Drop" Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" AutomationProperties.Name="PDF drop area">
-            <Grid>
+        <ui:Card x:Name="DropCard" Grid.Row="2" Height="188" MinHeight="188" MaxHeight="188" Panel.ZIndex="4" Padding="10" AllowDrop="True" DragEnter="DropCard_DragEnter" DragOver="DropTarget_DragOver" DragLeave="DropCard_DragLeave" Drop="DropTarget_Drop" Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" AutomationProperties.Name="PDF drop area">
+            <Grid Height="166">
                 <Rectangle x:Name="DropDash" Margin="1" RadiusX="10" RadiusY="10" Stroke="{DynamicResource BorderBrush}" StrokeThickness="1.5" StrokeDashArray="5,4" IsHitTestVisible="False" />
                 <Grid x:Name="EmptyDropContent" Margin="18,10">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -98,26 +98,23 @@
                 </Grid>
 
                 <Grid x:Name="SelectedDropContent" Visibility="Collapsed" Margin="18,10">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="116" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                    <Border Width="92" Height="142" Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" HorizontalAlignment="Left" Padding="6">
-                        <Grid>
-                            <Image x:Name="PreviewImage" Stretch="Uniform" />
-                            <Image x:Name="PreviewFallbackImage" Source="/PDFBlender.App;component/Assets/pdf-icon.png" Width="54" Height="54" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
-                            <Border x:Name="PreviewLoadingOverlay" Background="{DynamicResource SurfaceRaisedBrush}" Opacity="0.92" Visibility="Collapsed">
-                                <StackPanel VerticalAlignment="Center"><ui:ProgressRing IsIndeterminate="True" Width="24" Height="24" HorizontalAlignment="Center" /><TextBlock x:Name="PreviewLoadingText" FontSize="10" Foreground="{DynamicResource MutedTextBrush}" HorizontalAlignment="Center" Margin="0,6,0,0" /></StackPanel>
-                            </Border>
-                            <ui:Button x:Name="RemovePdfButton" Width="26" Height="26" Padding="0" HorizontalAlignment="Right" VerticalAlignment="Top" Appearance="Transparent" Click="RemovePdfButton_Click" ToolTip="Remove PDF" AutomationProperties.Name="Remove PDF"><ui:SymbolIcon Symbol="DismissCircle16" FontSize="16" /></ui:Button>
-                        </Grid>
-                    </Border>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="150" />
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0" Width="220" HorizontalAlignment="Left">
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" CanContentScroll="True">
+                            <StackPanel x:Name="PreviewStrip" Orientation="Horizontal" VerticalAlignment="Center" />
+                        </ScrollViewer>
+                    </Grid>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0,12,0">
                         <TextBlock x:Name="SelectedFileLabel" Style="{StaticResource CardTitleTextStyle}" FontSize="16" />
                         <TextBlock x:Name="FileNameText" FontSize="13" Foreground="{DynamicResource TextBrush}" TextTrimming="CharacterEllipsis" Margin="0,6,0,0" />
                         <TextBlock x:Name="SelectedCountText" FontSize="12" Foreground="{DynamicResource MutedTextBrush}" Margin="0,5,0,0" />
                         <TextBlock x:Name="PreviewErrorText" FontSize="11" Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap" Visibility="Collapsed" Margin="0,5,0,0" />
                     </StackPanel>
-                    <Border Grid.Column="2" Height="40" VerticalAlignment="Center" CornerRadius="8" Style="{StaticResource HomeGradientSurfaceStyle}" Tag="{Binding IsEnabled, ElementName=ReplacePdfButton}">
-                        <ui:Button x:Name="ReplacePdfButton" Style="{StaticResource HomeGradientButtonStyle}" Height="40" Click="BrowseButton_Click" AutomationProperties.Name="Replace PDF"><StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="Document24" Margin="0,0,7,0" Foreground="White" /><TextBlock x:Name="ReplacePdfButtonText" Foreground="White" /></StackPanel></ui:Button>
-                    </Border>
+                    <TextBlock x:Name="AdditionalFilesHint" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" FontSize="12" Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap" />
                 </Grid>
             </Grid>
         </ui:Card>

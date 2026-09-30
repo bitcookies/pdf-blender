@@ -15,7 +15,7 @@ internal static class PdfPreviewService
         {
             cancellationToken.ThrowIfCancellationRequested();
             using var png = new MemoryStream();
-            var options = new RenderOptions(72, Width: 420, Height: null, WithAspectRatio: true, UseTiling: true);
+            var options = new RenderOptions(144, Width: 840, Height: null, WithAspectRatio: true, UseTiling: true);
             Conversion.SavePng(png, bytes, 0, null, options);
             cancellationToken.ThrowIfCancellationRequested();
             png.Position = 0;

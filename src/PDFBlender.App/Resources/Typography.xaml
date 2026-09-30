@@ -9,6 +9,10 @@
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
         <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
     </Style>
+    <Style TargetType="Image">
+        <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
     <Style TargetType="Page">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
