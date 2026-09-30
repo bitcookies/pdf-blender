@@ -29,11 +29,11 @@ public partial class BlendLevelRail : UserControl
 
     public int SelectedIndex
     {
-        get => _levels.Count == 0 ? 0 : Math.Clamp((int)Math.Round(LevelSlider.Value), 0, _levels.Count - 1);
+        get => _levels.Count == 0 ? 0 : Math.Clamp((int)Math.Round(LevelSlider.Value), 0, SlotCount - 1);
         set
         {
             if (_levels.Count == 0) return;
-            var target = ResolveAvailableIndex(Math.Clamp(value, 0, _levels.Count - 1), value >= SelectedIndex);
+            var target = ResolveAvailableIndex(Math.Clamp(value, 0, SlotCount - 1), value >= SelectedIndex);
             _updating = true;
             LevelSlider.Value = target;
             _updating = false;
@@ -43,41 +43,51 @@ public partial class BlendLevelRail : UserControl
 
     public void SetLevels(IReadOnlyList<BlendLevelItem> levels)
     {
+        var previousIndex = _levels.Count == 0 ? 0 : Math.Clamp((int)Math.Round(LevelSlider.Value), 0, SlotCount - 1);
         _levels = levels.Take(SlotCount).ToArray();
         _updating = true;
         LevelSlider.Minimum = 0;
         LevelSlider.Maximum = SlotCount - 1;
         LevelSlider.IsEnabled = _levels.Count(level => level.IsAvailable) > 1;
-        var current = _levels.Count == 0 ? 0 : Math.Clamp(SelectedIndex, 0, _levels.Count - 1);
+        var current = _levels.Count == 0 ? 0 : Math.Clamp(previousIndex, 0, SlotCount - 1);
         LevelSlider.Value = _levels.Count == 0 ? 0 : ResolveAvailableIndex(current, true);
 
+        NumbersPanel.Children.Clear();
+        UpperTickPanel.Children.Clear();
+        LowerTickPanel.Children.Clear();
         LabelsPanel.Children.Clear();
-        TickPanel.Children.Clear();
         for (var index = 0; index < SlotCount; index++)
         {
             var level = index < _levels.Count ? _levels[index] : new BlendLevelItem($"{index + 1}", string.Empty, false);
+            var availableBrush = (Brush)FindResource(level.IsAvailable ? "MutedTextBrush" : "BorderBrush");
+            NumbersPanel.Children.Add(new TextBlock
+            {
+                Text = $"{index + 1}",
+                Width = 22,
+                Height = 18,
+                FontSize = 11,
+                Foreground = availableBrush,
+                FontWeight = FontWeights.SemiBold,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                TextAlignment = TextAlignment.Center
+            });
+            UpperTickPanel.Children.Add(CreateTick(availableBrush));
+            LowerTickPanel.Children.Add(CreateTick(availableBrush));
             LabelsPanel.Children.Add(new TextBlock
             {
-                Text = string.IsNullOrWhiteSpace(level.Name) ? $"{index + 1}" : level.Name,
+                Text = level.IsAvailable && !string.IsNullOrWhiteSpace(level.Name) ? level.Name : "—",
                 FontSize = 11,
-                Foreground = (Brush)FindResource(level.IsAvailable ? "MutedTextBrush" : "BorderBrush"),
+                Height = 20,
+                Foreground = availableBrush,
                 FontWeight = FontWeights.Medium,
-                HorizontalAlignment = HorizontalAlignment.Center,
                 TextAlignment = TextAlignment.Center,
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 Margin = new Thickness(0)
             });
-            TickPanel.Children.Add(new Ellipse
-            {
-                Width = 8,
-                Height = 8,
-                Fill = (Brush)FindResource(level.IsAvailable ? "MutedTextBrush" : "BorderBrush"),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            });
         }
 
         _updating = false;
+        PositionRailMarkers();
         UpdateSelectionText();
     }
 
@@ -156,20 +166,54 @@ public partial class BlendLevelRail : UserControl
         return NextAvailable(-1);
     }
 
+    private Rectangle CreateTick(Brush brush) => new()
+    {
+        Width = 2,
+        Height = 6,
+        Fill = brush,
+        HorizontalAlignment = HorizontalAlignment.Center,
+        VerticalAlignment = VerticalAlignment.Center,
+        RadiusX = 1,
+        RadiusY = 1
+    };
+
+    private void RailPanel_SizeChanged(object sender, SizeChangedEventArgs e) => PositionRailMarkers();
+
+    private void PositionRailMarkers()
+    {
+        PositionMarkers(NumbersPanel, markerWidth: 22);
+        PositionMarkers(UpperTickPanel, markerWidth: 2);
+        PositionMarkers(LowerTickPanel, markerWidth: 2);
+        var labelWidth = Math.Max(24, LabelsPanel.ActualWidth / 5d);
+        foreach (var label in LabelsPanel.Children.OfType<TextBlock>()) label.Width = labelWidth;
+        PositionMarkers(LabelsPanel, labelWidth);
+    }
+
+    private static void PositionMarkers(Canvas panel, double markerWidth)
+    {
+        if (panel.ActualWidth <= 0 || panel.Children.Count == 0) return;
+        var interval = panel.ActualWidth / (SlotCount - 1);
+        for (var index = 0; index < panel.Children.Count; index++)
+        {
+            var marker = panel.Children[index] as FrameworkElement;
+            if (marker is null) continue;
+            Canvas.SetLeft(marker, index * interval - markerWidth / 2);
+            Canvas.SetTop(marker, (panel.ActualHeight - marker.ActualHeight) / 2);
+        }
+    }
+
     private void UpdateSelectionText()
     {
         if (_levels.Count == 0)
         {
-            SelectionText.Text = string.Empty;
-            SelectionSummaryText.Text = string.Empty;
+            IntensityText.Text = string.Empty;
             return;
         }
 
         var index = SelectedIndex;
         var item = _levels.ElementAtOrDefault(index);
-        SelectionText.Text = item?.IsAvailable == true ? item.Name : string.Empty;
-        SelectionSummaryText.Text = item?.IsAvailable == true ? item.Summary : string.Empty;
-        SelectionText.ToolTip = SelectionSummaryText.Text;
+        IntensityText.Text = item?.IsAvailable == true ? item.Summary : string.Empty;
+        IntensityText.ToolTip = IntensityText.Text;
         for (var labelIndex = 0; labelIndex < LabelsPanel.Children.Count; labelIndex++)
         {
             if (LabelsPanel.Children[labelIndex] is not TextBlock label) continue;
@@ -177,6 +221,19 @@ public partial class BlendLevelRail : UserControl
             var available = _levels.ElementAtOrDefault(labelIndex)?.IsAvailable == true;
             label.Foreground = (Brush)FindResource(selected ? "AccentBrush" : available ? "MutedTextBrush" : "BorderBrush");
             label.FontWeight = selected ? FontWeights.SemiBold : FontWeights.Medium;
+        }
+        UpdateTickBrushes(index);
+    }
+
+    private void UpdateTickBrushes(int selectedIndex)
+    {
+        for (var index = 0; index < SlotCount; index++)
+        {
+            var available = _levels.ElementAtOrDefault(index)?.IsAvailable == true;
+            var brush = (Brush)FindResource(index == selectedIndex && available ? "AccentBrush" : available ? "MutedTextBrush" : "BorderBrush");
+            if (index < UpperTickPanel.Children.Count && UpperTickPanel.Children[index] is Rectangle upper) upper.Fill = brush;
+            if (index < LowerTickPanel.Children.Count && LowerTickPanel.Children[index] is Rectangle lower) lower.Fill = brush;
+            if (index < NumbersPanel.Children.Count && NumbersPanel.Children[index] is TextBlock number) number.Foreground = brush;
         }
     }
 }

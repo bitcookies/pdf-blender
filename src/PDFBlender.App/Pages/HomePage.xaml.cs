@@ -168,7 +168,6 @@ public partial class HomePage : Page
     {
         if (_initializing || e.SelectedIndex < 0 || e.SelectedIndex >= _session.SlotConfigurations.Count || _session.SlotConfigurations[e.SelectedIndex] is null) return;
         _session.SetBlendLevel(e.SelectedIndex);
-        StatusText.Text = e.Item.Summary;
     }
 
     private void SetInputPaths(IEnumerable<string>? paths, bool notify = true)
