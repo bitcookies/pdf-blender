@@ -13,9 +13,12 @@ namespace PDFBlender.App.Pages;
 
 public partial class ConfigurationPage : Page
 {
+    private const string ConfigurationDragFormat = "PDFBlender.ConfigurationId";
     private readonly AppSession _session;
     private readonly DialogService _dialogs;
     private Point _dragStart;
+    private UiCard? _dragCandidate;
+    private bool _dragInProgress;
 
     internal ConfigurationPage(AppSession session, DialogService dialogs)
     {
@@ -32,11 +35,6 @@ public partial class ConfigurationPage : Page
         SubtitleText.Text = UiText.Get("configurationSubtitle");
         SlotsHeader.Text = UiText.Get("blendSlots");
         SlotsHint.Text = UiText.Get("blendSlotsHint");
-        ConfigurationBlendLevelRail.SetCaption(UiText.Get("blendLevel"));
-        ConfigurationBlendLevelRail.SetAccessibilityName(UiText.Get("blendLevel"));
-        ConfigurationBlendLevelRail.SetEditAccessibilityName(UiText.Get("editBlendLevel"));
-        ConfigurationBlendLevelRail.SetLevels(BuildLevelItems());
-        ConfigurationBlendLevelRail.SelectedIndex = _session.SelectedBlendLevel;
         ConfigurationsHeader.Text = UiText.Get("blendConfigurations");
         AddButtonText.Text = UiText.Get("addConfiguration");
         EmptyText.Text = _session.AllConfigurations.Count == 0 ? UiText.Get("noConfigurations") : string.Empty;
@@ -82,22 +80,12 @@ public partial class ConfigurationPage : Page
         root.Children.Add(new TextBlock { Text = configuration?.Name ?? UiText.Get("emptySlot"), FontSize = 12, FontWeight = FontWeights.SemiBold, Foreground = (Brush)FindResource(configuration is null ? "MutedTextBrush" : "TextBrush"), TextTrimming = TextTrimming.CharacterEllipsis, Margin = new Thickness(0, 4, 0, 0) });
         if (configuration is not null) root.Children.Add(new TextBlock { Text = $"{UiText.Get("intensity")} {configuration.Intensity}", FontSize = 10, Foreground = IntensityBrush(configuration.Intensity), Margin = new Thickness(0, 3, 0, 0) });
         card.Content = root;
-        card.DragOver += Slot_DragOver;
-        card.DragLeave += (_, _) => ResetSlotVisual(card);
-        card.Drop += Slot_Drop;
+        card.AddHandler(UIElement.PreviewDragOverEvent, new DragEventHandler(Slot_DragOver), true);
+        card.AddHandler(UIElement.DragLeaveEvent, new DragEventHandler((_, _) => ResetSlotVisual(card)), true);
+        card.AddHandler(UIElement.PreviewDropEvent, new DragEventHandler(Slot_Drop), true);
         if (configuration is not null)
         {
-            card.MouseLeftButtonDown += (_, e) => _dragStart = e.GetPosition(card);
-            card.MouseMove += (_, e) =>
-            {
-                if (e.LeftButton == MouseButtonState.Pressed && (e.GetPosition(card) - _dragStart).Length >= SystemParameters.MinimumHorizontalDragDistance)
-                {
-                    card.BeginAnimation(OpacityProperty, new DoubleAnimation(1, 0.58, TimeSpan.FromMilliseconds(120)));
-                    DragDrop.DoDragDrop(card, configuration.Id, DragDropEffects.Move);
-                    card.BeginAnimation(OpacityProperty, null);
-                    card.Opacity = 1;
-                }
-            };
+            AttachDragHandlers(card, configuration.Id);
         }
         return card;
     }
@@ -111,7 +99,7 @@ public partial class ConfigurationPage : Page
 
     private UiCard CreateCard(BlendConfiguration configuration)
     {
-        var card = new UiCard { Margin = new Thickness(0, 0, 8, 8), Padding = new Thickness(12, 10, 10, 10), MinHeight = 126, Background = (Brush)FindResource("CardBrush"), BorderBrush = IntensityBrush(configuration.Intensity), BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), ToolTip = UiText.Get("dragToSlots") };
+        var card = new UiCard { Margin = new Thickness(0, 0, 8, 8), Padding = new Thickness(12, 10, 10, 10), MinHeight = 126, Background = (Brush)FindResource("CardBrush"), BorderBrush = IntensityBrush(configuration.Intensity), BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), ToolTip = UiText.Get("dragToSlots"), AllowDrop = false, Focusable = false };
         var grid = new Grid();
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -136,32 +124,121 @@ public partial class ConfigurationPage : Page
             if (confirmed) _session.DeleteConfiguration(configuration.Id);
         };
         actions.Children.Add(edit); actions.Children.Add(lockButton); actions.Children.Add(delete); Grid.SetColumn(actions, 1); grid.Children.Add(actions); card.Content = grid;
-        card.MouseLeftButtonDown += (_, e) => _dragStart = e.GetPosition(card);
-        card.MouseMove += (_, e) =>
-        {
-            if (e.LeftButton != MouseButtonState.Pressed || (e.GetPosition(card) - _dragStart).Length < SystemParameters.MinimumHorizontalDragDistance) return;
-            card.BeginAnimation(OpacityProperty, new DoubleAnimation(1, 0.58, TimeSpan.FromMilliseconds(120)));
-            DragDrop.DoDragDrop(card, configuration.Id, DragDropEffects.Move);
-            card.BeginAnimation(OpacityProperty, null);
-            card.Opacity = 1;
-        };
+        AttachDragHandlers(card, configuration.Id);
         return card;
+    }
+
+    private void AttachDragHandlers(UiCard card, string configurationId)
+    {
+        // WPF-UI cards contain buttons and templates that may mark mouse events handled.
+        // Listen to handled preview events so dragging still starts from the card body.
+        card.AddHandler(UIElement.PreviewMouseLeftButtonDownEvent,
+            new MouseButtonEventHandler((_, e) =>
+            {
+                _dragCandidate = IsActionElement(e.OriginalSource as DependencyObject) ? null : card;
+                _dragStart = e.GetPosition(card);
+                _dragInProgress = false;
+            }), true);
+        card.AddHandler(UIElement.PreviewMouseLeftButtonUpEvent,
+            new MouseButtonEventHandler((_, _) =>
+            {
+                _dragCandidate = null;
+                _dragInProgress = false;
+            }), true);
+        card.AddHandler(UIElement.PreviewMouseMoveEvent,
+            new MouseEventHandler((_, e) =>
+            {
+                if (_dragCandidate != card || _dragInProgress || e.LeftButton != MouseButtonState.Pressed) return;
+                if ((e.GetPosition(card) - _dragStart).Length < SystemParameters.MinimumHorizontalDragDistance) return;
+
+                _dragInProgress = true;
+                card.BeginAnimation(OpacityProperty, new DoubleAnimation(1, 0.58, TimeSpan.FromMilliseconds(120)));
+                try
+                {
+                    var data = new DataObject(ConfigurationDragFormat, configurationId);
+                    data.SetData(DataFormats.StringFormat, configurationId);
+                    data.SetData(DataFormats.UnicodeText, configurationId);
+                    DragDrop.DoDragDrop(card, data, DragDropEffects.Move);
+                }
+                finally
+                {
+                    card.BeginAnimation(OpacityProperty, null);
+                    card.Opacity = 1;
+                    _dragCandidate = null;
+                    _dragInProgress = false;
+                }
+            }), true);
     }
 
     private void OpenEditor(BlendConfiguration? source, bool isNew)
     {
         var initial = source ?? new BlendConfiguration("new", UiText.Get("configurationName"), false, new BlendSettings { NormalizeContentWidth = true });
-        var dialog = new ConfigurationEditorWindow(initial) { Owner = Window.GetWindow(this) };
-        if (dialog.ShowDialog() != true) return;
-        if (isNew) _session.AddUserConfiguration(dialog.ConfigurationName, dialog.Settings);
-        else if (!_session.RenameConfiguration(initial.Id, dialog.ConfigurationName) || !_session.UpdateConfiguration(initial.Id, dialog.Settings))
-            ErrorText.Text = UiText.Get("configurationUpdateFailed");
+        try
+        {
+            var dialog = new ConfigurationEditorWindow(initial) { Owner = Window.GetWindow(this) };
+            if (dialog.ShowDialog() != true) return;
+            if (isNew) _session.AddUserConfiguration(dialog.ConfigurationName, dialog.Settings);
+            else if (!_session.RenameConfiguration(initial.Id, dialog.ConfigurationName) || !_session.UpdateConfiguration(initial.Id, dialog.Settings))
+                ErrorText.Text = UiText.Get("configurationUpdateFailed");
+        }
+        catch (Exception exception)
+        {
+            // A malformed legacy configuration must not take down the shell.
+            ErrorText.Text = $"{UiText.Get("configurationUpdateFailed")}: {exception.Message}";
+        }
     }
 
     private void AddButton_Click(object sender, RoutedEventArgs e) => OpenEditor(null, true);
-    private void ConfigurationBlendLevelRail_SelectionChanged(object? sender, BlendLevelChangedEventArgs e) => _session.SetBlendLevel(e.SelectedIndex);
-    private void Slot_DragOver(object sender, DragEventArgs e) { if (sender is UiCard card) { card.Opacity = 0.82; card.BorderBrush = (Brush)FindResource("AccentDarkBrush"); } e.Effects = e.Data.GetDataPresent(DataFormats.StringFormat) ? DragDropEffects.Move : DragDropEffects.None; e.Handled = true; }
-    private void Slot_Drop(object sender, DragEventArgs e) { if (sender is UiCard card && card.Tag is int target && e.Data.GetData(DataFormats.StringFormat) is string id) _session.AddToSlots(id, target); if (sender is UiCard dropped) ResetSlotVisual(dropped); e.Handled = true; }
+    private void Card_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not UiCard card || IsActionElement(e.OriginalSource as DependencyObject)) return;
+        _dragStart = e.GetPosition(card);
+    }
+
+    private static bool IsActionElement(DependencyObject? source)
+    {
+        while (source is not null)
+        {
+            if (source is UiButton) return true;
+            source = source is Visual visual ? VisualTreeHelper.GetParent(visual) : LogicalTreeHelper.GetParent(source);
+        }
+        return false;
+    }
+
+    private static string? GetDraggedConfigurationId(DragEventArgs e)
+    {
+        if (e.Data.GetDataPresent(ConfigurationDragFormat))
+            return Convert.ToString(e.Data.GetData(ConfigurationDragFormat));
+        if (e.Data.GetDataPresent(DataFormats.StringFormat))
+            return Convert.ToString(e.Data.GetData(DataFormats.StringFormat));
+        return e.Data.GetDataPresent(DataFormats.UnicodeText)
+            ? Convert.ToString(e.Data.GetData(DataFormats.UnicodeText))
+            : null;
+    }
+
+    private void Slot_DragOver(object sender, DragEventArgs e)
+    {
+        var id = GetDraggedConfigurationId(e);
+        if (sender is UiCard card && id is not null && _session.GetConfiguration(id) is not null)
+        {
+            card.Opacity = 0.82;
+            card.BorderBrush = (Brush)FindResource("AccentDarkBrush");
+            e.Effects = DragDropEffects.Move;
+        }
+        else
+        {
+            e.Effects = DragDropEffects.None;
+        }
+        e.Handled = true;
+    }
+
+    private void Slot_Drop(object sender, DragEventArgs e)
+    {
+        if (sender is UiCard card && card.Tag is int target && GetDraggedConfigurationId(e) is string id)
+            _session.AddToSlots(id, target);
+        if (sender is UiCard dropped) ResetSlotVisual(dropped);
+        e.Handled = true;
+    }
     private void ResetSlotVisual(UiCard card) { card.Opacity = 1; card.BorderBrush = (Brush)FindResource(_session.SlotConfigurations.ElementAtOrDefault((int)card.Tag!) is null ? "BorderBrush" : "AccentBrush"); }
     private UiButton MakeIconAction(string symbol, string tooltip, bool enabled)
     {
@@ -172,5 +249,4 @@ public partial class ConfigurationPage : Page
     private Border CreateIntensityBar(int intensity) => new() { Height = 4, Background = (Brush)FindResource("BorderBrush"), CornerRadius = new CornerRadius(2), Child = new Border { Width = Math.Max(4, 140 * (intensity + 1) / 10d), HorizontalAlignment = HorizontalAlignment.Left, Background = IntensityBrush(intensity), CornerRadius = new CornerRadius(2) } };
     private Brush IntensityBrush(int intensity) { var stops = new[] { Colors.ForestGreen, Colors.YellowGreen, Colors.Gold, Colors.Orange, Colors.OrangeRed, Colors.Firebrick }; return new SolidColorBrush(stops[(int)Math.Round(Math.Clamp(intensity, 0, 9) / 9d * (stops.Length - 1))]); }
     private string FeatureSummary(BlendConfiguration configuration) => string.Join(" · ", configuration.EnabledFeatures.Select(feature => feature switch { BlendFeature.NormalizeContentWidth => UiText.Get("normalizeWidth"), BlendFeature.Flatten => UiText.Get("flatten"), BlendFeature.Watermark => UiText.Get("watermark"), BlendFeature.PixelNoise => UiText.Get("noise"), _ => feature.ToString() }).DefaultIfEmpty(UiText.Get("noFeatures")));
-    private IReadOnlyList<BlendLevelItem> BuildLevelItems() => _session.SlotConfigurations.Select((configuration, index) => configuration is null ? new BlendLevelItem($"{index + 1}", string.Empty, false) : new BlendLevelItem(configuration.Name, $"{UiText.Get("intensity")} {configuration.Intensity}")).ToList();
 }

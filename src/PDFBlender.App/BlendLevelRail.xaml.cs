@@ -65,7 +65,7 @@ public partial class BlendLevelRail : UserControl
                 HorizontalAlignment = HorizontalAlignment.Center,
                 TextAlignment = TextAlignment.Center,
                 TextTrimming = TextTrimming.CharacterEllipsis,
-                Margin = new Thickness(3, 0, 3, 0)
+                Margin = new Thickness(0)
             });
             TickPanel.Children.Add(new Ellipse
             {

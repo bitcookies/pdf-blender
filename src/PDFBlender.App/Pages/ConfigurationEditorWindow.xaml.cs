@@ -27,7 +27,9 @@ public partial class ConfigurationEditorWindow : Wpf.Ui.Controls.FluentWindow
     public ConfigurationEditorWindow(BlendConfiguration source)
     {
         _source = source;
-        Settings = source.Settings;
+        // Older configuration files may omit Settings; keep the editor usable and let
+        // the normal validation/save path write a complete settings object back.
+        Settings = source.Settings ?? BlendSettings.Default;
         InitializeComponent();
         TitleText.Text = UiText.Get("editConfiguration");
         NameBox.Text = source.Name;
@@ -72,22 +74,41 @@ public partial class ConfigurationEditorWindow : Wpf.Ui.Controls.FluentWindow
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(ConfigurationName)) return;
-        var width = double.TryParse(_width.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var value) ? value : 210;
-        var settings = Settings with
+        try
         {
-            NormalizeContentWidth = _normalize.IsChecked == true,
-            TargetWidthMillimeters = width,
-            Protection = _flatten.IsChecked == true ? ProtectionMethod.Flatten : ProtectionMethod.None,
-            Dpi = _dpi.SelectedItem is int dpi ? dpi : 150,
-            Watermark = _watermark.IsChecked == true ? (_watermarkType.SelectedIndex == 1 ? WatermarkStyle.FullPage : WatermarkStyle.Text) : WatermarkStyle.None,
-            WatermarkText = _watermarkText.Text,
-            Noise = _noise.IsChecked == true ? (NoiseStrength)(_noiseLevel.SelectedIndex + 1) : NoiseStrength.Off
-        };
-        var errors = SettingsValidator.Validate(settings);
-        ErrorText.Text = string.Empty;
-        if (errors.Count > 0) { ErrorText.Text = string.Join("\n", errors); return; }
-        Settings = settings; DialogResult = true;
+            if (string.IsNullOrWhiteSpace(ConfigurationName))
+            {
+                ErrorText.Text = UiText.Get("configurationNameRequired");
+                return;
+            }
+
+            var width = double.TryParse(_width.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var value) ? value : 210;
+            var settings = Settings with
+            {
+                NormalizeContentWidth = _normalize.IsChecked == true,
+                TargetWidthMillimeters = width,
+                Protection = _flatten.IsChecked == true ? ProtectionMethod.Flatten : ProtectionMethod.None,
+                Dpi = _dpi.SelectedItem is int dpi ? dpi : 150,
+                Watermark = _watermark.IsChecked == true ? (_watermarkType.SelectedIndex == 1 ? WatermarkStyle.FullPage : WatermarkStyle.Text) : WatermarkStyle.None,
+                WatermarkText = _watermarkText.Text ?? string.Empty,
+                Noise = _noise.IsChecked == true ? (NoiseStrength)Math.Clamp(_noiseLevel.SelectedIndex + 1, 1, 3) : NoiseStrength.Off
+            };
+            var errors = SettingsValidator.Validate(settings);
+            ErrorText.Text = string.Empty;
+            if (errors.Count > 0)
+            {
+                ErrorText.Text = string.Join("\n", errors);
+                return;
+            }
+
+            Settings = settings;
+            DialogResult = true;
+        }
+        catch (Exception exception)
+        {
+            // Keep a malformed legacy value inside the editor instead of terminating the shell.
+            ErrorText.Text = $"{UiText.Get("configurationUpdateFailed")}: {exception.Message}";
+        }
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e) { DialogResult = false; }

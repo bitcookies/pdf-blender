@@ -13,7 +13,7 @@ internal sealed record ConfigurationDocument(
 
 internal static class ConfigurationStore
 {
-    private const int CurrentSchemaVersion = 3;
+    private const int CurrentSchemaVersion = 4;
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         WriteIndented = true,
@@ -34,9 +34,22 @@ internal static class ConfigurationStore
             if (File.Exists(FilePath))
             {
                 var document = JsonSerializer.Deserialize<ConfigurationDocument>(File.ReadAllText(FilePath), SerializerOptions);
-                if (document is not null && document.SchemaVersion is 1 or 2 or CurrentSchemaVersion)
+                if (document is not null && document.SchemaVersion is >= 1 and <= CurrentSchemaVersion)
                 {
-                    return Normalize(document with { SchemaVersion = CurrentSchemaVersion });
+                    var normalized = Normalize(document);
+                    // Persist legacy repairs immediately. This makes the schema-3
+                    // empty-slot migration durable even before the user changes a
+                    // setting or opens the configuration page.
+                    if (document.SchemaVersion != CurrentSchemaVersion || !(document.SlotIds ?? []).SequenceEqual(normalized.SlotIds))
+                    {
+                        try
+                        {
+                            Save(normalized);
+                        }
+                        catch (IOException) { }
+                        catch (UnauthorizedAccessException) { }
+                    }
+                    return normalized;
                 }
             }
         }
@@ -66,11 +79,13 @@ internal static class ConfigurationStore
             .Select(group => group.First() with
             {
                 IsBuiltIn = false,
-                Name = string.IsNullOrWhiteSpace(group.First().Name) ? "Custom" : group.First().Name.Trim()
+                Name = string.IsNullOrWhiteSpace(group.First().Name) ? "Custom" : group.First().Name.Trim(),
+                Settings = group.First().Settings ?? BlendSettings.Default
             })
             .ToList();
-        var validIds = new HashSet<string>(BuiltInConfigurations.All.Select(configuration => configuration.Id), StringComparer.OrdinalIgnoreCase);
-        foreach (var configuration in uniqueUser) validIds.Add(configuration.Id);
+        // Built-in presets are persisted in UserConfigurations after first use. Do not
+        // keep stale slot references to a preset that is no longer present in the file.
+        var validIds = new HashSet<string>(uniqueUser.Select(configuration => configuration.Id), StringComparer.OrdinalIgnoreCase);
 
         var seenSlots = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var slots = (document.SlotIds ?? [])
@@ -78,6 +93,21 @@ internal static class ConfigurationStore
             .Select(id => id is not null && validIds.Contains(id) && seenSlots.Add(id) ? id : null)
             .ToList();
         while (slots.Count < 5) slots.Add(null);
+
+        // Version 3 could persist the configurations while losing every slot id.
+        // Repair that one-time migration using the stable light/medium/heavy order;
+        // later saves use schema 4, so an intentional empty slot remains empty.
+        if (document.SchemaVersion < CurrentSchemaVersion && slots.All(id => id is null))
+        {
+            var preferredIds = new[] { "builtin-light", "builtin-medium", "builtin-heavy" };
+            var migrationIds = preferredIds
+                .Concat(uniqueUser.Select(configuration => configuration.Id))
+                .Where(validIds.Contains)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Take(5)
+                .ToArray();
+            for (var index = 0; index < migrationIds.Length; index++) slots[index] = migrationIds[index];
+        }
         var selected = document.SelectedConfigurationId is not null && validIds.Contains(document.SelectedConfigurationId)
             ? document.SelectedConfigurationId
             : slots.FirstOrDefault();
