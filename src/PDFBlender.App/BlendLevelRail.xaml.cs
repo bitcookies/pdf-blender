@@ -12,6 +12,8 @@ public sealed record BlendLevelItem(string Name, string Summary, bool IsAvailabl
 public partial class BlendLevelRail : UserControl
 {
     private const int SlotCount = 5;
+    private const double RailStartRatio = 0.1;
+    private const double RailTravelRatio = 0.8;
     private IReadOnlyList<BlendLevelItem> _levels = [];
     private bool _updating;
 
@@ -64,7 +66,7 @@ public partial class BlendLevelRail : UserControl
             {
                 Text = $"{index + 1}",
                 Width = 22,
-                Height = 18,
+                Height = 16,
                 FontSize = 11,
                 Foreground = availableBrush,
                 FontWeight = FontWeights.SemiBold,
@@ -77,7 +79,7 @@ public partial class BlendLevelRail : UserControl
             {
                 Text = level.IsAvailable && !string.IsNullOrWhiteSpace(level.Name) ? level.Name : "—",
                 FontSize = 11,
-                Height = 20,
+                Height = 18,
                 Foreground = availableBrush,
                 FontWeight = FontWeights.Medium,
                 TextAlignment = TextAlignment.Center,
@@ -181,24 +183,31 @@ public partial class BlendLevelRail : UserControl
 
     private void PositionRailMarkers()
     {
-        PositionMarkers(NumbersPanel, markerWidth: 22);
-        PositionMarkers(UpperTickPanel, markerWidth: 2);
-        PositionMarkers(LowerTickPanel, markerWidth: 2);
-        var labelWidth = Math.Max(24, LabelsPanel.ActualWidth / 5d);
+        // All marker layers must use one measured rail width. Measuring each Canvas
+        // independently causes text and ticks to shift when the page is re-laid out.
+        var railWidth = NumbersPanel.ActualWidth;
+        if (railWidth <= 0 || NumbersPanel.Children.Count == 0) return;
+
+        PositionMarkers(NumbersPanel, railWidth, markerWidth: 22);
+        PositionMarkers(UpperTickPanel, railWidth, markerWidth: 2);
+        PositionMarkers(LowerTickPanel, railWidth, markerWidth: 2);
+        var labelWidth = Math.Max(24, railWidth * RailTravelRatio / (SlotCount - 1));
         foreach (var label in LabelsPanel.Children.OfType<TextBlock>()) label.Width = labelWidth;
-        PositionMarkers(LabelsPanel, labelWidth);
+        PositionMarkers(LabelsPanel, railWidth, labelWidth);
     }
 
-    private static void PositionMarkers(Canvas panel, double markerWidth)
+    private static void PositionMarkers(Canvas panel, double railWidth, double markerWidth)
     {
-        if (panel.ActualWidth <= 0 || panel.Children.Count == 0) return;
-        var interval = panel.ActualWidth / (SlotCount - 1);
+        if (railWidth <= 0 || panel.Children.Count == 0) return;
+        var interval = railWidth * RailTravelRatio / (SlotCount - 1);
         for (var index = 0; index < panel.Children.Count; index++)
         {
             var marker = panel.Children[index] as FrameworkElement;
             if (marker is null) continue;
-            Canvas.SetLeft(marker, index * interval - markerWidth / 2);
-            Canvas.SetTop(marker, (panel.ActualHeight - marker.ActualHeight) / 2);
+            Canvas.SetLeft(marker, railWidth * RailStartRatio + index * interval - markerWidth / 2);
+            // Every marker canvas has a fixed row height. Keep its top coordinate
+            // stable instead of deriving it from transient layout measurements.
+            Canvas.SetTop(marker, 0);
         }
     }
 
