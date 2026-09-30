@@ -56,14 +56,14 @@ public partial class HomePage : Page
         BlendLevelRailControl.SetEditAccessibilityName(UiText.Get("editBlendLevel"));
         BlendLevelRailControl.SetLevels(BuildLevelItems());
         BlendLevelRailControl.SelectedIndex = _session.SelectedBlendLevel;
-        SetInputPath(_session.InputPath, notify: false);
+        SetInputPaths(_session.InputPaths, notify: false);
         _initializing = false;
     }
 
     private void BrowseButton_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new OpenFileDialog { Filter = "PDF files (*.pdf)|*.pdf", CheckFileExists = true, Multiselect = false, Title = UiText.Get("browse") };
-        if (dialog.ShowDialog() == true) SetInputPath(dialog.FileName);
+        var dialog = new OpenFileDialog { Filter = "PDF files (*.pdf)|*.pdf", CheckFileExists = true, Multiselect = true, Title = UiText.Get("browse") };
+        if (dialog.ShowDialog() == true) SetInputPaths(dialog.FileNames);
     }
 
     private void DropCard_DragEnter(object sender, DragEventArgs e)
@@ -73,6 +73,7 @@ public partial class HomePage : Page
         {
             DropCard.BorderBrush = (Brush)FindResource("AccentBrush");
             DropCard.Background = (Brush)FindResource("AccentSoftBrush");
+            DropDash.Stroke = (Brush)FindResource("AccentBrush");
         }
     }
 
@@ -80,6 +81,7 @@ public partial class HomePage : Page
     {
         DropCard.BorderBrush = (Brush)FindResource("BorderBrush");
         DropCard.Background = (Brush)FindResource("CardBrush");
+        DropDash.Stroke = (Brush)FindResource("BorderBrush");
     }
 
     private void DropTarget_DragOver(object sender, DragEventArgs e)
@@ -92,8 +94,8 @@ public partial class HomePage : Page
     {
         if (e.Data.GetData(DataFormats.FileDrop) is string[] files)
         {
-            var pdf = files.FirstOrDefault(path => string.Equals(Path.GetExtension(path), ".pdf", StringComparison.OrdinalIgnoreCase));
-            if (pdf is not null) SetInputPath(pdf);
+            var pdfs = files.Where(path => string.Equals(Path.GetExtension(path), ".pdf", StringComparison.OrdinalIgnoreCase));
+            SetInputPaths(pdfs);
         }
         DropCard_DragLeave(sender, e);
         e.Handled = true;
@@ -101,26 +103,34 @@ public partial class HomePage : Page
 
     private async void BlendButton_Click(object sender, RoutedEventArgs e)
     {
-        if (_session.InputPath is null) { StatusText.Text = UiText.Get("ready"); return; }
+        if (_session.InputPaths.Count == 0) { StatusText.Text = UiText.Get("ready"); return; }
         if (_session.SlotConfigurations.All(configuration => configuration is null)) { StatusText.Text = UiText.Get("noBlendSlots"); return; }
         if (_processingCts is not null) return;
-        var inputPath = _session.InputPath;
-        var outputPath = Path.Combine(Path.GetDirectoryName(inputPath) ?? string.Empty, $"{Path.GetFileNameWithoutExtension(inputPath)}_blended.pdf");
+        var inputPaths = _session.InputPaths.ToArray();
         _processingCts = new CancellationTokenSource();
         SetProcessingState(true);
         var progressNotification = _notifications.Show(UiNotificationKind.Progress, UiText.Get("blend"), UiText.Get("processing"), autoDismiss: false);
+        var completedFiles = 0;
         var progress = new Progress<BlendProgress>(value =>
         {
-            ProcessingProgress.Value = value.Fraction * 100;
-            StatusText.Text = $"{value.Stage} {value.CompletedPages}/{value.TotalPages}";
-            _notifications.UpdateProgress(progressNotification, StatusText.Text, value.Fraction);
+            var overall = (completedFiles + value.Fraction) / inputPaths.Length;
+            ProcessingProgress.Value = overall * 100;
+            StatusText.Text = $"{value.Stage} {completedFiles + 1}/{inputPaths.Length} · {value.CompletedPages}/{value.TotalPages}";
+            _notifications.UpdateProgress(progressNotification, StatusText.Text, overall);
         });
         try
         {
-            var result = await _processor.ProcessAsync(new BlendRequest(inputPath, outputPath, _session.Settings), progress, _processingCts.Token);
-            StatusText.Text = $"{UiText.Get("completed")}: {Path.GetFileName(result.OutputPath)}";
+            var outputNames = new List<string>();
+            foreach (var inputPath in inputPaths)
+            {
+                var outputPath = Path.Combine(Path.GetDirectoryName(inputPath) ?? string.Empty, $"{Path.GetFileNameWithoutExtension(inputPath)}_blended.pdf");
+                var result = await _processor.ProcessAsync(new BlendRequest(inputPath, outputPath, _session.Settings), progress, _processingCts.Token);
+                outputNames.Add(Path.GetFileName(result.OutputPath));
+                completedFiles++;
+            }
+            StatusText.Text = $"{UiText.Get("completed")}: {string.Format(UiText.Get("completedCount"), outputNames.Count)}";
             _notifications.Dismiss(progressNotification);
-            _notifications.Show(UiNotificationKind.Success, UiText.Get("completed"), Path.GetFileName(result.OutputPath));
+            _notifications.Show(UiNotificationKind.Success, UiText.Get("completed"), string.Join(", ", outputNames));
         }
         catch (OperationCanceledException)
         {
@@ -142,7 +152,7 @@ public partial class HomePage : Page
         }
     }
 
-    private void RemovePdfButton_Click(object sender, RoutedEventArgs e) => SetInputPath(null);
+    private void RemovePdfButton_Click(object sender, RoutedEventArgs e) => SetInputPaths([]);
     private void BlendLevelRailControl_EditRequested(object? sender, RoutedEventArgs e) => _openConfiguration();
     private void CancelButton_Click(object sender, RoutedEventArgs e) => _processingCts?.Cancel();
 
@@ -153,21 +163,23 @@ public partial class HomePage : Page
         StatusText.Text = e.Item.Summary;
     }
 
-    private void SetInputPath(string? path, bool notify = true)
+    private void SetInputPaths(IEnumerable<string>? paths, bool notify = true)
     {
-        if (notify) _session.SetInputPath(path);
+        var selectedPaths = (paths ?? []).Where(File.Exists).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+        if (notify) _session.SetInputPaths(selectedPaths);
         _previewCts?.Cancel();
         _previewCts?.Dispose();
         _previewCts = null;
         var generation = ++_previewGeneration;
-        var hasFile = !string.IsNullOrWhiteSpace(path);
+        var path = selectedPaths.FirstOrDefault();
+        var hasFile = selectedPaths.Length > 0;
         EmptyDropContent.Visibility = hasFile ? Visibility.Collapsed : Visibility.Visible;
         SelectedDropContent.Visibility = hasFile ? Visibility.Visible : Visibility.Collapsed;
-        ReadyText.Text = hasFile ? UiText.Get("selected") : UiText.Get("ready");
         FileNameText.Text = hasFile ? Path.GetFileName(path) : string.Empty;
+        SelectedCountText.Text = selectedPaths.Length > 1 ? string.Format(UiText.Get("selectedCount"), selectedPaths.Length) : string.Empty;
         PreviewImage.Source = null;
         PreviewImage.Visibility = Visibility.Visible;
-        PreviewFallbackIcon.Visibility = hasFile ? Visibility.Visible : Visibility.Collapsed;
+        PreviewFallbackImage.Visibility = hasFile ? Visibility.Visible : Visibility.Collapsed;
         PreviewErrorText.Visibility = Visibility.Collapsed;
         PreviewLoadingOverlay.Visibility = hasFile ? Visibility.Visible : Visibility.Collapsed;
         BlendButton.IsEnabled = hasFile && _session.SlotConfigurations.Any(configuration => configuration is not null);
@@ -184,7 +196,7 @@ public partial class HomePage : Page
             var bitmap = await PdfPreviewService.RenderFirstPageAsync(path, cts.Token);
             if (generation != _previewGeneration || cts.IsCancellationRequested) return;
             PreviewImage.Source = bitmap;
-            PreviewFallbackIcon.Visibility = Visibility.Collapsed;
+            PreviewFallbackImage.Visibility = Visibility.Collapsed;
         }
         catch (OperationCanceledException) { }
         catch (Exception)
@@ -192,6 +204,7 @@ public partial class HomePage : Page
             if (generation != _previewGeneration) return;
             PreviewErrorText.Text = UiText.Get("previewFailed");
             PreviewErrorText.Visibility = Visibility.Visible;
+            PreviewFallbackImage.Visibility = Visibility.Visible;
         }
         finally
         {
@@ -206,7 +219,7 @@ public partial class HomePage : Page
 
     private void SetProcessingState(bool processing)
     {
-        BlendButton.IsEnabled = !processing && _session.InputPath is not null && _session.SlotConfigurations.Any(configuration => configuration is not null);
+        BlendButton.IsEnabled = !processing && _session.InputPaths.Count > 0 && _session.SlotConfigurations.Any(configuration => configuration is not null);
         BrowseButton.IsEnabled = !processing;
         ReplacePdfButton.IsEnabled = !processing;
         RemovePdfButton.IsEnabled = !processing;

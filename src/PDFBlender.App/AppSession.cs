@@ -18,6 +18,7 @@ internal sealed class AppSession
     public string? SelectedConfigurationId => _selectedConfigurationId;
     public BlendSettings Settings => SlotConfigurations.ElementAtOrDefault(SelectedBlendLevel)?.Settings ?? BlendSettings.Default;
     public string? InputPath { get; private set; }
+    public IReadOnlyList<string> InputPaths { get; private set; } = [];
 
     public event EventHandler? Changed;
 
@@ -41,7 +42,16 @@ internal sealed class AppSession
 
     public void SetInputPath(string? path)
     {
-        InputPath = path;
+        SetInputPaths(string.IsNullOrWhiteSpace(path) ? [] : [path]);
+    }
+
+    public void SetInputPaths(IEnumerable<string>? paths)
+    {
+        InputPaths = (paths ?? [])
+            .Where(path => !string.IsNullOrWhiteSpace(path))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        InputPath = InputPaths.FirstOrDefault();
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
