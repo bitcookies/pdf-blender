@@ -6,6 +6,7 @@
              UseLayoutRounding="True"
              SnapsToDevicePixels="True">
     <UserControl.Resources>
+        <TranslateTransform x:Key="RailContentOffset" Y="20" />
         <Style x:Key="RailRepeatButtonStyle" TargetType="RepeatButton">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
@@ -123,12 +124,14 @@
                      Grid.Row="1"
                      Grid.Column="0"
                      Height="16"
+                     RenderTransform="{StaticResource RailContentOffset}"
                      IsHitTestVisible="False"
                      SizeChanged="RailPanel_SizeChanged" />
         <Canvas x:Name="UpperTickPanel"
                      Grid.Row="2"
                      Grid.Column="0"
                      Height="6"
+                     RenderTransform="{StaticResource RailContentOffset}"
                      IsHitTestVisible="False"
                      SizeChanged="RailPanel_SizeChanged" />
         <Slider x:Name="LevelSlider"
@@ -136,6 +139,7 @@
                 Grid.Column="0"
                 Style="{StaticResource BlendSliderStyle}"
                 ClipToBounds="False"
+                RenderTransform="{StaticResource RailContentOffset}"
                 Minimum="0"
                 Maximum="4"
                 TickFrequency="1"
@@ -147,12 +151,14 @@
                      Grid.Row="4"
                      Grid.Column="0"
                      Height="6"
+                     RenderTransform="{StaticResource RailContentOffset}"
                      IsHitTestVisible="False"
                      SizeChanged="RailPanel_SizeChanged" />
         <Canvas x:Name="LabelsPanel"
                      Grid.Row="5"
                      Grid.Column="0"
                      Height="18"
+                     RenderTransform="{StaticResource RailContentOffset}"
                      IsHitTestVisible="False"
                      SizeChanged="RailPanel_SizeChanged" />
 
@@ -163,6 +169,7 @@
                 Height="32"
                 HorizontalAlignment="Left"
                 Margin="-16,0,0,0"
+                RenderTransform="{StaticResource RailContentOffset}"
                 VerticalAlignment="Center"
                 Background="{DynamicResource CardBrush}"
                 BorderBrush="{DynamicResource BorderBrush}"
@@ -191,6 +198,7 @@
                    BorderThickness="1"
                    Appearance="Transparent"
                    FocusVisualStyle="{x:Null}"
+                   RenderTransform="{StaticResource RailContentOffset}"
                    HorizontalContentAlignment="Center"
                    VerticalContentAlignment="Center"
                    HorizontalAlignment="Center"
