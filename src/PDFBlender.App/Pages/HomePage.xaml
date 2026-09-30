@@ -86,11 +86,11 @@
                 <Rectangle x:Name="DropDash" Margin="1" RadiusX="10" RadiusY="10" Stroke="{DynamicResource BorderBrush}" StrokeThickness="1.5" StrokeDashArray="5,4" IsHitTestVisible="False" />
                 <Grid x:Name="EmptyDropContent" Margin="18,10">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Image Source="/PDFBlender.App;component/Assets/pdf-icon.png" Width="54" Height="54" Stretch="Uniform" HorizontalAlignment="Center" />
+                        <Image Source="/PDFBlender.App;component/Assets/pdf-icon.png" Width="46" Height="46" Stretch="Uniform" HorizontalAlignment="Center" />
                         <TextBlock x:Name="DropTitleText" Style="{StaticResource CardTitleTextStyle}" FontSize="16" HorizontalAlignment="Center" Margin="0,6,0,0" />
                         <TextBlock x:Name="DropHintText" Style="{StaticResource CardDescriptionTextStyle}" HorizontalAlignment="Center" Margin="0,3,0,0" />
-                        <Border Height="40" Margin="0,9,0,0" CornerRadius="8" Style="{StaticResource HomeGradientSurfaceStyle}" Tag="{Binding IsEnabled, ElementName=BrowseButton}">
-                            <ui:Button x:Name="BrowseButton" Style="{StaticResource HomeGradientButtonStyle}" Height="40" Click="BrowseButton_Click" AutomationProperties.Name="Browse PDF">
+                        <Border Width="160" Height="40" Margin="0,9,0,0" CornerRadius="8" Style="{StaticResource HomeGradientSurfaceStyle}" Tag="{Binding IsEnabled, ElementName=BrowseButton}">
+                            <ui:Button x:Name="BrowseButton" Style="{StaticResource HomeGradientButtonStyle}" Width="160" Height="40" Click="BrowseButton_Click" AutomationProperties.Name="Browse PDF">
                                 <StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="Document24" Margin="0,0,7,0" Foreground="White" /><TextBlock x:Name="BrowseButtonText" Foreground="White" /></StackPanel>
                             </ui:Button>
                         </Border>
