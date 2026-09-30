@@ -32,6 +32,11 @@ public partial class ConfigurationPage : Page
         SubtitleText.Text = UiText.Get("configurationSubtitle");
         SlotsHeader.Text = UiText.Get("blendSlots");
         SlotsHint.Text = UiText.Get("blendSlotsHint");
+        ConfigurationBlendLevelRail.SetCaption(UiText.Get("blendLevel"));
+        ConfigurationBlendLevelRail.SetAccessibilityName(UiText.Get("blendLevel"));
+        ConfigurationBlendLevelRail.SetEditAccessibilityName(UiText.Get("editBlendLevel"));
+        ConfigurationBlendLevelRail.SetLevels(BuildLevelItems());
+        ConfigurationBlendLevelRail.SelectedIndex = _session.SelectedBlendLevel;
         ConfigurationsHeader.Text = UiText.Get("blendConfigurations");
         AddButtonText.Text = UiText.Get("addConfiguration");
         EmptyText.Text = _session.AllConfigurations.Count == 0 ? UiText.Get("noConfigurations") : string.Empty;
@@ -154,6 +159,7 @@ public partial class ConfigurationPage : Page
     }
 
     private void AddButton_Click(object sender, RoutedEventArgs e) => OpenEditor(null, true);
+    private void ConfigurationBlendLevelRail_SelectionChanged(object? sender, BlendLevelChangedEventArgs e) => _session.SetBlendLevel(e.SelectedIndex);
     private void Slot_DragOver(object sender, DragEventArgs e) { if (sender is UiCard card) { card.Opacity = 0.82; card.BorderBrush = (Brush)FindResource("AccentDarkBrush"); } e.Effects = e.Data.GetDataPresent(DataFormats.StringFormat) ? DragDropEffects.Move : DragDropEffects.None; e.Handled = true; }
     private void Slot_Drop(object sender, DragEventArgs e) { if (sender is UiCard card && card.Tag is int target && e.Data.GetData(DataFormats.StringFormat) is string id) _session.AddToSlots(id, target); if (sender is UiCard dropped) ResetSlotVisual(dropped); e.Handled = true; }
     private void ResetSlotVisual(UiCard card) { card.Opacity = 1; card.BorderBrush = (Brush)FindResource(_session.SlotConfigurations.ElementAtOrDefault((int)card.Tag!) is null ? "BorderBrush" : "AccentBrush"); }
@@ -166,4 +172,5 @@ public partial class ConfigurationPage : Page
     private Border CreateIntensityBar(int intensity) => new() { Height = 4, Background = (Brush)FindResource("BorderBrush"), CornerRadius = new CornerRadius(2), Child = new Border { Width = Math.Max(4, 140 * (intensity + 1) / 10d), HorizontalAlignment = HorizontalAlignment.Left, Background = IntensityBrush(intensity), CornerRadius = new CornerRadius(2) } };
     private Brush IntensityBrush(int intensity) { var stops = new[] { Colors.ForestGreen, Colors.YellowGreen, Colors.Gold, Colors.Orange, Colors.OrangeRed, Colors.Firebrick }; return new SolidColorBrush(stops[(int)Math.Round(Math.Clamp(intensity, 0, 9) / 9d * (stops.Length - 1))]); }
     private string FeatureSummary(BlendConfiguration configuration) => string.Join(" · ", configuration.EnabledFeatures.Select(feature => feature switch { BlendFeature.NormalizeContentWidth => UiText.Get("normalizeWidth"), BlendFeature.Flatten => UiText.Get("flatten"), BlendFeature.Watermark => UiText.Get("watermark"), BlendFeature.PixelNoise => UiText.Get("noise"), _ => feature.ToString() }).DefaultIfEmpty(UiText.Get("noFeatures")));
+    private IReadOnlyList<BlendLevelItem> BuildLevelItems() => _session.SlotConfigurations.Select((configuration, index) => configuration is null ? new BlendLevelItem($"{index + 1}", string.Empty, false) : new BlendLevelItem(configuration.Name, $"{UiText.Get("intensity")} {configuration.Intensity}")).ToList();
 }

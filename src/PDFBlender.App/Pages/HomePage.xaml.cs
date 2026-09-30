@@ -49,8 +49,6 @@ public partial class HomePage : Page
         AutomationProperties.SetName(RemovePdfButton, UiText.Get("removePdf"));
         BlendButtonText.Text = UiText.Get("blend");
         AutomationProperties.SetName(BlendButton, UiText.Get("blend"));
-        CancelButtonText.Text = UiText.Get("cancel");
-        AutomationProperties.SetName(CancelButton, UiText.Get("cancel"));
         BlendLevelRailControl.SetCaption(UiText.Get("blendLevel"));
         BlendLevelRailControl.SetAccessibilityName(UiText.Get("blendLevel"));
         BlendLevelRailControl.SetEditAccessibilityName(UiText.Get("editBlendLevel"));
@@ -103,6 +101,11 @@ public partial class HomePage : Page
 
     private async void BlendButton_Click(object sender, RoutedEventArgs e)
     {
+        if (_processingCts is not null)
+        {
+            _processingCts.Cancel();
+            return;
+        }
         if (_session.InputPaths.Count == 0) { StatusText.Text = UiText.Get("ready"); return; }
         if (_session.SlotConfigurations.All(configuration => configuration is null)) { StatusText.Text = UiText.Get("noBlendSlots"); return; }
         if (_processingCts is not null) return;
@@ -154,8 +157,6 @@ public partial class HomePage : Page
 
     private void RemovePdfButton_Click(object sender, RoutedEventArgs e) => SetInputPaths([]);
     private void BlendLevelRailControl_EditRequested(object? sender, RoutedEventArgs e) => _openConfiguration();
-    private void CancelButton_Click(object sender, RoutedEventArgs e) => _processingCts?.Cancel();
-
     private void BlendLevelRailControl_SelectionChanged(object? sender, BlendLevelChangedEventArgs e)
     {
         if (_initializing || e.SelectedIndex < 0 || e.SelectedIndex >= _session.SlotConfigurations.Count || _session.SlotConfigurations[e.SelectedIndex] is null) return;
@@ -219,13 +220,15 @@ public partial class HomePage : Page
 
     private void SetProcessingState(bool processing)
     {
-        BlendButton.IsEnabled = !processing && _session.InputPaths.Count > 0 && _session.SlotConfigurations.Any(configuration => configuration is not null);
+        BlendButton.IsEnabled = processing || (_session.InputPaths.Count > 0 && _session.SlotConfigurations.Any(configuration => configuration is not null));
         BrowseButton.IsEnabled = !processing;
         ReplacePdfButton.IsEnabled = !processing;
         RemovePdfButton.IsEnabled = !processing;
         BlendLevelRailControl.IsEnabled = !processing;
         ProcessingProgress.Visibility = processing ? Visibility.Visible : Visibility.Collapsed;
-        CancelButton.Visibility = processing ? Visibility.Visible : Visibility.Collapsed;
+        BlendButtonText.Text = UiText.Get(processing ? "cancel" : "blend");
+        BlendButtonIcon.Symbol = processing ? Wpf.Ui.Controls.SymbolRegular.Dismiss24 : Wpf.Ui.Controls.SymbolRegular.Play24;
+        AutomationProperties.SetName(BlendButton, UiText.Get(processing ? "cancel" : "blend"));
         if (!processing) ProcessingProgress.Value = 0;
     }
 

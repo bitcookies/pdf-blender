@@ -11,16 +11,16 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Slider">
                         <Grid Height="34">
-                            <Border Height="10" Background="{DynamicResource BorderBrush}" CornerRadius="5" VerticalAlignment="Center" Margin="15,0" />
+                            <Border Height="12" Background="{DynamicResource BorderBrush}" CornerRadius="6" VerticalAlignment="Center" Margin="15,0" />
                             <Track x:Name="PART_Track" VerticalAlignment="Center">
                                 <Track.DecreaseRepeatButton>
-                                    <RepeatButton Command="{x:Static Slider.DecreaseLarge}" Background="Transparent" BorderThickness="0" IsTabStop="False" />
+                                    <RepeatButton Command="{x:Static Slider.DecreaseLarge}" Background="{DynamicResource AccentBrush}" BorderThickness="0" IsTabStop="False" />
                                 </Track.DecreaseRepeatButton>
                                 <Track.Thumb>
                                     <Thumb Width="30" Height="30" FocusVisualStyle="{x:Null}">
                                         <Thumb.Template>
                                             <ControlTemplate TargetType="Thumb">
-                                                <Border x:Name="ThumbBorder" Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource CardBrush}" BorderThickness="3" CornerRadius="15" />
+                                                <Border x:Name="ThumbBorder" Background="{DynamicResource AccentBrush}" BorderBrush="White" BorderThickness="3" CornerRadius="15" Effect="{DynamicResource FlyoutShadowEffect}" />
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource AccentDarkBrush}" /></Trigger>
                                                     <Trigger Property="IsDragging" Value="True"><Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource AccentDarkBrush}" /></Trigger>
@@ -30,7 +30,7 @@
                                     </Thumb>
                                 </Track.Thumb>
                                 <Track.IncreaseRepeatButton>
-                                    <RepeatButton Command="{x:Static Slider.IncreaseLarge}" Background="Transparent" BorderThickness="0" IsTabStop="False" />
+                                    <RepeatButton Command="{x:Static Slider.IncreaseLarge}" Background="{DynamicResource BorderBrush}" BorderThickness="0" IsTabStop="False" />
                                 </Track.IncreaseRepeatButton>
                             </Track>
                         </Grid>
@@ -42,7 +42,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="40" />
+            <RowDefinition Height="48" />
             <RowDefinition Height="28" />
         </Grid.RowDefinitions>
         <Grid>
@@ -52,20 +52,25 @@
                     <TextBlock x:Name="SelectionText" HorizontalAlignment="Right" FontSize="13" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
                     <TextBlock x:Name="SelectionSummaryText" HorizontalAlignment="Right" Foreground="{DynamicResource MutedTextBrush}" FontSize="11" TextTrimming="CharacterEllipsis" />
                 </StackPanel>
-                <ui:Button x:Name="EditButton" Width="32" Height="32" Padding="0" Appearance="Transparent" Click="EditButton_Click" ToolTip="Edit blend configurations" AutomationProperties.Name="Edit blend configurations">
-                    <ui:SymbolIcon Symbol="Edit16" FontSize="16" />
-                </ui:Button>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="1">
-            <UniformGrid x:Name="TickPanel" Columns="5" IsHitTestVisible="False" VerticalAlignment="Center" Margin="10,0">
-                <Ellipse Width="8" Height="8" Fill="{DynamicResource MutedTextBrush}" HorizontalAlignment="Center" />
-                <Ellipse Width="8" Height="8" Fill="{DynamicResource MutedTextBrush}" HorizontalAlignment="Center" />
-                <Ellipse Width="8" Height="8" Fill="{DynamicResource MutedTextBrush}" HorizontalAlignment="Center" />
-                <Ellipse Width="8" Height="8" Fill="{DynamicResource MutedTextBrush}" HorizontalAlignment="Center" />
-                <Ellipse Width="8" Height="8" Fill="{DynamicResource MutedTextBrush}" HorizontalAlignment="Center" />
-            </UniformGrid>
-            <Slider x:Name="LevelSlider" Style="{StaticResource BlendSliderStyle}" Minimum="0" Maximum="4" TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center" AutomationProperties.Name="Blend level" ValueChanged="LevelSlider_ValueChanged" />
+            <Grid.ColumnDefinitions><ColumnDefinition Width="4*" /><ColumnDefinition Width="1*" /></Grid.ColumnDefinitions>
+            <Grid Grid.Column="0" Margin="0,0,8,0">
+                <UniformGrid x:Name="TickPanel" Columns="5" IsHitTestVisible="False" VerticalAlignment="Center" Margin="10,0">
+                    <Ellipse Width="8" Height="8" Fill="{DynamicResource MutedTextBrush}" HorizontalAlignment="Center" />
+                    <Ellipse Width="8" Height="8" Fill="{DynamicResource MutedTextBrush}" HorizontalAlignment="Center" />
+                    <Ellipse Width="8" Height="8" Fill="{DynamicResource MutedTextBrush}" HorizontalAlignment="Center" />
+                    <Ellipse Width="8" Height="8" Fill="{DynamicResource MutedTextBrush}" HorizontalAlignment="Center" />
+                    <Ellipse Width="8" Height="8" Fill="{DynamicResource MutedTextBrush}" HorizontalAlignment="Center" />
+                </UniformGrid>
+                <Slider x:Name="LevelSlider" Margin="10,0" Style="{StaticResource BlendSliderStyle}" Minimum="0" Maximum="4" TickFrequency="1" IsSnapToTickEnabled="True" VerticalAlignment="Center" AutomationProperties.Name="Blend level" ValueChanged="LevelSlider_ValueChanged" />
+            </Grid>
+            <Border Grid.Column="1" Width="48" Height="48" CornerRadius="24" Background="White" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ui:Button x:Name="EditButton" Width="46" Height="46" Padding="0" Appearance="Transparent" Click="EditButton_Click" ToolTip="Edit blend configurations" AutomationProperties.Name="Edit blend configurations">
+                    <ui:SymbolIcon Symbol="PuzzlePiece16" FontSize="18" Foreground="{DynamicResource AccentBrush}" />
+                </ui:Button>
+            </Border>
         </Grid>
         <UniformGrid x:Name="LabelsPanel" Grid.Row="2" Columns="5" HorizontalAlignment="Stretch" />
     </Grid>
