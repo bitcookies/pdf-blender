@@ -10,6 +10,25 @@
             <GradientStop Color="#D02E3D" Offset="0" />
             <GradientStop Color="#FF5671" Offset="1" />
         </LinearGradientBrush>
+        <LinearGradientBrush x:Key="HomeGradientHoverBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#B82435" Offset="0" />
+            <GradientStop Color="#E94761" Offset="1" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="HomeGradientDisabledBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#9A9A9A" Offset="0" />
+            <GradientStop Color="#B8B8B8" Offset="1" />
+        </LinearGradientBrush>
+        <Style x:Key="HomeGradientSurfaceStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource HomeGradientBrush}" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource HomeGradientHoverBrush}" />
+                </Trigger>
+                <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="False">
+                    <Setter Property="Background" Value="{StaticResource HomeGradientDisabledBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
         <Style x:Key="HomeGradientButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
             <Setter Property="Appearance" Value="Transparent" />
             <Setter Property="Background" Value="Transparent" />
@@ -17,12 +36,16 @@
             <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="MinHeight" Value="0" />
-            <Setter Property="Padding" Value="14,6" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="White" /><Setter Property="Opacity" Value="1" /></Trigger>
-                <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="White" /><Setter Property="Opacity" Value="1" /></Trigger>
+                <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="White" /></Trigger>
+                <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="White" /></Trigger>
                 <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="White" /><Setter Property="Opacity" Value="1" /></Trigger>
             </Style.Triggers>
         </Style>
@@ -38,7 +61,7 @@
             <RowDefinition Height="56" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Grid.RowSpan="3" Panel.ZIndex="2" IsHitTestVisible="False" ClipToBounds="False">
+        <Grid Grid.Row="0" Grid.RowSpan="3" Margin="0,0,-20,0" Panel.ZIndex="2" IsHitTestVisible="False" ClipToBounds="False">
             <Image Source="/PDFBlender.App;component/Assets/banner.png"
                    Stretch="Uniform"
                    Opacity="1"
@@ -46,7 +69,7 @@
                    VerticalAlignment="Top"
                    Width="580"
                    Height="157"
-                   Margin="0,8,4,0" />
+                   Margin="0,8,0,0" />
         </Grid>
         <Grid Grid.Row="0" Panel.ZIndex="3" Background="Transparent">
             <Grid VerticalAlignment="Center">
@@ -66,8 +89,8 @@
                         <Image Source="/PDFBlender.App;component/Assets/pdf-icon.png" Width="54" Height="54" Stretch="Uniform" HorizontalAlignment="Center" />
                         <TextBlock x:Name="DropTitleText" Style="{StaticResource CardTitleTextStyle}" FontSize="16" HorizontalAlignment="Center" Margin="0,6,0,0" />
                         <TextBlock x:Name="DropHintText" Style="{StaticResource CardDescriptionTextStyle}" HorizontalAlignment="Center" Margin="0,3,0,0" />
-                        <Border Height="40" Margin="0,9,0,0" CornerRadius="8" Background="{StaticResource HomeGradientBrush}">
-                            <ui:Button x:Name="BrowseButton" Style="{StaticResource HomeGradientButtonStyle}" Height="40" Padding="14,6" Click="BrowseButton_Click" AutomationProperties.Name="Browse PDF">
+                        <Border Height="40" Margin="0,9,0,0" CornerRadius="8" Style="{StaticResource HomeGradientSurfaceStyle}" Tag="{Binding IsEnabled, ElementName=BrowseButton}">
+                            <ui:Button x:Name="BrowseButton" Style="{StaticResource HomeGradientButtonStyle}" Height="40" Click="BrowseButton_Click" AutomationProperties.Name="Browse PDF">
                                 <StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="Document24" Margin="0,0,7,0" Foreground="White" /><TextBlock x:Name="BrowseButtonText" Foreground="White" /></StackPanel>
                             </ui:Button>
                         </Border>
@@ -92,8 +115,8 @@
                         <TextBlock x:Name="SelectedCountText" FontSize="12" Foreground="{DynamicResource MutedTextBrush}" Margin="0,5,0,0" />
                         <TextBlock x:Name="PreviewErrorText" FontSize="11" Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap" Visibility="Collapsed" Margin="0,5,0,0" />
                     </StackPanel>
-                    <Border Grid.Column="2" Height="40" VerticalAlignment="Center" CornerRadius="8" Background="{StaticResource HomeGradientBrush}">
-                        <ui:Button x:Name="ReplacePdfButton" Style="{StaticResource HomeGradientButtonStyle}" Height="40" Padding="14,6" Click="BrowseButton_Click" AutomationProperties.Name="Replace PDF"><StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="Document24" Margin="0,0,7,0" Foreground="White" /><TextBlock x:Name="ReplacePdfButtonText" Foreground="White" /></StackPanel></ui:Button>
+                    <Border Grid.Column="2" Height="40" VerticalAlignment="Center" CornerRadius="8" Style="{StaticResource HomeGradientSurfaceStyle}" Tag="{Binding IsEnabled, ElementName=ReplacePdfButton}">
+                        <ui:Button x:Name="ReplacePdfButton" Style="{StaticResource HomeGradientButtonStyle}" Height="40" Click="BrowseButton_Click" AutomationProperties.Name="Replace PDF"><StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="Document24" Margin="0,0,7,0" Foreground="White" /><TextBlock x:Name="ReplacePdfButtonText" Foreground="White" /></StackPanel></ui:Button>
                     </Border>
                 </Grid>
             </Grid>
@@ -107,7 +130,7 @@
                 <Border Style="{StaticResource PillBorderStyle}" Padding="9,4" BorderBrush="{DynamicResource NotificationBorderBrush}" BorderThickness="1"><StackPanel Orientation="Horizontal"><Ellipse Width="7" Height="7" Fill="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,6,0" /><TextBlock x:Name="StatusText" Foreground="{DynamicResource PillTextBrush}" FontSize="11.5" VerticalAlignment="Center" /></StackPanel></Border>
                 <ProgressBar x:Name="ProcessingProgress" Width="120" Height="5" Margin="10,0,8,0" Visibility="Collapsed" />
             </StackPanel>
-            <Border Grid.Column="1" Width="166" Height="52" CornerRadius="8" Background="{StaticResource HomeGradientBrush}">
+            <Border Grid.Column="1" Width="166" Height="52" CornerRadius="8" Style="{StaticResource HomeGradientSurfaceStyle}" Tag="{Binding IsEnabled, ElementName=BlendButton}">
                 <ui:Button x:Name="BlendButton" Style="{StaticResource HomeGradientButtonStyle}" Width="166" Height="52" Click="BlendButton_Click" AutomationProperties.Name="Blend PDF">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <ui:SymbolIcon x:Name="BlendButtonIcon" Symbol="Play24" FontSize="19" Margin="0,0,8,0" Foreground="White" />
