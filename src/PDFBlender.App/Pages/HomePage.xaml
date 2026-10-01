@@ -24,9 +24,9 @@
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="{StaticResource HomeGradientHoverBrush}" />
                 </Trigger>
-                <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="False">
+                <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Background" Value="{StaticResource HomeGradientDisabledBrush}" />
-                </DataTrigger>
+                </Trigger>
             </Style.Triggers>
         </Style>
         <Style x:Key="HomeGradientButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
@@ -131,14 +131,19 @@
 
         <Grid Grid.Row="6">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Border Style="{StaticResource PillBorderStyle}" Padding="9,4" BorderBrush="{DynamicResource NotificationBorderBrush}" BorderThickness="1"><StackPanel Orientation="Horizontal"><Ellipse Width="7" Height="7" Fill="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,6,0" /><TextBlock x:Name="StatusText" Foreground="{DynamicResource PillTextBrush}" FontSize="11.5" VerticalAlignment="Center" /></StackPanel></Border>
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0">
+                <ui:Card Padding="12,8" MinHeight="42" Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource NotificationBorderBrush}" BorderThickness="1" AutomationProperties.Name="Status">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse Width="7" Height="7" Fill="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock x:Name="StatusText" Foreground="{DynamicResource PillTextBrush}" FontSize="11.5" VerticalAlignment="Center" />
+                    </StackPanel>
+                </ui:Card>
                 <ProgressBar x:Name="ProcessingProgress" Width="120" Height="5" Margin="10,0,8,0" Visibility="Collapsed" />
             </StackPanel>
-            <Border Grid.Column="1" Width="166" Height="52" CornerRadius="8" Style="{StaticResource HomeGradientSurfaceStyle}" Tag="{Binding IsEnabled, ElementName=BlendButton}">
-                <ui:Button x:Name="BlendButton" Style="{StaticResource HomeGradientButtonStyle}" Width="166" Height="52" Click="BlendButton_Click" AutomationProperties.Name="Blend PDF">
+            <Border Grid.Column="1" Width="250" Height="52" CornerRadius="8" HorizontalAlignment="Right" IsEnabled="{Binding IsEnabled, ElementName=BlendButton}" Style="{StaticResource HomeGradientSurfaceStyle}">
+                <ui:Button x:Name="BlendButton" Style="{StaticResource HomeGradientButtonStyle}" Width="250" Height="52" Click="BlendButton_Click" AutomationProperties.Name="Blend PDF">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <ui:SymbolIcon x:Name="BlendButtonIcon" Symbol="Play24" FontSize="19" Margin="0,0,8,0" Foreground="White" />
+                        <ui:SymbolIcon x:Name="BlendButtonIcon" Symbol="TriangleRight20" Filled="True" FontSize="19" Margin="0,0,8,0" Foreground="White" />
                         <TextBlock x:Name="BlendButtonText" FontSize="14" Foreground="White" />
                     </StackPanel>
                 </ui:Button>

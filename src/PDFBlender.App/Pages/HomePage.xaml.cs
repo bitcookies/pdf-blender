@@ -126,7 +126,7 @@ public partial class HomePage : Page
         {
             var overall = (completedFiles + value.Fraction) / inputPaths.Length;
             ProcessingProgress.Value = overall * 100;
-            StatusText.Text = $"{value.Stage} {completedFiles + 1}/{inputPaths.Length} · {value.CompletedPages}/{value.TotalPages}";
+            StatusText.Text = UiText.Get("processing");
             _notifications.UpdateProgress(progressNotification, StatusText.Text, overall);
         });
         try
@@ -139,7 +139,7 @@ public partial class HomePage : Page
                 outputNames.Add(Path.GetFileName(result.OutputPath));
                 completedFiles++;
             }
-            StatusText.Text = $"{UiText.Get("completed")}: {string.Format(UiText.Get("completedCount"), outputNames.Count)}";
+            StatusText.Text = UiText.Get("completed");
             _notifications.Dismiss(progressNotification);
             _notifications.Show(UiNotificationKind.Success, UiText.Get("completed"), string.Join(", ", outputNames));
         }
@@ -151,7 +151,7 @@ public partial class HomePage : Page
         }
         catch (Exception exception)
         {
-            StatusText.Text = $"{UiText.Get("processingError")}: {exception.Message}";
+            StatusText.Text = UiText.Get("processingError");
             _notifications.Dismiss(progressNotification);
             _notifications.Show(UiNotificationKind.Error, UiText.Get("processingError"), exception.Message, autoDismiss: false);
         }
@@ -193,7 +193,9 @@ public partial class HomePage : Page
             PreviewStrip.Children.Add(preview.Container);
         }
         BlendButton.IsEnabled = hasFile && _session.SlotConfigurations.Any(configuration => configuration is not null);
-        StatusText.Text = _session.SlotConfigurations.All(configuration => configuration is null) ? UiText.Get("noBlendSlots") : hasFile ? Path.GetFileName(path) : UiText.Get("ready");
+        StatusText.Text = _session.SlotConfigurations.All(configuration => configuration is null)
+            ? UiText.Get("noBlendSlots")
+            : hasFile ? UiText.Get("readyToBlend") : UiText.Get("ready");
         if (hasFile) _ = LoadPreviewsAsync(selectedPaths, generation);
     }
 
@@ -348,7 +350,8 @@ public partial class HomePage : Page
         BlendLevelRailControl.IsEnabled = !processing;
         ProcessingProgress.Visibility = processing ? Visibility.Visible : Visibility.Collapsed;
         BlendButtonText.Text = UiText.Get(processing ? "cancel" : "blend");
-        BlendButtonIcon.Symbol = processing ? Wpf.Ui.Controls.SymbolRegular.Dismiss24 : Wpf.Ui.Controls.SymbolRegular.Play24;
+        BlendButtonIcon.Symbol = processing ? Wpf.Ui.Controls.SymbolRegular.Dismiss24 : Wpf.Ui.Controls.SymbolRegular.TriangleRight20;
+        BlendButtonIcon.Filled = !processing;
         AutomationProperties.SetName(BlendButton, UiText.Get(processing ? "cancel" : "blend"));
         if (!processing) ProcessingProgress.Value = 0;
     }
