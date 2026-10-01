@@ -4,7 +4,7 @@
                   xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                   Title="Edit configuration" Width="520" Height="620" MinWidth="480" MinHeight="520"
                   WindowStartupLocation="CenterOwner" WindowBackdropType="Mica" WindowCornerPreference="Round"
-                  Background="{DynamicResource WindowBackgroundBrush}" TextElement.FontFamily="{DynamicResource AppFontFamily}">
+                  Background="{DynamicResource WindowBackgroundBrush}" TextElement.FontFamily="{DynamicResource AppFontFamily}" UseLayoutRounding="True" SnapsToDevicePixels="True">
     <Grid Margin="24,20,24,24">
         <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
         <StackPanel>

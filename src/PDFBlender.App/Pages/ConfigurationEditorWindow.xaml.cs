@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using PDFBlender.Core.Models;
+using PDFBlender.App;
 using UiCard = Wpf.Ui.Controls.Card;
 using UiTextBox = Wpf.Ui.Controls.TextBox;
 using UiToggleSwitch = Wpf.Ui.Controls.ToggleSwitch;
@@ -31,11 +32,23 @@ public partial class ConfigurationEditorWindow : Wpf.Ui.Controls.FluentWindow
         // the normal validation/save path write a complete settings object back.
         Settings = source.Settings ?? BlendSettings.Default;
         InitializeComponent();
+        DpiChanged += ConfigurationEditorWindow_DpiChanged;
+        Loaded += ConfigurationEditorWindow_Loaded;
         TitleText.Text = UiText.Get("editConfiguration");
         NameBox.Text = source.Name;
         CancelButton.Content = UiText.Get("cancel");
         SaveButton.Content = UiText.Get("save");
         BuildFeatureRows();
+    }
+
+    private void ConfigurationEditorWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        DpiSupport.RefreshVisuals(this);
+    }
+
+    private void ConfigurationEditorWindow_DpiChanged(object sender, DpiChangedEventArgs e)
+    {
+        DpiSupport.RefreshVisuals(this);
     }
 
     private void BuildFeatureRows()

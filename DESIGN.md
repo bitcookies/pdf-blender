@@ -21,6 +21,8 @@ Use Segoe UI Variable with Segoe UI fallback. Keep the type scale compact: 18–
 
 Use small translucent surfaces only where they improve hierarchy. Do not rely on continuous blur or custom window chrome. The WPF-UI `FluentWindow` and `TitleBar` provide the shell controls while retaining standard Windows behavior for high-DPI sizing, resizing, and accessibility.
 
+The application runs as a Per-Monitor V2 aware WPF process. Layout remains in device-independent pixels, uses layout rounding and device-pixel snapping, and refreshes the visual tree when a window moves between monitors or the display scale changes. Raster assets use high-quality bitmap scaling; source assets should be supplied at a size that remains sharp at 200% and 300% scale.
+
 ## Home Layout
 
 The main window is 820×600 with a 760×540 minimum. It uses WPF-UI `NavigationView` in `LeftFluent` mode, fixed to a 74 px rail with no pane expansion. Home and Configuration occupy the main group; Settings occupies the footer group. The title bar and rail share a shell surface (`#F3F3F3` light, `#202020` dark); the content surface uses `#F9F9F9` light / `#272727` dark and has a 12 px top-left radius with square remaining corners. Cards use `#FDFDFD` light / `#323232` dark. Home contains a bordered drag-and-drop surface with selected-file summary, the three-level Blend rail, a Configuration shortcut, and a bottom action row with progress and Cancel. The home screen does not expose profile, output, theme, or language controls.

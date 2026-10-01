@@ -12,6 +12,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <ApplicationIcon>Assets\logo.ico</ApplicationIcon>
     <AssemblyTitle>PDF Blender</AssemblyTitle>
     <Description>PDF Blender</Description>

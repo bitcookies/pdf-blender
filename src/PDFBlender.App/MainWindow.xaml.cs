@@ -23,6 +23,7 @@ public partial class MainWindow : FluentWindow
     public MainWindow()
     {
         InitializeComponent();
+        DpiChanged += MainWindow_DpiChanged;
         AddHandler(Keyboard.PreviewGotKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnKeyboardFocus), true);
         _dialogs = new DialogService(RootDialogHost);
         _notifications = new UiNotificationService(AppNotificationHost, _session);
@@ -31,7 +32,21 @@ public partial class MainWindow : FluentWindow
         ApplyLanguage();
         NavigateTo("home");
         _session.Changed += Session_Changed;
-        Loaded += (_, _) => Dispatcher.BeginInvoke(() => SelectNavigationItem("home"), DispatcherPriority.Loaded);
+        Loaded += MainWindow_Loaded;
+
+    }
+
+    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        DpiSupport.RefreshVisuals(this);
+        Dispatcher.BeginInvoke(() => SelectNavigationItem("home"), DispatcherPriority.Loaded);
+    }
+
+    private void MainWindow_DpiChanged(object sender, DpiChangedEventArgs e)
+    {
+        // WPF keeps dimensions in device-independent pixels; refresh only the visual tree.
+        DpiSupport.RefreshVisuals(this);
+        Dispatcher.BeginInvoke(() => ContentFrame.InvalidateMeasure(), DispatcherPriority.Render);
     }
 
     private void NavigationView_SelectionChanged(object sender, RoutedEventArgs e)

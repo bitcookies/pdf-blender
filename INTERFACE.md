@@ -53,6 +53,8 @@ Represent empty, file selected, validating, processing, cancelling, completed, a
 
 Support keyboard access for import, selectors, settings, and the primary action. Provide accessible names for controls and meaningful focus order. Keep controls stable in size and labels from clipping across supported text lengths and Windows scaling settings. Do not block the UI thread during rendering, conversion, or file writing.
 
+The WPF process is Per-Monitor V2 DPI aware. Windows scaling from 100% through 300%, including moving a window between monitors with different scales, must preserve device-independent layout dimensions and trigger a visual re-measure. Images use high-quality bitmap scaling and must not be replaced with low-resolution runtime copies.
+
 ## v0.6.0 Configuration Cards
 
 The Configuration page is ordered as five fixed Home blend slots, a separator, and one merged "Blend configurations" section. The first run creates three editable cards named with the localized `Preset`/`预设` prefix. Every card shows only enabled features and provides edit, lock, delete, and drag actions; a lock disables edit and delete. Editing opens a modal editor and only enabled features reveal detail controls. Dragging onto an occupied slot replaces that slot, while dragging a configuration from one slot to another leaves its old position empty. Cards render three per row. Settings can restore missing default presets through a confirmed action without overwriting existing edits. Preferences and configurations use the roaming AppData folder named PDF Blender.
