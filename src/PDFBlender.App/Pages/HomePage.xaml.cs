@@ -173,6 +173,26 @@ public partial class HomePage : Page
     private void SetInputPaths(IEnumerable<string>? paths, bool notify = true)
     {
         var selectedPaths = (paths ?? []).Where(File.Exists).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+        // Session changes also fire when only the blend level changes. Keep the
+        // existing preview visuals in that case; rebuilding them briefly shows
+        // loading overlays and serves no purpose.
+        var currentPreviewPaths = _previewVisuals.Select(visual => visual.Path).ToArray();
+        if ((selectedPaths.Length > 0 || currentPreviewPaths.Length > 0)
+            && selectedPaths.SequenceEqual(currentPreviewPaths, StringComparer.OrdinalIgnoreCase))
+        {
+            if (notify) _session.SetInputPaths(selectedPaths);
+            if (selectedPaths.Length > 0)
+            {
+                SelectedCountText.Text = selectedPaths.Length > 1
+                    ? string.Format(UiText.Get("selectedCount"), selectedPaths.Length)
+                    : string.Empty;
+            }
+            BlendButton.IsEnabled = selectedPaths.Length > 0 && _session.SlotConfigurations.Any(configuration => configuration is not null);
+            StatusText.Text = _session.SlotConfigurations.All(configuration => configuration is null)
+                ? UiText.Get("noBlendSlots")
+                : selectedPaths.Length > 0 ? UiText.Get("readyToBlend") : UiText.Get("ready");
+            return;
+        }
         if (notify) _session.SetInputPaths(selectedPaths);
         _previewCts?.Cancel();
         _previewCts?.Dispose();

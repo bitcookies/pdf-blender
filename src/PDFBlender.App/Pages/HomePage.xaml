@@ -24,9 +24,9 @@
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="{StaticResource HomeGradientHoverBrush}" />
                 </Trigger>
-                <Trigger Property="IsEnabled" Value="False">
+                <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="False">
                     <Setter Property="Background" Value="{StaticResource HomeGradientDisabledBrush}" />
-                </Trigger>
+                </DataTrigger>
             </Style.Triggers>
         </Style>
         <Style x:Key="HomeGradientButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
@@ -140,7 +140,7 @@
                 </ui:Card>
                 <ProgressBar x:Name="ProcessingProgress" Width="120" Height="5" Margin="10,0,8,0" Visibility="Collapsed" />
             </StackPanel>
-            <Border Grid.Column="1" Width="250" Height="52" CornerRadius="8" HorizontalAlignment="Right" IsEnabled="{Binding IsEnabled, ElementName=BlendButton}" Style="{StaticResource HomeGradientSurfaceStyle}">
+            <Border Grid.Column="1" Width="250" Height="52" CornerRadius="8" HorizontalAlignment="Right" Style="{StaticResource HomeGradientSurfaceStyle}" Tag="{Binding IsEnabled, ElementName=BlendButton}">
                 <ui:Button x:Name="BlendButton" Style="{StaticResource HomeGradientButtonStyle}" Width="250" Height="52" Click="BlendButton_Click" AutomationProperties.Name="Blend PDF">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <ui:SymbolIcon x:Name="BlendButtonIcon" Symbol="TriangleRight20" Filled="True" FontSize="19" Margin="0,0,8,0" Foreground="White" />
