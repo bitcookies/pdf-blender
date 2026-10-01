@@ -17,7 +17,10 @@ public sealed record AppPreferences(
     int SelectedBlendLevel = 1,
     bool RestorePresets = false,
     bool ToastSoundEnabled = true,
-    bool AllowMultipleInstances = false);
+    bool AllowMultipleInstances = false,
+    bool BannerNotificationsEnabled = true,
+    bool WindowsNotificationsEnabled = false,
+    string ToastSound = "toast-1.mp3");
 
 internal static class AppPreferencesStore
 {
@@ -54,7 +57,15 @@ internal static class AppPreferencesStore
     {
         Theme = Enum.IsDefined(preferences.Theme) ? preferences.Theme : ThemePreference.System,
         Language = Enum.IsDefined(preferences.Language) ? preferences.Language : UiLanguage.System,
-        SelectedBlendLevel = Math.Clamp(preferences.SelectedBlendLevel, 0, 4)
+        SelectedBlendLevel = Math.Clamp(preferences.SelectedBlendLevel, 0, 4),
+        ToastSound = preferences.ToastSound.ToLowerInvariant() switch
+        {
+            "toast-2.mp3" => "toast-2.mp3",
+            "toast-3.mp3" => "toast-3.mp3",
+            "toast-4.mp3" => "toast-4.mp3",
+            "toast-5.mp3" => "toast-5.mp3",
+            _ => "toast-1.mp3"
+        }
     };
 
     public static void Save(AppPreferences preferences)

@@ -11,8 +11,14 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Assets\logo.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
 
   <ItemGroup>
     <Resource Include="Assets\logo.png" />
@@ -20,7 +26,11 @@
     <Resource Include="..\..\assets\banner.png" Link="Assets\banner.png" />
     <Resource Include="..\..\assets\pdf-icon.png" Link="Assets\pdf-icon.png" />
     <Resource Include="..\..\assets\bitcookies-words.png" Link="Assets\bitcookies-words.png" />
-    <Content Include="..\..\assets\sounds\toast.mp3" Link="Assets\sounds\toast.mp3" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\assets\sounds\toast-1.mp3" Link="Assets\sounds\toast-1.mp3" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\assets\sounds\toast-2.mp3" Link="Assets\sounds\toast-2.mp3" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\assets\sounds\toast-3.mp3" Link="Assets\sounds\toast-3.mp3" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\assets\sounds\toast-4.mp3" Link="Assets\sounds\toast-4.mp3" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\assets\sounds\toast-5.mp3" Link="Assets\sounds\toast-5.mp3" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

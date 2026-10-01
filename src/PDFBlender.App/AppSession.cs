@@ -174,7 +174,7 @@ internal sealed class AppSession
         catch (UnauthorizedAccessException) { }
     }
 
-    public void ApplyPreferences(ThemePreference? theme = null, UiLanguage? language = null, bool? restorePresets = null, bool? toastSoundEnabled = null, bool? allowMultipleInstances = null)
+    public void ApplyPreferences(ThemePreference? theme = null, UiLanguage? language = null, bool? restorePresets = null, bool? toastSoundEnabled = null, bool? allowMultipleInstances = null, bool? bannerNotificationsEnabled = null, bool? windowsNotificationsEnabled = null, string? toastSound = null)
     {
         Preferences = Preferences with
         {
@@ -182,7 +182,10 @@ internal sealed class AppSession
             Language = language ?? Preferences.Language,
             RestorePresets = restorePresets ?? Preferences.RestorePresets,
             ToastSoundEnabled = toastSoundEnabled ?? Preferences.ToastSoundEnabled,
-            AllowMultipleInstances = allowMultipleInstances ?? Preferences.AllowMultipleInstances
+            AllowMultipleInstances = allowMultipleInstances ?? Preferences.AllowMultipleInstances,
+            BannerNotificationsEnabled = bannerNotificationsEnabled ?? Preferences.BannerNotificationsEnabled,
+            WindowsNotificationsEnabled = windowsNotificationsEnabled ?? Preferences.WindowsNotificationsEnabled,
+            ToastSound = toastSound ?? Preferences.ToastSound
         };
         UiText.SetLanguage(Preferences.Language);
         if (restorePresets == true)

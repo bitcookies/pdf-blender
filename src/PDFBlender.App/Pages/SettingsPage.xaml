@@ -57,8 +57,32 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="NotificationSoundComboBoxItemStyle" TargetType="ComboBoxItem" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
+                    <Setter Property="Opacity" Value="0.62" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="NotificationSoundComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="ItemContainerStyle" Value="{StaticResource NotificationSoundComboBoxItemStyle}" />
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
+                    <Setter Property="Opacity" Value="0.62" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Page.Resources>
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <ScrollViewer x:Name="SettingsScrollViewer"
+                  VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled"
+                  Loaded="SettingsScrollViewer_Loaded"
+                  ScrollChanged="SettingsScrollViewer_ScrollChanged"
+                  PreviewMouseWheel="SettingsScrollViewer_PreviewMouseWheel">
         <StackPanel Margin="24,20,24,24" MaxWidth="760">
             <TextBlock x:Name="TitleText" Style="{StaticResource PageTitleTextStyle}" />
             <TextBlock x:Name="SubtitleText" Style="{StaticResource PageDescriptionTextStyle}" />
@@ -114,17 +138,54 @@
             </Border>
             </StackPanel>
             <TextBlock x:Name="SoundHeader" Style="{StaticResource SectionTitleTextStyle}" />
-            <Border Style="{StaticResource SettingsCardStyle}">
-                <Grid>
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                    <ui:SymbolIcon Symbol="Speaker224" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,14,0">
-                        <TextBlock x:Name="ToastSoundLabel" Style="{StaticResource CardTitleTextStyle}" />
-                        <TextBlock x:Name="ToastSoundHint" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" />
-                    </StackPanel>
-                    <ui:ToggleSwitch x:Name="ToastSoundToggle" Grid.Column="2" VerticalAlignment="Center" Click="ToastSoundToggle_Click" />
-                </Grid>
-            </Border>
+            <StackPanel Margin="0,0,0,16">
+                <Border Style="{StaticResource SettingsCardStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Symbol="Alert24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,14,0">
+                            <TextBlock x:Name="BannerNotificationsLabel" Style="{StaticResource CardTitleTextStyle}" />
+                            <TextBlock x:Name="BannerNotificationsHint" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <ui:ToggleSwitch x:Name="BannerNotificationsToggle" Grid.Column="2" VerticalAlignment="Center" Click="BannerNotificationsToggle_Click" />
+                    </Grid>
+                </Border>
+                <Border Style="{StaticResource SettingsCardStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Symbol="Speaker224" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,14,0">
+                            <TextBlock x:Name="BannerNotificationSoundLabel" Style="{StaticResource CardTitleTextStyle}" />
+                            <TextBlock x:Name="BannerNotificationSoundHint" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <ui:ToggleSwitch x:Name="ToastSoundToggle" Grid.Column="2" VerticalAlignment="Center" Click="ToastSoundToggle_Click" />
+                    </Grid>
+                </Border>
+                <Border Style="{StaticResource SettingsCardStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Symbol="MusicNote224" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" x:Name="NotificationSoundLabel" Style="{StaticResource CardTitleTextStyle}" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <ComboBox x:Name="ToastSoundOptions" Width="168" VerticalAlignment="Center" Style="{StaticResource NotificationSoundComboBoxStyle}" SelectionChanged="ToastSoundOptions_SelectionChanged" />
+                            <ui:Button x:Name="TestToastSoundButton" Width="36" Height="36" Margin="6,0,0,0" Padding="0" Appearance="Secondary" Click="TestToastSoundButton_Click" ToolTip="Test sound" AutomationProperties.Name="Test notification sound">
+                                <ui:SymbolIcon Symbol="Play24" FontSize="17" />
+                            </ui:Button>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <Border Style="{StaticResource SettingsCardStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <ui:SymbolIcon Symbol="WindowApps24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,14,0">
+                            <TextBlock x:Name="WindowsNotificationsLabel" Style="{StaticResource CardTitleTextStyle}" />
+                            <TextBlock x:Name="WindowsNotificationsHint" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <ui:ToggleSwitch x:Name="WindowsNotificationsToggle" Grid.Column="2" VerticalAlignment="Center" Click="WindowsNotificationsToggle_Click" />
+                    </Grid>
+                </Border>
+            </StackPanel>
             <TextBlock x:Name="AboutHeader" Style="{StaticResource SectionTitleTextStyle}" Margin="0,20,0,8" />
             <Border Padding="0" Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="14" ClipToBounds="True">
                 <StackPanel>
