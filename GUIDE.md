@@ -31,8 +31,6 @@ pwsh -NoProfile -File .\build.ps1
 | --- | --- | --- |
 | `1` | 生成便携版 | `publish/portable/` |
 | `2` | 生成 MSIX 安装包 | `publish/installer/` |
-| `3` | Release 编译 | 使用 .NET 默认输出目录 |
-| `4` | Release 测试 | 测试项目输出目录 |
 | `0` | 退出 | 不修改文件 |
 
 也可以直接传数字：
@@ -40,12 +38,10 @@ pwsh -NoProfile -File .\build.ps1
 ```powershell
 pwsh -NoProfile -File .\build.ps1 1
 pwsh -NoProfile -File .\build.ps1 2
-pwsh -NoProfile -File .\build.ps1 3
-pwsh -NoProfile -File .\build.ps1 4
+pwsh -NoProfile -File .\build.ps1 0
 ```
 
 便携版是用于开发和测试的 `win-x64` 发布目录，包含 EXE、托管程序集以及 PDFium/SkiaSharp 原生组件。它不是 Microsoft Store 安装包。
-
 如果 `publish/portable` 或 `publish/installer` 已经存在文件，脚本会询问：
 
 ```text
@@ -92,7 +88,7 @@ PDFBlender/
 ├─ AGENTS.md               AI 在本仓库中工作时必须遵守的规则
 ├─ LICENSE                 项目许可证
 ├─ PDFBlender.slnx         .NET 解决方案
-├─ Directory.Build.props   统一版本号，目前是 0.5.0 / 0.5.0.0
+├─ Directory.Build.props   统一版本号，目前是 0.6.0 / 0.6.0.0
 └─ build.ps1               数字构建入口
 ```
 
@@ -100,14 +96,14 @@ PDFBlender/
 
 ## 常用开发流程
 
-1. 修改源码后运行 `pwsh -NoProfile -File .\build.ps1 3`。
-2. 运行 `pwsh -NoProfile -File .\build.ps1 4`。
+1. 修改源码后运行 `dotnet build PDFBlender.slnx -c Release`。
+2. 运行 `dotnet test PDFBlender.slnx -c Release`。
 3. 需要测试便携版时运行 `pwsh -NoProfile -File .\build.ps1 1`，然后启动 `publish/portable/PDFBlender.App.exe`。
 4. 提交前确认 `git status` 中没有 `publish/`、`bin/`、`obj/`、参考项目或本地 PDF。
 
 PDF 处理完全在本机执行。不要把 PDF 内容、提取文字或个人文档信息写入日志，也不要把 `PDF-Poisoning/` 或 `参考图/` 加入发布包。
 
-## v0.5.0 配置页面
+## v0.6.0 配置页面
 
 配置页面从上到下分为三部分：顶部是首页搅拌挡位槽位，中间是我的配置，底部是内置预设。可以把任意用户配置或内置预设拖到顶部，最多五个；槽位会按强度从弱到强保存。没有槽位时首页会提示先去配置页面添加挡位。
 
@@ -119,4 +115,4 @@ PDF 处理完全在本机执行。不要把 PDF 内容、提取文字或个人�
 
     C:\Users\<用户名>\AppData\Roaming\PDF Blender
 
-主要文件是 configurations.json 和 preferences.json。v0.5.0 不读取旧的 AppData\Local\PDFBlender 路径。
+主要文件是 configurations.json 和 preferences.json。v0.6.0 不读取旧的 AppData\Local\PDFBlender 路径。

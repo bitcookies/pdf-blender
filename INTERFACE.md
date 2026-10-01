@@ -1,6 +1,6 @@
 # PDF Blender Interface Specification
 
-Status: v0.5.0 WPF-UI visual standardization
+Status: v0.6.0 WPF-UI visual standardization
 
 ## Visual Direction
 
@@ -21,7 +21,7 @@ The first screen is the working tool, not a marketing page. The compact 820×600
 3. The discrete Blend level rail and a Configuration shortcut.
 4. A clear primary `Blend PDF` action.
 
-The main workflow is `Drop/Browse -> choose Blend level -> Blend PDF`. v0.5.0 handles one PDF at a time. Reject unsupported file types clearly and do not start processing before a valid PDF is selected. The output is written beside the input as `<source>_blended.pdf`; the destination is not exposed as a home control. Theme and language controls are absent from the home screen and available in Settings.
+The main workflow is `Drop/Browse -> choose Blend level -> Blend PDF`. v0.6.0 accepts one or more PDF files per batch and ignores duplicate paths. Reject unsupported file types clearly and do not start processing before a valid PDF is selected. The output is written beside the input as `<source>_blended.pdf`; the destination is not exposed as a home control. Theme and language controls are absent from the home screen and available in Settings.
 
 The shell is a single WPF-UI `FluentWindow` with a fixed 44 px title bar, a WPF-UI `NavigationView` in `LeftFluent` mode fixed at 74 px, and a content `Frame`. Pane expansion is disabled. Home and Configuration appear in the main navigation group; Settings appears in the footer group. The title bar and navigation rail share one shell surface (`#F3F3F3` light / `#202020` dark); the content surface uses `#F9F9F9` light / `#272727` dark, with a 12 px top-left radius. Cards use `#FDFDFD` light / `#323232` dark. Home, Configuration, and Settings share one `AppSession`; language refresh preserves the current selection. Settings also contains the collapsible About section with version, links, license, feedback, and developer information.
 
@@ -53,6 +53,6 @@ Represent empty, file selected, validating, processing, cancelling, completed, a
 
 Support keyboard access for import, selectors, settings, and the primary action. Provide accessible names for controls and meaningful focus order. Keep controls stable in size and labels from clipping across supported text lengths and Windows scaling settings. Do not block the UI thread during rendering, conversion, or file writing.
 
-## v0.5.0 Configuration Cards
+## v0.6.0 Configuration Cards
 
 The Configuration page is ordered as five fixed Home blend slots, a separator, and one merged "Blend configurations" section. The first run creates three editable cards named with the localized `Preset`/`预设` prefix. Every card shows only enabled features and provides edit, lock, delete, and drag actions; a lock disables edit and delete. Editing opens a modal editor and only enabled features reveal detail controls. Dragging onto an occupied slot replaces that slot, while dragging a configuration from one slot to another leaves its old position empty. Cards render three per row. Settings can restore missing default presets through a confirmed action without overwriting existing edits. Preferences and configurations use the roaming AppData folder named PDF Blender.

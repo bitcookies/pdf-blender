@@ -58,14 +58,7 @@ internal static class AppPreferencesStore
         Theme = Enum.IsDefined(preferences.Theme) ? preferences.Theme : ThemePreference.System,
         Language = Enum.IsDefined(preferences.Language) ? preferences.Language : UiLanguage.System,
         SelectedBlendLevel = Math.Clamp(preferences.SelectedBlendLevel, 0, 4),
-        ToastSound = preferences.ToastSound.ToLowerInvariant() switch
-        {
-            "toast-2.mp3" => "toast-2.mp3",
-            "toast-3.mp3" => "toast-3.mp3",
-            "toast-4.mp3" => "toast-4.mp3",
-            "toast-5.mp3" => "toast-5.mp3",
-            _ => "toast-1.mp3"
-        }
+        ToastSound = ToastSoundCatalog.Normalize(preferences.ToastSound)
     };
 
     public static void Save(AppPreferences preferences)

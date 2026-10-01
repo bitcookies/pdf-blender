@@ -53,7 +53,7 @@ public sealed class UiNotificationService
     {
         try
         {
-            var path = Path.Combine(AppContext.BaseDirectory, "Assets", "sounds", _session.Preferences.ToastSound);
+            var path = Path.Combine(AppContext.BaseDirectory, "Assets", "sounds", ToastSoundCatalog.Normalize(_session.Preferences.ToastSound));
             if (!File.Exists(path)) return;
             _toastPlayer.Open(new System.Uri(path));
             _toastPlayer.Play();

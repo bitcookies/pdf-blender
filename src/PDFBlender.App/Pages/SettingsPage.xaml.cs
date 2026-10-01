@@ -13,7 +13,6 @@ namespace PDFBlender.App.Pages;
 
 public partial class SettingsPage : Page
 {
-    private static readonly string[] SoundFiles = ["toast-1.mp3", "toast-2.mp3", "toast-3.mp3", "toast-4.mp3", "toast-5.mp3"];
     private readonly AppSession _session;
     private readonly DialogService _dialogs;
     private readonly UiNotificationService _notifications;
@@ -58,8 +57,8 @@ public partial class SettingsPage : Page
         BannerNotificationSoundHint.Text = UiText.Get("bannerNotificationSoundHint");
         NotificationSoundLabel.Text = UiText.Get("notificationSound");
         ToastSoundToggle.IsChecked = _session.Preferences.ToastSoundEnabled;
-        ToastSoundOptions.ItemsSource = Enumerable.Range(1, SoundFiles.Length).Select(index => UiText.Get($"sound{index}")).ToArray();
-        ToastSoundOptions.SelectedIndex = Array.FindIndex(SoundFiles, sound => string.Equals(sound, _session.Preferences.ToastSound, StringComparison.OrdinalIgnoreCase));
+        ToastSoundOptions.ItemsSource = ToastSoundCatalog.Options.Select(option => UiText.Get(option.TextKey)).ToArray();
+        ToastSoundOptions.SelectedIndex = ToastSoundCatalog.Options.ToList().FindIndex(option => string.Equals(option.FileName, _session.Preferences.ToastSound, StringComparison.OrdinalIgnoreCase));
         if (ToastSoundOptions.SelectedIndex < 0) ToastSoundOptions.SelectedIndex = 0;
         TestToastSoundButton.ToolTip = UiText.Get("testSound");
         WindowsNotificationsLabel.Text = UiText.Get("windowsNotifications");
@@ -115,8 +114,8 @@ public partial class SettingsPage : Page
 
     private void ToastSoundOptions_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (!_initializing && ToastSoundOptions.SelectedIndex >= 0 && ToastSoundOptions.SelectedIndex < SoundFiles.Length)
-            _session.ApplyPreferences(toastSound: SoundFiles[ToastSoundOptions.SelectedIndex]);
+        if (!_initializing && ToastSoundOptions.SelectedIndex >= 0 && ToastSoundOptions.SelectedIndex < ToastSoundCatalog.Options.Count)
+            _session.ApplyPreferences(toastSound: ToastSoundCatalog.Options[ToastSoundOptions.SelectedIndex].FileName);
     }
 
     private void WindowsNotificationsToggle_Click(object sender, RoutedEventArgs e)

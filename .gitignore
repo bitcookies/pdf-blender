@@ -52,3 +52,6 @@ project.assets.json
 # Operating system files
 Thumbs.db
 .DS_Store
+
+# Local OpenSpec/Codex skill installation
+/.agents/

@@ -20,6 +20,7 @@ internal sealed class AppSession
     public string? InputPath { get; private set; }
     public IReadOnlyList<string> InputPaths { get; private set; } = [];
 
+    public event EventHandler<SessionChangedEventArgs>? SessionChanged;
     public event EventHandler? Changed;
 
     public AppSession()
@@ -52,7 +53,7 @@ internal sealed class AppSession
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray();
         InputPath = InputPaths.FirstOrDefault();
-        Changed?.Invoke(this, EventArgs.Empty);
+        RaiseChanged(SessionChangeKind.InputFiles);
     }
 
     public void SetBlendLevel(int index)
@@ -64,7 +65,7 @@ internal sealed class AppSession
         _selectedConfigurationId = selected.Id;
         Preferences = Preferences with { SelectedBlendLevel = SelectedBlendLevel };
         SaveAll();
-        Changed?.Invoke(this, EventArgs.Empty);
+        RaiseChanged(SessionChangeKind.BlendSelection);
     }
 
     public string AddUserConfiguration(string? name = null, BlendSettings? settings = null)
@@ -79,7 +80,7 @@ internal sealed class AppSession
         }));
         _selectedConfigurationId = id;
         SaveAll();
-        Changed?.Invoke(this, EventArgs.Empty);
+        RaiseChanged(SessionChangeKind.Configurations);
         return id;
     }
 
@@ -90,7 +91,7 @@ internal sealed class AppSession
         if (_userConfigurations[index].IsLocked) return false;
         _userConfigurations[index] = _userConfigurations[index] with { Name = name.Trim() };
         SaveAll();
-        Changed?.Invoke(this, EventArgs.Empty);
+        RaiseChanged(SessionChangeKind.Configurations);
         return true;
     }
 
@@ -100,7 +101,7 @@ internal sealed class AppSession
         if (index < 0 || _userConfigurations[index].IsLocked) return false;
         _userConfigurations[index] = _userConfigurations[index] with { Settings = settings };
         SaveAll();
-        Changed?.Invoke(this, EventArgs.Empty);
+        RaiseChanged(SessionChangeKind.Configurations);
         return true;
     }
 
@@ -114,7 +115,7 @@ internal sealed class AppSession
             if (string.Equals(_slotIds[index], id, StringComparison.OrdinalIgnoreCase)) _slotIds[index] = null;
         if (string.Equals(_selectedConfigurationId, id, StringComparison.OrdinalIgnoreCase)) _selectedConfigurationId = SlotConfigurations.FirstOrDefault(configuration => configuration is not null)?.Id;
         SaveAll();
-        Changed?.Invoke(this, EventArgs.Empty);
+        RaiseChanged(SessionChangeKind.Configurations);
         return true;
     }
 
@@ -131,7 +132,7 @@ internal sealed class AppSession
         SelectedBlendLevel = target;
         _selectedConfigurationId = id;
         SaveAll();
-        Changed?.Invoke(this, EventArgs.Empty);
+        RaiseChanged(SessionChangeKind.Configurations);
         return true;
     }
 
@@ -142,7 +143,7 @@ internal sealed class AppSession
             if (string.Equals(_slotIds[index], id, StringComparison.OrdinalIgnoreCase)) { _slotIds[index] = null; removed = true; }
         if (!removed) return false;
         SaveAll();
-        Changed?.Invoke(this, EventArgs.Empty);
+        RaiseChanged(SessionChangeKind.Configurations);
         return true;
     }
 
@@ -152,7 +153,7 @@ internal sealed class AppSession
         if (index < 0) return false;
         _userConfigurations[index] = _userConfigurations[index] with { IsLocked = locked };
         SaveAll();
-        Changed?.Invoke(this, EventArgs.Empty);
+        RaiseChanged(SessionChangeKind.Configurations);
         return true;
     }
 
@@ -191,7 +192,7 @@ internal sealed class AppSession
         if (restorePresets == true)
             RestoreMissingPresets();
         SaveAll();
-        Changed?.Invoke(this, EventArgs.Empty);
+        RaiseChanged(SessionChangeKind.Preferences);
     }
 
     public int RestorePresetsNow()
@@ -200,7 +201,7 @@ internal sealed class AppSession
         RestoreMissingPresets();
         var added = _userConfigurations.Count - before;
         SaveAll();
-        Changed?.Invoke(this, EventArgs.Empty);
+        RaiseChanged(SessionChangeKind.Configurations);
         return added;
     }
 
@@ -258,5 +259,11 @@ internal sealed class AppSession
 
         SelectedBlendLevel = 0;
         _selectedConfigurationId = null;
+    }
+
+    private void RaiseChanged(SessionChangeKind kind)
+    {
+        SessionChanged?.Invoke(this, new SessionChangedEventArgs(kind));
+        Changed?.Invoke(this, EventArgs.Empty);
     }
 }

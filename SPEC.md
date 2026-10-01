@@ -1,6 +1,6 @@
 # PDF Blender Product Specification
 
-Status: v0.5.0 WPF-UI visual standardization baseline
+Status: v0.6.0 WPF-UI visual standardization baseline
 Product: PDF Blender  
 Slogan: `DO NOT PLAGIARIZE MY PDF.`
 
@@ -12,11 +12,11 @@ PDF Blender creates a new, ordinarily readable PDF from a source PDF while raisi
 
 - Windows desktop application, C# / .NET 10, WPF, Fluent-inspired UI.
 - Microsoft Store is the sole release channel; release packaging is MSIX. Development builds may include a portable package.
-- Current version: `0.5.0`; package version: `0.5.0.0`.
+- Current version: `0.6.0`; package version: `0.6.0.0`.
 - Microsoft Store handles updates. No custom update service is in scope.
 - Preserve the reserved Store identity: Package Identity Name `57335Bitcookies.PDFBlender`; Publisher `CN=53636128-C1AF-456C-8B82-AC0D583B730C`; Publisher display name `Bitcookies`; Store ID `9P65BNNQRGVZ`. Do not change it or hard-code a Store URL before publication.
 
-## v0.5.0 Scope
+## v0.6.0 Scope
 
 This release refines the WPF shell, reusable visual resources, page layouts, and lightweight motion. It does not add PDF protection algorithms, change output semantics, or add network services.
 
@@ -31,7 +31,7 @@ This release refines the WPF shell, reusable visual resources, page layouts, and
 
 The processing scope below remains the v0.1.0 MVP behavior carried forward unchanged.
 
-The first usable release targets one input PDF per operation and includes:
+The first usable release accepts one or more input PDFs per operation and includes:
 
 - Browse and drag/drop import, input summary, and automatic output name `<source>_blended.pdf` beside the source without overwriting it.
 - Local PDF rendering and reconstruction, with progress, cancellation, understandable errors, and temporary-file cleanup.
@@ -69,7 +69,7 @@ Modes express processing presets, not security levels. The user can turn individ
 
 ## Configuration and Settings
 
-Configuration contains Format, Protection, Watermark, and Image controls for the selected level. Settings contains only theme and language. The home screen exposes only import, Blend Mode, Configuration shortcut, and the primary Blend action.
+Configuration contains Format, Protection, Watermark, and Image controls for the selected level. Settings contains appearance, language, notification, storage/runtime, and restore-preset controls. The home screen exposes only import, Blend Mode, Configuration shortcut, and the primary Blend action.
 
 Primary protection methods are mutually exclusive: None, Flatten, Text Scrambling, or PDF Permission Restriction. v0.1.0 implements Flatten only. Watermarks and image processing can compose with the selected primary method.
 
@@ -90,7 +90,7 @@ Do not block v0.1.0 on Text Scrambling, PDF permission restrictions, keyed/dynam
 
 Cloud processing, accounts, DRM, guaranteed copy prevention, custom update checks, and advanced experimental protection features are not part of the initial release.
 
-## v0.5.0 Configuration Presets
+## v0.6.0 Configuration Presets
 
 Configuration is organized as cards. The page shows five Home blend slots first, a separator, then one merged `Blend configurations` section. On first use the application seeds three editable configurations named with the localized `Preset`/`预设` prefix. Users can create, rename, edit, lock, unlock, and delete any configuration. A locked configuration cannot be edited or deleted. Settings provides a confirmation action that adds missing default preset IDs without replacing existing edits.
 

@@ -1,8 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateRange(0, 2)]
-    [int]$Mode = 0,
+    [int]$Mode = -1,
 
     [switch]$Force
 )
@@ -11,7 +10,6 @@ $ErrorActionPreference = 'Stop'
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
 
 $root = $PSScriptRoot
-$solution = Join-Path $root 'PDFBlender.slnx'
 $appProject = Join-Path $root 'src/PDFBlender.App/PDFBlender.App.csproj'
 $publishRoot = Join-Path $root 'publish'
 $portableOutput = Join-Path $publishRoot 'portable'
@@ -54,14 +52,22 @@ function Invoke-Dotnet([string[]]$Arguments, [int]$FailureCode) {
     }
 }
 
-if ($Mode -eq 0) {
+if ($Mode -eq -1) {
     Show-Menu
     $selection = Read-Host 'Choose an action number'
-    if (-not [int]::TryParse($selection, [ref]$Mode) -or $Mode -notin 1..2) {
-        if ($selection -eq '0') { exit 0 }
+    if (-not [int]::TryParse($selection, [ref]$Mode)) {
         Write-Host 'Invalid action. Choose 1, 2, or 0.' -ForegroundColor Red
         exit 2
     }
+}
+
+if ($Mode -notin 0, 1, 2) {
+    Write-Host 'Invalid action. Choose 1, 2, or 0.' -ForegroundColor Red
+    exit 2
+}
+
+if ($Mode -eq 0) {
+    exit 0
 }
 
 switch ($Mode) {

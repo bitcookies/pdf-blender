@@ -1,7 +1,6 @@
 using Microsoft.Win32;
 using PDFBlender.Core.Models;
 using PDFBlender.Core.Processing;
-using PDFBlender.Pdf;
 using System.IO;
 using System.Windows;
 using System.Windows.Automation;
@@ -16,7 +15,7 @@ public partial class HomePage : Page
     private readonly AppSession _session;
     private readonly UiNotificationService _notifications;
     private readonly Action _openConfiguration;
-    private readonly IBlendProcessor _processor = new PdfBlendProcessor();
+    private readonly BlendWorkflowService _workflow = new();
     private bool _initializing;
     private CancellationTokenSource? _processingCts;
     private CancellationTokenSource? _previewCts;
@@ -121,24 +120,17 @@ public partial class HomePage : Page
         _processingCts = new CancellationTokenSource();
         SetProcessingState(true);
         var progressNotification = _notifications.Show(UiNotificationKind.Progress, UiText.Get("blend"), UiText.Get("processing"), autoDismiss: false);
-        var completedFiles = 0;
-        var progress = new Progress<BlendProgress>(value =>
+        var progress = new Progress<BlendBatchProgress>(value =>
         {
-            var overall = (completedFiles + value.Fraction) / inputPaths.Length;
+            var overall = value.Fraction;
             ProcessingProgress.Value = overall * 100;
             StatusText.Text = UiText.Get("processing");
             _notifications.UpdateProgress(progressNotification, StatusText.Text, overall);
         });
         try
         {
-            var outputNames = new List<string>();
-            foreach (var inputPath in inputPaths)
-            {
-                var outputPath = Path.Combine(Path.GetDirectoryName(inputPath) ?? string.Empty, $"{Path.GetFileNameWithoutExtension(inputPath)}_blended.pdf");
-                var result = await _processor.ProcessAsync(new BlendRequest(inputPath, outputPath, _session.Settings), progress, _processingCts.Token);
-                outputNames.Add(Path.GetFileName(result.OutputPath));
-                completedFiles++;
-            }
+            var results = await _workflow.BlendAsync(inputPaths, _session.Settings, progress, _processingCts.Token);
+            var outputNames = results.Select(result => Path.GetFileName(result.OutputPath)).ToArray();
             StatusText.Text = UiText.Get("completed");
             _notifications.Dismiss(progressNotification);
             _notifications.Show(UiNotificationKind.Success, UiText.Get("completed"), string.Join(", ", outputNames));

@@ -10,14 +10,14 @@ namespace PDFBlender.App;
 public partial class App : Application
 {
     private const string SingleInstanceMutexName = "PDFBlender.SingleInstance.CurrentUser";
-    private Mutex? _singleInstanceMutex;
+    private readonly SingleInstanceGuard _singleInstance = new(SingleInstanceMutexName);
 
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
 
         var preferences = AppPreferencesStore.Load();
-        if (!preferences.AllowMultipleInstances && !TryAcquireSingleInstanceMutex())
+        if (!preferences.AllowMultipleInstances && !_singleInstance.TryAcquire())
         {
             Shutdown();
             return;
@@ -30,45 +30,8 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
-        ReleaseSingleInstanceMutex();
+        _singleInstance.Dispose();
         base.OnExit(e);
-    }
-
-    private bool TryAcquireSingleInstanceMutex()
-    {
-        if (_singleInstanceMutex is not null)
-            return true;
-
-        try
-        {
-            var mutex = new Mutex(true, SingleInstanceMutexName, out var createdNew);
-            if (!createdNew)
-            {
-                mutex.Dispose();
-                return false;
-            }
-
-            _singleInstanceMutex = mutex;
-            return true;
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return false;
-        }
-    }
-
-    private void ReleaseSingleInstanceMutex()
-    {
-        if (_singleInstanceMutex is null)
-            return;
-
-        try { _singleInstanceMutex.ReleaseMutex(); }
-        catch (ApplicationException) { }
-        finally
-        {
-            _singleInstanceMutex.Dispose();
-            _singleInstanceMutex = null;
-        }
     }
 }
 
