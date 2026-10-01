@@ -31,7 +31,7 @@ The main window is 820×600 with a 760×540 minimum. It uses WPF-UI `NavigationV
 
 ## Settings and Preferences
 
-Settings contains software preferences: System/Light/Dark, System/English/Simplified Chinese, and a Restore presets button with confirmation. Theme and language changes apply immediately. Configuration cards own their feature values. Preferences and configurations are stored under the roaming AppData folder named PDF Blender; malformed or out-of-range values fall back to safe defaults.
+Settings contains software preferences: System/Light/Dark, System/English/Simplified Chinese, an Allow multiple instances toggle (off by default), and a Restore presets button with confirmation. Theme, language, and instance policy changes apply immediately. When multiple instances are disabled, startup uses a per-user mutex to keep one running window. Configuration cards own their feature values. Preferences and configurations are stored under the roaming AppData folder named PDF Blender; malformed or out-of-range values fall back to safe defaults.
 
 The initial presets are `STIR`, `BLEND`, and `PULSE`. `CRUSH` and `OVERBLEND` remain future/experimental until their quality and behavior are validated. Users can independently toggle supported options, and manual edits turn the selected preset into a modified/custom configuration.
 

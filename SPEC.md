@@ -21,7 +21,7 @@ PDF Blender creates a new, ordinarily readable PDF from a source PDF while raisi
 This release refines the WPF shell, reusable visual resources, page layouts, and lightweight motion. It does not add PDF protection algorithms, change output semantics, or add network services.
 
 - Compact single-window home layout at `820×600`, with a `760×540` minimum and a compact icon-and-label navigation rail.
-- Settings-only theme and language controls, supporting System/Light/Dark and System/English/简体中文, plus a confirmed one-shot Restore presets button.
+- Settings-only software controls, supporting System/Light/Dark and System/English/简体中文, an Allow multiple instances toggle disabled by default, plus a confirmed one-shot Restore presets button.
 - A snapped, keyboard-accessible Blend level rail showing the validated `STIR`, `BLEND`, and `PULSE` presets.
 - Local preferences and configuration cards at the roaming AppData folder named PDF Blender, with safe defaults for malformed values.
 - Logo-derived multi-size `logo.ico` used by the WPF window and executable.

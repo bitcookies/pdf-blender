@@ -174,14 +174,15 @@ internal sealed class AppSession
         catch (UnauthorizedAccessException) { }
     }
 
-    public void ApplyPreferences(ThemePreference? theme = null, UiLanguage? language = null, bool? restorePresets = null, bool? toastSoundEnabled = null)
+    public void ApplyPreferences(ThemePreference? theme = null, UiLanguage? language = null, bool? restorePresets = null, bool? toastSoundEnabled = null, bool? allowMultipleInstances = null)
     {
         Preferences = Preferences with
         {
             Theme = theme ?? Preferences.Theme,
             Language = language ?? Preferences.Language,
             RestorePresets = restorePresets ?? Preferences.RestorePresets,
-            ToastSoundEnabled = toastSoundEnabled ?? Preferences.ToastSoundEnabled
+            ToastSoundEnabled = toastSoundEnabled ?? Preferences.ToastSoundEnabled,
+            AllowMultipleInstances = allowMultipleInstances ?? Preferences.AllowMultipleInstances
         };
         UiText.SetLanguage(Preferences.Language);
         if (restorePresets == true)

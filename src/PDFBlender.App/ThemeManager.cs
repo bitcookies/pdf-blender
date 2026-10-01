@@ -41,6 +41,7 @@ internal static class ThemeManager
             SetBrush(resources, "AccentBrush", "#C9021E");
             SetBrush(resources, "AccentDarkBrush", "#E45F60");
             SetBrush(resources, "AccentSoftBrush", "#35C9021E");
+            SetToggleSwitchPalette(resources, "#C9021E", "#A80119", "#980018", "#7A333D");
             SetBrush(resources, "NavHoverBrush", "#18FFFFFF");
             SetBrush(resources, "NavSelectedBrush", "#2D2D2D");
             SetBrush(resources, "NavTextBrush", "#9A9A9A");
@@ -79,6 +80,7 @@ internal static class ThemeManager
             SetBrush(resources, "AccentBrush", "#C9021E");
             SetBrush(resources, "AccentDarkBrush", "#E45F60");
             SetBrush(resources, "AccentSoftBrush", "#25C9021E");
+            SetToggleSwitchPalette(resources, "#C9021E", "#A80119", "#980018", "#E6B4BA");
             SetBrush(resources, "NavHoverBrush", "#0F000000");
             SetBrush(resources, "NavSelectedBrush", "#EAEAEA");
             SetBrush(resources, "NavTextBrush", "#868686");
@@ -104,6 +106,22 @@ internal static class ThemeManager
     private static void SetBrush(ResourceDictionary resources, string key, string hex)
     {
         resources[key] = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex)!);
+    }
+
+    private static void SetToggleSwitchPalette(ResourceDictionary resources, string normal, string pointerOver, string pressed, string disabled)
+    {
+        SetBrush(resources, "ToggleSwitchFillOn", normal);
+        SetBrush(resources, "ToggleSwitchFillOnPointerOver", pointerOver);
+        SetBrush(resources, "ToggleSwitchFillOnPressed", pressed);
+        SetBrush(resources, "ToggleSwitchFillOnDisabled", disabled);
+        SetBrush(resources, "ToggleSwitchStrokeOn", normal);
+        SetBrush(resources, "ToggleSwitchStrokeOnPointerOver", pointerOver);
+        SetBrush(resources, "ToggleSwitchStrokeOnPressed", pressed);
+        SetBrush(resources, "ToggleSwitchStrokeOnDisabled", disabled);
+        SetBrush(resources, "ToggleSwitchKnobFillOn", "#FFFFFF");
+        SetBrush(resources, "ToggleSwitchKnobFillOnPointerOver", "#FFFFFF");
+        SetBrush(resources, "ToggleSwitchKnobFillOnPressed", "#FFFFFF");
+        SetBrush(resources, "ToggleSwitchKnobFillOnDisabled", "#F7F7F7");
     }
 
 }

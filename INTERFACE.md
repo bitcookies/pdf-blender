@@ -31,11 +31,11 @@ The shell is a single WPF-UI `FluentWindow` with a fixed 44 px title bar, a WPF-
 
 ## Configuration and Settings
 
-Configuration exposes Format, Protection, Watermark, and Image controls for the selected blend level, arranged as WPF-UI cards and controls. Settings exposes only Appearance (theme and language) plus a WPF-UI Restore presets button and confirmation dialog. Only implemented controls should appear as active settings. Future features may be documented elsewhere but must not be presented as working toggles.
+Configuration exposes Format, Protection, Watermark, and Image controls for the selected blend level, arranged as WPF-UI cards and controls. Settings exposes Appearance (theme and language), a Storage and runtime Allow multiple instances toggle (off by default), plus a WPF-UI Restore presets button and confirmation dialog. Only implemented controls should appear as active settings. Future features may be documented elsewhere but must not be presented as working toggles.
 
 The shell uses WPF-UI `NavigationView` item selection with a scoped project template for four-corner hover/active surfaces, a coral selection indicator, and localized accessible item names/tooltips. The pane remains fixed and cannot be expanded. Selection changes are handled through one `SelectionChanged` entry point; page instances remain cached. The application palette is derived from the PDF Blender logo. Processing notifications appear in a right-aligned notification host; confirmations use `ContentDialogHost` and `ContentDialog`.
 
-Preferences and configurations are stored under the roaming AppData folder named PDF Blender. Theme, language, and selected slot restore across restarts; Restore presets is a one-shot command and is not persisted as a UI toggle. A malformed file is ignored and replaced by safe defaults.
+Preferences and configurations are stored under the roaming AppData folder named PDF Blender. Theme, language, selected slot, and the multiple-instance policy restore across restarts; the policy defaults to single-instance. When disabled, startup acquires a per-user named mutex. Restore presets is a one-shot command and is not persisted as a UI toggle. A malformed file is ignored and replaced by safe defaults.
 
 - Format: Normalize Content Width toggle and configurable target width in millimeters. Clarify that it scales content proportionally rather than converting pages to A4 or equal heights.
 - Protection: mutually exclusive method selector. The current MVP enables Flatten; future methods must be visibly unavailable or absent.

@@ -95,6 +95,17 @@
             </Border>
             <Border Style="{StaticResource SettingsCardStyle}">
                 <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <ui:SymbolIcon Symbol="WindowMultiple20" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,14,0">
+                        <TextBlock x:Name="AllowMultipleInstancesLabel" Style="{StaticResource CardTitleTextStyle}" />
+                        <TextBlock x:Name="AllowMultipleInstancesHint" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <ui:ToggleSwitch x:Name="AllowMultipleInstancesToggle" Grid.Column="2" VerticalAlignment="Center" Click="AllowMultipleInstancesToggle_Click" />
+                </Grid>
+            </Border>
+            <Border Style="{StaticResource SettingsCardStyle}">
+                <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
                     <ui:SymbolIcon Symbol="ArrowSync24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
                     <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="RestorePresetsLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="RestorePresetsHint" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" /></StackPanel>

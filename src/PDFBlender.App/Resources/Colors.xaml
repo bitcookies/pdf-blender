@@ -18,6 +18,18 @@
     <SolidColorBrush x:Key="AccentDarkBrush" Color="#E45F60" />
     <SolidColorBrush x:Key="AccentSoftBrush" Color="#25C9021E" />
     <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOn" Color="#C9021E" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOnPointerOver" Color="#A80119" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOnPressed" Color="#980018" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOnDisabled" Color="#E6B4BA" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOn" Color="#C9021E" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOnPointerOver" Color="#A80119" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOnPressed" Color="#980018" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOnDisabled" Color="#E6B4BA" />
+    <SolidColorBrush x:Key="ToggleSwitchKnobFillOn" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ToggleSwitchKnobFillOnPointerOver" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ToggleSwitchKnobFillOnPressed" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ToggleSwitchKnobFillOnDisabled" Color="#F7F7F7" />
     <SolidColorBrush x:Key="NavHoverBrush" Color="#0F000000" />
     <SolidColorBrush x:Key="NavSelectedBrush" Color="#EAEAEA" />
     <SolidColorBrush x:Key="NavTextBrush" Color="#868686" />

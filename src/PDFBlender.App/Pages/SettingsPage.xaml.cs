@@ -42,6 +42,9 @@ public partial class SettingsPage : Page
         SettingsFileLabel.Text = UiText.Get("settingsFile");
         SettingsFilePath.Text = AppPreferencesStore.FilePath;
         OpenFolderButtonText.Text = UiText.Get("openFolder");
+        AllowMultipleInstancesLabel.Text = UiText.Get("allowMultipleInstances");
+        AllowMultipleInstancesHint.Text = UiText.Get("allowMultipleInstancesHint");
+        AllowMultipleInstancesToggle.IsChecked = _session.Preferences.AllowMultipleInstances;
         ToastSoundLabel.Text = UiText.Get("toastSound");
         ToastSoundHint.Text = UiText.Get("toastSoundHint");
         ToastSoundToggle.IsChecked = _session.Preferences.ToastSoundEnabled;
@@ -78,6 +81,12 @@ public partial class SettingsPage : Page
     {
         if (!_initializing)
             _session.ApplyPreferences(toastSoundEnabled: ToastSoundToggle.IsChecked == true);
+    }
+
+    private void AllowMultipleInstancesToggle_Click(object sender, RoutedEventArgs e)
+    {
+        if (!_initializing)
+            _session.ApplyPreferences(allowMultipleInstances: AllowMultipleInstancesToggle.IsChecked == true);
     }
 
     private void OpenFolderButton_Click(object sender, RoutedEventArgs e)

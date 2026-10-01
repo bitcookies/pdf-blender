@@ -16,7 +16,8 @@ public sealed record AppPreferences(
     UiLanguage Language = UiLanguage.System,
     int SelectedBlendLevel = 1,
     bool RestorePresets = false,
-    bool ToastSoundEnabled = true);
+    bool ToastSoundEnabled = true,
+    bool AllowMultipleInstances = false);
 
 internal static class AppPreferencesStore
 {
