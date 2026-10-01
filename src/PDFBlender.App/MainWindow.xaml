@@ -64,9 +64,6 @@
                     </ui:NavigationViewItem>
                 </ui:NavigationView.MenuItems>
                 <ui:NavigationView.FooterMenuItems>
-                    <ui:NavigationViewItem x:Name="AboutNavigationItem" Content="About" Tag="about" Style="{StaticResource BlenderNavigationItemStyle}" Click="NavigationItem_Click" Loaded="NavigationItem_Loaded" SizeChanged="NavigationItem_SizeChanged" Focusable="True" KeyboardNavigation.IsTabStop="True" AutomationProperties.Name="About">
-                        <ui:NavigationViewItem.Icon><ui:SymbolIcon Symbol="Info24" FontSize="24" /></ui:NavigationViewItem.Icon>
-                    </ui:NavigationViewItem>
                     <ui:NavigationViewItem x:Name="SettingsNavigationItem" Content="Settings" Tag="settings" Style="{StaticResource BlenderNavigationItemStyle}" Click="NavigationItem_Click" Loaded="NavigationItem_Loaded" SizeChanged="NavigationItem_SizeChanged" Focusable="True" KeyboardNavigation.IsTabStop="True" AutomationProperties.Name="Settings">
                         <ui:NavigationViewItem.Icon><ui:SymbolIcon Symbol="Settings24" FontSize="24" /></ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>

@@ -1,18 +1,6 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
-    <Style x:Key="PrimaryActionButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
-        <Setter Property="Appearance" Value="Primary" />
-        <Setter Property="Padding" Value="16,9" />
-        <Setter Property="MinWidth" Value="136" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-    </Style>
-    <Style x:Key="SecondaryActionButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
-        <Setter Property="Appearance" Value="Secondary" />
-        <Setter Property="Padding" Value="13,8" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-    </Style>
     <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
     </Style>

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using Wpf.Ui.Controls;
@@ -31,6 +32,7 @@ public partial class SettingsPage : Page
         AppearanceHeader.Text = UiText.Get("appearanceAndLanguage");
         StorageHeader.Text = UiText.Get("storageAndRuntime");
         SoundHeader.Text = UiText.Get("soundAndNotifications");
+        AboutHeader.Text = UiText.Get("about");
         ThemeLabel.Text = UiText.Get("theme");
         ThemeHint.Text = UiText.Get("themeHint");
         LanguageLabel.Text = UiText.Get("language");
@@ -48,6 +50,13 @@ public partial class SettingsPage : Page
         ThemeOptions.SelectedIndex = (int)_session.Preferences.Theme;
         LanguageOptions.SelectedIndex = (int)_session.Preferences.Language;
         RestorePresetsButtonText.Text = UiText.Get("restore");
+        AboutProductName.Text = UiText.Get("appName");
+        AboutCopyrightText.Text = UiText.Get("aboutCopyright");
+        AboutVersionText.Text = $"v{GetApplicationVersion()}";
+        AboutGithubLabel.Text = UiText.Get("aboutGithub");
+        AboutLicenseLabel.Text = UiText.Get("aboutLicense");
+        AboutFeedbackLabel.Text = UiText.Get("aboutFeedback");
+        AboutDeveloperLabel.Text = UiText.Get("aboutDeveloper");
         _initializing = false;
     }
 
@@ -98,4 +107,20 @@ public partial class SettingsPage : Page
             UiText.Get("restorePresets"),
             added > 0 ? string.Format(UiText.Get("restorePresetsSuccess"), added) : UiText.Get("restorePresetsNone"));
     }
+
+    private void AboutSummaryButton_Click(object sender, RoutedEventArgs e)
+    {
+        var expanded = AboutDetails.Visibility == Visibility.Visible;
+        AboutDetails.Visibility = expanded ? Visibility.Collapsed : Visibility.Visible;
+        AboutExpandIcon.Symbol = expanded ? SymbolRegular.ChevronDown24 : SymbolRegular.ChevronUp24;
+    }
+
+    private void AboutLinkButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: string url } && Uri.TryCreate(url, UriKind.Absolute, out _))
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+    }
+
+    private static string GetApplicationVersion() =>
+        (Assembly.GetEntryAssembly()?.GetName().Version ?? new Version(0, 5, 0, 0)).ToString(4);
 }

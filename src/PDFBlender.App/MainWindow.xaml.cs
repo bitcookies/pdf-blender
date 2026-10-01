@@ -18,7 +18,6 @@ public partial class MainWindow : FluentWindow
     private HomePage? _homePage;
     private ConfigurationPage? _configurationPage;
     private SettingsPage? _settingsPage;
-    private AboutPage? _aboutPage;
     private string _currentPage = "home";
 
     public MainWindow()
@@ -161,7 +160,6 @@ public partial class MainWindow : FluentWindow
         {
             "configuration" => _configurationPage ??= new ConfigurationPage(_session, _dialogs),
             "settings" => _settingsPage ??= new SettingsPage(_session, _dialogs, _notifications),
-            "about" => _aboutPage ??= new AboutPage(),
             _ => _homePage ??= new HomePage(_session, _notifications, () => NavigateTo("configuration"))
         };
         if (synchronizeSelection)
@@ -177,7 +175,6 @@ public partial class MainWindow : FluentWindow
         _homePage?.RefreshFromSession();
         _configurationPage?.RefreshFromSession();
         _settingsPage?.RefreshFromSession();
-        _aboutPage?.RefreshLanguage();
     }
 
     private void ApplyLanguage()
@@ -186,7 +183,6 @@ public partial class MainWindow : FluentWindow
         HomeNavigationItem.Content = UiText.Get("home");
         ConfigurationNavigationItem.Content = UiText.Get("configuration");
         SettingsNavigationItem.Content = UiText.Get("settings");
-        AboutNavigationItem.Content = UiText.Get("about");
         ShellTitleBar.Title = "PDF Blender";
     }
 

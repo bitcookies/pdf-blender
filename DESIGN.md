@@ -23,7 +23,7 @@ Use small translucent surfaces only where they improve hierarchy. Do not rely on
 
 ## Home Layout
 
-The main window is 820×600 with a 760×540 minimum. It uses WPF-UI `NavigationView` in `LeftFluent` mode, fixed to a 74 px rail with no pane expansion. Home and Configuration occupy the main group; About and Settings occupy the footer group. The title bar and rail share a shell surface (`#F3F3F3` light, `#202020` dark); the content surface uses `#F9F9F9` light / `#272727` dark and has a 12 px top-left radius with square remaining corners. Cards use `#FDFDFD` light / `#323232` dark. Home contains a bordered drag-and-drop surface with selected-file summary, the three-level Blend rail, a Configuration shortcut, and a bottom action row with progress and Cancel. The home screen does not expose profile, output, theme, or language controls.
+The main window is 820×600 with a 760×540 minimum. It uses WPF-UI `NavigationView` in `LeftFluent` mode, fixed to a 74 px rail with no pane expansion. Home and Configuration occupy the main group; Settings occupies the footer group. The title bar and rail share a shell surface (`#F3F3F3` light, `#202020` dark); the content surface uses `#F9F9F9` light / `#272727` dark and has a 12 px top-left radius with square remaining corners. Cards use `#FDFDFD` light / `#323232` dark. Home contains a bordered drag-and-drop surface with selected-file summary, the three-level Blend rail, a Configuration shortcut, and a bottom action row with progress and Cancel. The home screen does not expose profile, output, theme, or language controls.
 
 ## Blend Level Rail
 
@@ -51,7 +51,7 @@ Normalize Content Width makes visual content the selected width and derives its 
 
 The first protection path is flattening: render each page and reconstruct it as raster content, then apply supported image operations and watermarks before writing the output PDF. DPI and pixel noise must stay within tested readability limits. Processing is local, asynchronous, cancellable, reports progress, and removes temporary files on every exit path. The source file is not overwritten by default.
 
-The first implementation uses `PDFtoImage` 5.4.0 with PDFium and SkiaSharp in the isolated `PDFBlender.Pdf` project. The dependency targets .NET 10, renders locally, and is published with the Windows native assets for portable builds. The About page presents the current dependency versions, licenses, and upstream links inline; real-document quality validation remains a release gate. `PDF-Poisoning/` may inform research but is external reference material, not an implementation dependency.
+The first implementation uses `PDFtoImage` 5.4.0 with PDFium and SkiaSharp in the isolated `PDFBlender.Pdf` project. The dependency targets .NET 10, renders locally, and is published with the Windows native assets for portable builds. Settings contains the collapsible About section with product version, links, license, feedback, and developer information; real-document quality validation remains a release gate. `PDF-Poisoning/` may inform research but is external reference material, not an implementation dependency.
 
 ## Deferred Direction
 

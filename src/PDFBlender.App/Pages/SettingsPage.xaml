@@ -13,6 +13,20 @@
             <Setter Property="CornerRadius" Value="8" />
             <Setter Property="VerticalAlignment" Value="Top" />
         </Style>
+        <Style x:Key="AboutRowLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="AboutRowValueStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}" />
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
     </Page.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="24,20,24,24" MaxWidth="760">
@@ -69,6 +83,73 @@
                     </StackPanel>
                     <ui:ToggleSwitch x:Name="ToastSoundToggle" Grid.Column="2" VerticalAlignment="Center" Click="ToastSoundToggle_Click" />
                 </Grid>
+            </Border>
+            <TextBlock x:Name="AboutHeader" Style="{StaticResource SectionTitleTextStyle}" Margin="0,20,0,8" />
+            <Border Padding="0" Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
+                <StackPanel>
+                    <ui:Button x:Name="AboutSummaryButton" Appearance="Transparent" Padding="12,8" MinHeight="76"
+                               HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch"
+                               CornerRadius="8" Cursor="Hand" Click="AboutSummaryButton_Click"
+                               AutomationProperties.Name="About">
+                        <Grid Margin="0,0,20,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="56" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="40" />
+                            </Grid.ColumnDefinitions>
+                            <Image Grid.Column="0" Width="48" Height="48" Source="/PDFBlender.App;component/Assets/logo.png" Stretch="Uniform" VerticalAlignment="Center" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,12,0">
+                                <TextBlock x:Name="AboutProductName" Style="{StaticResource CardTitleTextStyle}" />
+                                <TextBlock x:Name="AboutCopyrightText" Style="{StaticResource SmallMutedTextStyle}" Margin="0,3,0,0" />
+                            </StackPanel>
+                            <TextBlock x:Name="AboutVersionText" Grid.Column="2" VerticalAlignment="Center" Foreground="{DynamicResource MutedTextBrush}" FontSize="13" Margin="0,0,8,0" />
+                            <ui:SymbolIcon x:Name="AboutExpandIcon" Grid.Column="3" Symbol="ChevronDown24" FontSize="18" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                        </Grid>
+                    </ui:Button>
+                    <Border x:Name="AboutDetails" Visibility="Collapsed">
+                        <StackPanel>
+                            <Grid MinHeight="46" Margin="16,0">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <TextBlock x:Name="AboutGithubLabel" Style="{StaticResource AboutRowLabelStyle}" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="github.com/bitcookies/pdf-blender" Style="{StaticResource AboutRowValueStyle}" />
+                                    <ui:Button Tag="https://github.com/bitcookies/pdf-blender" Appearance="Transparent" Background="{DynamicResource SurfaceMutedBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Cursor="Hand" Click="AboutLinkButton_Click" Width="32" Height="32" Padding="4" Margin="8,0,0,0" CornerRadius="8" ToolTip="Open link" AutomationProperties.Name="Open GitHub project">
+                                        <ui:SymbolIcon Symbol="Open24" FontSize="15" />
+                                    </ui:Button>
+                                </StackPanel>
+                            </Grid>
+                            <Border Height="1" Background="{DynamicResource BorderBrush}" />
+                            <Grid MinHeight="46" Margin="16,0">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <TextBlock x:Name="AboutLicenseLabel" Style="{StaticResource AboutRowLabelStyle}" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="GNU General Public License v3.0" Style="{StaticResource AboutRowValueStyle}" />
+                                    <ui:Button Tag="https://github.com/bitcookies/pdf-blender/blob/main/LICENSE" Appearance="Transparent" Background="{DynamicResource SurfaceMutedBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Cursor="Hand" Click="AboutLinkButton_Click" Width="32" Height="32" Padding="4" Margin="8,0,0,0" CornerRadius="8" ToolTip="Open license" AutomationProperties.Name="Open license">
+                                        <ui:SymbolIcon Symbol="Open24" FontSize="15" />
+                                    </ui:Button>
+                                </StackPanel>
+                            </Grid>
+                            <Border Height="1" Background="{DynamicResource BorderBrush}" />
+                            <Grid MinHeight="46" Margin="16,0">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <TextBlock x:Name="AboutFeedbackLabel" Style="{StaticResource AboutRowLabelStyle}" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="GitHub Issues" Style="{StaticResource AboutRowValueStyle}" />
+                                    <ui:Button Tag="https://github.com/bitcookies/pdf-blender/issues" Appearance="Transparent" Background="{DynamicResource SurfaceMutedBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Cursor="Hand" Click="AboutLinkButton_Click" Width="32" Height="32" Padding="4" Margin="8,0,0,0" CornerRadius="8" ToolTip="Open issues" AutomationProperties.Name="Open GitHub issues">
+                                        <ui:SymbolIcon Symbol="Open24" FontSize="15" />
+                                    </ui:Button>
+                                </StackPanel>
+                            </Grid>
+                            <Border Height="1" Background="{DynamicResource BorderBrush}" />
+                            <Grid MinHeight="50" Margin="16,0">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <TextBlock x:Name="AboutDeveloperLabel" Style="{StaticResource AboutRowLabelStyle}" />
+                                <Image Grid.Column="1" Source="/PDFBlender.App;component/Assets/bitcookies-words.png" Width="100" Height="28" Stretch="Uniform" Opacity="0.88" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
             </Border>
         </StackPanel>
     </ScrollViewer>
