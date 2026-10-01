@@ -27,6 +27,36 @@
             <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
+        <Style x:Key="AboutSummaryButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+            <Setter Property="Appearance" Value="Transparent" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ui:Button">
+                        <Border x:Name="SummarySurface"
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}"
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                ClipToBounds="True">
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SummarySurface" Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="SummarySurface" Property="Background" Value="{DynamicResource SurfaceRaisedBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Page.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="24,20,24,24" MaxWidth="760">
@@ -85,11 +115,12 @@
                 </Grid>
             </Border>
             <TextBlock x:Name="AboutHeader" Style="{StaticResource SectionTitleTextStyle}" Margin="0,20,0,8" />
-            <Border Padding="0" Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
+            <Border Padding="0" Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="14" ClipToBounds="True">
                 <StackPanel>
-                    <ui:Button x:Name="AboutSummaryButton" Appearance="Transparent" Padding="12,8" MinHeight="76"
+                    <ui:Button x:Name="AboutSummaryButton" Style="{StaticResource AboutSummaryButtonStyle}" Padding="12,8" MinHeight="76"
+                               Margin="1,1,1,0"
                                HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch"
-                               CornerRadius="8" Cursor="Hand" Click="AboutSummaryButton_Click"
+                               CornerRadius="13" Cursor="Hand" Click="AboutSummaryButton_Click"
                                AutomationProperties.Name="About">
                         <Grid Margin="0,0,20,0">
                             <Grid.ColumnDefinitions>
@@ -104,10 +135,14 @@
                                 <TextBlock x:Name="AboutCopyrightText" Style="{StaticResource SmallMutedTextStyle}" Margin="0,3,0,0" />
                             </StackPanel>
                             <TextBlock x:Name="AboutVersionText" Grid.Column="2" VerticalAlignment="Center" Foreground="{DynamicResource MutedTextBrush}" FontSize="13" Margin="0,0,8,0" />
-                            <ui:SymbolIcon x:Name="AboutExpandIcon" Grid.Column="3" Symbol="ChevronDown24" FontSize="18" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                            <ui:SymbolIcon x:Name="AboutExpandIcon" Grid.Column="3" Symbol="ChevronDown24" FontSize="18" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                <ui:SymbolIcon.RenderTransform>
+                                    <RotateTransform Angle="0" />
+                                </ui:SymbolIcon.RenderTransform>
+                            </ui:SymbolIcon>
                         </Grid>
                     </ui:Button>
-                    <Border x:Name="AboutDetails" Visibility="Collapsed">
+                    <Border x:Name="AboutDetails" Margin="1,0,1,1" Visibility="Collapsed">
                         <StackPanel>
                             <Grid MinHeight="46" Margin="16,0">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>

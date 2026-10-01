@@ -3,8 +3,10 @@
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Cursor" Value="Hand" />
     </Style>
     <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Cursor" Value="Hand" />
     </Style>
 </ResourceDictionary>

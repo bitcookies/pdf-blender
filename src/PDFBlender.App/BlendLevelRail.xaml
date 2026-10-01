@@ -135,6 +135,7 @@
                      IsHitTestVisible="False"
                      SizeChanged="RailPanel_SizeChanged" />
         <Slider x:Name="LevelSlider"
+                Cursor="Hand"
                 Grid.Row="3"
                 Grid.Column="0"
                 Style="{StaticResource BlendSliderStyle}"

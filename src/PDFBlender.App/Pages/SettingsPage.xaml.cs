@@ -3,6 +3,8 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 using Wpf.Ui.Controls;
 
 namespace PDFBlender.App.Pages;
@@ -112,7 +114,16 @@ public partial class SettingsPage : Page
     {
         var expanded = AboutDetails.Visibility == Visibility.Visible;
         AboutDetails.Visibility = expanded ? Visibility.Collapsed : Visibility.Visible;
-        AboutExpandIcon.Symbol = expanded ? SymbolRegular.ChevronDown24 : SymbolRegular.ChevronUp24;
+        if (AboutExpandIcon.RenderTransform is RotateTransform rotate)
+        {
+            var animation = new DoubleAnimation
+            {
+                To = expanded ? 0 : 180,
+                Duration = TimeSpan.FromMilliseconds(180),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            };
+            rotate.BeginAnimation(RotateTransform.AngleProperty, animation);
+        }
     }
 
     private void AboutLinkButton_Click(object sender, RoutedEventArgs e)
