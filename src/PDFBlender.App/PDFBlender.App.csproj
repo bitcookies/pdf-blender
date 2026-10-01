@@ -35,6 +35,8 @@
     <Content Include="..\..\assets\sounds\toast-3.mp3" Link="Assets\sounds\toast-3.mp3" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="..\..\assets\sounds\toast-4.mp3" Link="Assets\sounds\toast-4.mp3" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="..\..\assets\sounds\toast-5.mp3" Link="Assets\sounds\toast-5.mp3" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\assets\sounds\toast-6.mp3" Link="Assets\sounds\toast-6.mp3" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\assets\sounds\toast-7.mp3" Link="Assets\sounds\toast-7.mp3" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

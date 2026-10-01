@@ -10,7 +10,9 @@ internal static class ToastSoundCatalog
         new("toast-2.mp3", "sound2"),
         new("toast-3.mp3", "sound3"),
         new("toast-4.mp3", "sound4"),
-        new("toast-5.mp3", "sound5")
+        new("toast-5.mp3", "sound5"),
+        new("toast-6.mp3", "sound6"),
+        new("toast-7.mp3", "sound7")
     ];
 
     public static bool IsKnown(string? fileName) => Options.Any(option =>
