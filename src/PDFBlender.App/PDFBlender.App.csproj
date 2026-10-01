@@ -13,6 +13,10 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Assets\logo.ico</ApplicationIcon>
+    <AssemblyTitle>PDF Blender</AssemblyTitle>
+    <Description>PDF Blender</Description>
+    <Product>PDF Blender</Product>
+    <Copyright>Copyright © 2016-2026 BITCOOKIES</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
