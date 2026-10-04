@@ -1,4 +1,5 @@
 using System.IO;
+using System.Security.Cryptography;
 using PDFBlender.Core.Models;
 
 namespace PDFBlender.App;
@@ -29,13 +30,17 @@ internal sealed class AppSession
         UiText.SetLanguage(Preferences.Language);
         var document = ConfigurationStore.Load();
         _userConfigurations = document.UserConfigurations ?? [];
-        if ((!ConfigurationStore.Exists && _userConfigurations.Count == 0) || Preferences.RestorePresets)
-            RestoreMissingPresets();
+        var seededInitialPresets = !ConfigurationStore.Exists && _userConfigurations.Count == 0;
+        if (seededInitialPresets)
+            SeedInitialPresets();
+        var metadataChanged = EnsureConfigurationMetadata();
         _slotIds = document.SlotIds ?? [];
         _selectedConfigurationId = document.SelectedConfigurationId;
         _slotIds = NormalizeSlots(_slotIds);
         SelectedBlendLevel = Math.Clamp(Preferences.SelectedBlendLevel, 0, 4);
         EnsureSelectedSlot();
+        if (seededInitialPresets || metadataChanged)
+            SaveAll();
     }
 
     public BlendConfiguration? GetConfiguration(string id) =>
@@ -68,16 +73,29 @@ internal sealed class AppSession
         RaiseChanged(SessionChangeKind.BlendSelection);
     }
 
-    public string AddUserConfiguration(string? name = null, BlendSettings? settings = null)
+    public string AddUserConfiguration(string? name = null, BlendSettings? settings = null, string? colorKey = null)
     {
         var id = "custom-" + Guid.NewGuid().ToString("N");
-        _userConfigurations.Add(new BlendConfiguration(id, string.IsNullOrWhiteSpace(name) ? "Custom" : name.Trim(), false, settings ?? new BlendSettings
+        var requestedName = string.IsNullOrWhiteSpace(name) ? UiText.Get("customConfiguration") : name.Trim();
+        _userConfigurations.Add(new BlendConfiguration(id, MakeUniqueName(requestedName), false, settings ?? new BlendSettings
         {
             NormalizeContentWidth = true,
             Protection = ProtectionMethod.None,
             Watermark = WatermarkStyle.None,
             Noise = NoiseStrength.Off
-        }));
+        }, false, CreateShortId(), ConfigurationPalette.Normalize(colorKey ?? ConfigurationPalette.ForIndex(_userConfigurations.Count))));
+        _selectedConfigurationId = id;
+        SaveAll();
+        RaiseChanged(SessionChangeKind.Configurations);
+        return id;
+    }
+
+    public string AddPresetConfiguration(string presetId)
+    {
+        var preset = BuiltInConfigurations.FirstOrDefault(item => string.Equals(item.Id, presetId, StringComparison.OrdinalIgnoreCase));
+        if (preset is null) return string.Empty;
+        var id = "preset-" + Guid.NewGuid().ToString("N");
+        _userConfigurations.Add(preset with { Id = id, Name = MakeUniqueName(LocalizedPresetName(preset)), IsBuiltIn = false, IsLocked = false, ShortId = CreateShortId(), ColorKey = ConfigurationPalette.ForIndex(_userConfigurations.Count) });
         _selectedConfigurationId = id;
         SaveAll();
         RaiseChanged(SessionChangeKind.Configurations);
@@ -95,11 +113,11 @@ internal sealed class AppSession
         return true;
     }
 
-    public bool UpdateConfiguration(string id, BlendSettings settings)
+    public bool UpdateConfiguration(string id, BlendSettings settings, string? colorKey = null)
     {
         var index = _userConfigurations.FindIndex(configuration => string.Equals(configuration.Id, id, StringComparison.OrdinalIgnoreCase));
         if (index < 0 || _userConfigurations[index].IsLocked) return false;
-        _userConfigurations[index] = _userConfigurations[index] with { Settings = settings };
+        _userConfigurations[index] = _userConfigurations[index] with { Settings = settings, ColorKey = ConfigurationPalette.Normalize(colorKey ?? _userConfigurations[index].ColorKey) };
         SaveAll();
         RaiseChanged(SessionChangeKind.Configurations);
         return true;
@@ -170,18 +188,17 @@ internal sealed class AppSession
         EnsureSelectedSlot();
         Preferences = Preferences with { SelectedBlendLevel = SelectedBlendLevel };
         SavePreferences();
-        try { ConfigurationStore.Save(new ConfigurationDocument(4, _userConfigurations, _slotIds, _selectedConfigurationId)); }
+        try { ConfigurationStore.Save(new ConfigurationDocument(5, _userConfigurations, _slotIds, _selectedConfigurationId)); }
         catch (IOException) { }
         catch (UnauthorizedAccessException) { }
     }
 
-    public void ApplyPreferences(ThemePreference? theme = null, UiLanguage? language = null, bool? restorePresets = null, bool? toastSoundEnabled = null, bool? allowMultipleInstances = null, bool? bannerNotificationsEnabled = null, bool? windowsNotificationsEnabled = null, string? toastSound = null)
+    public void ApplyPreferences(ThemePreference? theme = null, UiLanguage? language = null, bool? toastSoundEnabled = null, bool? allowMultipleInstances = null, bool? bannerNotificationsEnabled = null, bool? windowsNotificationsEnabled = null, string? toastSound = null)
     {
         Preferences = Preferences with
         {
             Theme = theme ?? Preferences.Theme,
             Language = language ?? Preferences.Language,
-            RestorePresets = restorePresets ?? Preferences.RestorePresets,
             ToastSoundEnabled = toastSoundEnabled ?? Preferences.ToastSoundEnabled,
             AllowMultipleInstances = allowMultipleInstances ?? Preferences.AllowMultipleInstances,
             BannerNotificationsEnabled = bannerNotificationsEnabled ?? Preferences.BannerNotificationsEnabled,
@@ -189,23 +206,11 @@ internal sealed class AppSession
             ToastSound = toastSound ?? Preferences.ToastSound
         };
         UiText.SetLanguage(Preferences.Language);
-        if (restorePresets == true)
-            RestoreMissingPresets();
         SaveAll();
         RaiseChanged(SessionChangeKind.Preferences);
     }
 
-    public int RestorePresetsNow()
-    {
-        var before = _userConfigurations.Count;
-        RestoreMissingPresets();
-        var added = _userConfigurations.Count - before;
-        SaveAll();
-        RaiseChanged(SessionChangeKind.Configurations);
-        return added;
-    }
-
-    private void RestoreMissingPresets()
+    private void SeedInitialPresets()
     {
         foreach (var preset in BuiltInConfigurations)
         {
@@ -216,6 +221,57 @@ internal sealed class AppSession
                 IsBuiltIn = false,
                 IsLocked = false
             });
+        }
+    }
+
+    private bool EnsureConfigurationMetadata()
+    {
+        var changed = false;
+        var usedIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        for (var index = 0; index < _userConfigurations.Count; index++)
+        {
+            var configuration = _userConfigurations[index];
+            var shortId = IsValidShortId(configuration.ShortId) && usedIds.Add(configuration.ShortId!)
+                ? configuration.ShortId
+                : CreateShortId(usedIds);
+            var colorKey = ConfigurationPalette.Normalize(configuration.ColorKey);
+            if (!string.Equals(configuration.ShortId, shortId, StringComparison.Ordinal) || !string.Equals(configuration.ColorKey, colorKey, StringComparison.OrdinalIgnoreCase))
+            {
+                _userConfigurations[index] = configuration with { ShortId = shortId, ColorKey = colorKey };
+                changed = true;
+            }
+        }
+        return changed;
+    }
+
+    private string CreateShortId(ISet<string>? reserved = null)
+    {
+        reserved ??= _userConfigurations.Select(item => item.ShortId).Where(IsValidShortId).Cast<string>().ToHashSet(StringComparer.OrdinalIgnoreCase);
+        do
+        {
+            var value = RandomNumberGenerator.GetInt32(0, 1679616);
+            const string alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
+            var chars = new char[4];
+            for (var index = chars.Length - 1; index >= 0; index--)
+            {
+                chars[index] = alphabet[value % alphabet.Length];
+                value /= alphabet.Length;
+            }
+            var candidate = new string(chars);
+            if (reserved.Add(candidate)) return candidate;
+        } while (true);
+    }
+
+    private static bool IsValidShortId(string? value) =>
+        value is { Length: 4 } && value.All(character => character is >= '0' and <= '9' or >= 'a' and <= 'z');
+    private string MakeUniqueName(string requestedName)
+    {
+        var baseName = string.IsNullOrWhiteSpace(requestedName) ? UiText.Get("customConfiguration") : requestedName.Trim();
+        if (!_userConfigurations.Any(item => string.Equals(item.Name, baseName, StringComparison.CurrentCultureIgnoreCase))) return baseName;
+        for (var suffix = 2; ; suffix++)
+        {
+            var candidate = $"{baseName} ({suffix})";
+            if (!_userConfigurations.Any(item => string.Equals(item.Name, candidate, StringComparison.CurrentCultureIgnoreCase))) return candidate;
         }
     }
 

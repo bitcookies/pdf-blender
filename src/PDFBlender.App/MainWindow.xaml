@@ -73,9 +73,9 @@
                 <Grid>
                     <Frame x:Name="ContentFrame" NavigationUIVisibility="Hidden" Margin="0" />
                     <local:UiNotificationHost x:Name="AppNotificationHost" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,16,20,0" />
-                    <ui:ContentDialogHost x:Name="RootDialogHost" IsDisableSiblingsEnabled="True" />
                 </Grid>
             </Border>
         </Grid>
+        <ui:ContentDialogHost x:Name="RootDialogHost" Grid.RowSpan="2" Panel.ZIndex="100" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsDisableSiblingsEnabled="True" />
     </Grid>
 </ui:FluentWindow>

@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using UiButton = Wpf.Ui.Controls.Button;
 using PDFBlender.Core.Models;
 using PDFBlender.App;
 using UiCard = Wpf.Ui.Controls.Card;
@@ -24,6 +26,7 @@ public partial class ConfigurationEditorWindow : Wpf.Ui.Controls.FluentWindow
 
     public string ConfigurationName => NameBox.Text.Trim();
     public BlendSettings Settings { get; private set; }
+    public string SelectedColorKey { get; private set; }
 
     public ConfigurationEditorWindow(BlendConfiguration source)
     {
@@ -31,6 +34,7 @@ public partial class ConfigurationEditorWindow : Wpf.Ui.Controls.FluentWindow
         // Older configuration files may omit Settings; keep the editor usable and let
         // the normal validation/save path write a complete settings object back.
         Settings = source.Settings ?? BlendSettings.Default;
+        SelectedColorKey = ConfigurationPalette.Normalize(source.ColorKey);
         InitializeComponent();
         DpiChanged += ConfigurationEditorWindow_DpiChanged;
         Loaded += ConfigurationEditorWindow_Loaded;
@@ -38,7 +42,9 @@ public partial class ConfigurationEditorWindow : Wpf.Ui.Controls.FluentWindow
         NameBox.Text = source.Name;
         CancelButton.Content = UiText.Get("cancel");
         SaveButton.Content = UiText.Get("save");
+        ColorText.Text = UiText.Get("selectColor");
         BuildFeatureRows();
+        BuildPalette();
     }
 
     private void ConfigurationEditorWindow_Loaded(object sender, RoutedEventArgs e)
@@ -51,6 +57,32 @@ public partial class ConfigurationEditorWindow : Wpf.Ui.Controls.FluentWindow
         DpiSupport.RefreshVisuals(this);
     }
 
+    private void BuildPalette()
+    {
+        ColorPanel.Children.Clear();
+        foreach (var key in ConfigurationPalette.Keys)
+        {
+            var button = new UiButton
+            {
+                Width = 28,
+                Height = 28,
+                Padding = new Thickness(0),
+                Margin = new Thickness(0, 0, 8, 0),
+                Background = ConfigurationPalette.GetBrush(key),
+                BorderBrush = string.Equals(key, SelectedColorKey, StringComparison.OrdinalIgnoreCase) ? (Brush)FindResource("TextBrush") : null,
+                BorderThickness = new Thickness(string.Equals(key, SelectedColorKey, StringComparison.OrdinalIgnoreCase) ? 2 : 0),
+                CornerRadius = new CornerRadius(14),
+                ToolTip = key,
+                Cursor = System.Windows.Input.Cursors.Hand
+            };
+            button.Click += (_, _) =>
+            {
+                SelectedColorKey = key;
+                BuildPalette();
+            };
+            ColorPanel.Children.Add(button);
+        }
+    }
     private void BuildFeatureRows()
     {
         _normalize.IsChecked = Settings.NormalizeContentWidth;

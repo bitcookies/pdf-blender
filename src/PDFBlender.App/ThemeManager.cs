@@ -6,6 +6,7 @@ namespace PDFBlender.App;
 
 internal static class ThemeManager
 {
+    public static bool IsDark { get; private set; }
     public static bool SystemUsesLightTheme()
     {
         try
@@ -21,6 +22,7 @@ internal static class ThemeManager
 
     public static void ApplyPalette(bool dark)
     {
+        IsDark = dark;
         var resources = Application.Current.Resources;
         if (dark)
         {

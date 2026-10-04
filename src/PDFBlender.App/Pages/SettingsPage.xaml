@@ -128,14 +128,7 @@
                     <ui:ToggleSwitch x:Name="AllowMultipleInstancesToggle" Grid.Column="2" VerticalAlignment="Center" Click="AllowMultipleInstancesToggle_Click" />
                 </Grid>
             </Border>
-            <Border Style="{StaticResource SettingsCardStyle}">
-                <Grid>
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="48" /><ColumnDefinition Width="*" /><ColumnDefinition Width="220" /></Grid.ColumnDefinitions>
-                    <ui:SymbolIcon Symbol="ArrowSync24" FontSize="22" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock x:Name="RestorePresetsLabel" Style="{StaticResource CardTitleTextStyle}" /><TextBlock x:Name="RestorePresetsHint" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" /></StackPanel>
-                    <ui:Button x:Name="RestorePresetsButton" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Click="RestorePresetsButton_Click" Appearance="Secondary"><StackPanel Orientation="Horizontal"><ui:SymbolIcon Symbol="ArrowSync24" Margin="0,0,7,0" /><TextBlock x:Name="RestorePresetsButtonText" /></StackPanel></ui:Button>
-                </Grid>
-            </Border>
+
             </StackPanel>
             <TextBlock x:Name="SoundHeader" Style="{StaticResource SectionTitleTextStyle}" />
             <StackPanel Margin="0,0,0,16">

@@ -46,9 +46,25 @@ public static class ConfigurationIntensity
 {
     public static int For(BlendSettings settings) =>
         BlendFeatureCatalog.All.Max(feature => BlendFeatureCatalog.Weight(settings, feature));
+
+    public static string LabelKey(int intensity) => intensity switch
+    {
+        <= 0 => "intensityNone",
+        <= 2 => "intensityLight",
+        <= 4 => "intensityModerate",
+        <= 6 => "intensityStrong",
+        _ => "intensityVeryStrong"
+    };
 }
 
-public sealed record BlendConfiguration(string Id, string Name, bool IsBuiltIn, BlendSettings Settings, bool IsLocked = false)
+public sealed record BlendConfiguration(
+    string Id,
+    string Name,
+    bool IsBuiltIn,
+    BlendSettings Settings,
+    bool IsLocked = false,
+    string? ShortId = null,
+    string? ColorKey = null)
 {
     public int Intensity => ConfigurationIntensity.For(Settings);
 

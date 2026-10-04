@@ -1,6 +1,6 @@
 # PDF Blender Product Specification
 
-Status: v0.6.0 WPF-UI visual standardization baseline
+Status: v0.7.0 configuration workflow baseline
 Product: PDF Blender  
 Slogan: `DO NOT PLAGIARIZE MY PDF.`
 
@@ -12,16 +12,16 @@ PDF Blender creates a new, ordinarily readable PDF from a source PDF while raisi
 
 - Windows desktop application, C# / .NET 10, WPF, Fluent-inspired UI.
 - Microsoft Store is the sole release channel; release packaging is MSIX. Development builds may include a portable package.
-- Current version: `0.6.0`; package version: `0.6.0.0`.
+- Current version: `0.7.0`; package version: `0.7.0.0`.
 - Microsoft Store handles updates. No custom update service is in scope.
 - Preserve the reserved Store identity: Package Identity Name `57335Bitcookies.PDFBlender`; Publisher `CN=53636128-C1AF-456C-8B82-AC0D583B730C`; Publisher display name `Bitcookies`; Store ID `9P65BNNQRGVZ`. Do not change it or hard-code a Store URL before publication.
 
-## v0.6.0 Scope
+## v0.7.0 Scope
 
 This release refines the WPF shell, reusable visual resources, page layouts, and lightweight motion. It does not add PDF protection algorithms, change output semantics, or add network services.
 
 - Compact single-window home layout at `820×600`, with a `760×540` minimum and a compact icon-and-label navigation rail.
-- Settings-only software controls, supporting System/Light/Dark and System/English/简体中文, an Allow multiple instances toggle disabled by default, plus a confirmed one-shot Restore presets button.
+- Settings-only software controls, supporting System/Light/Dark and System/English/简体中文, and an Allow multiple instances toggle disabled by default.
 - A snapped, keyboard-accessible Blend level rail showing the validated `STIR`, `BLEND`, and `PULSE` presets.
 - Local preferences and configuration cards at the roaming AppData folder named PDF Blender, with safe defaults for malformed values.
 - Logo-derived multi-size `logo.ico` used by the WPF window and executable.
@@ -69,7 +69,7 @@ Modes express processing presets, not security levels. The user can turn individ
 
 ## Configuration and Settings
 
-Configuration contains Format, Protection, Watermark, and Image controls for the selected level. Settings contains appearance, language, notification, storage/runtime, and restore-preset controls. The home screen exposes only import, Blend Mode, Configuration shortcut, and the primary Blend action.
+Configuration contains Format, Protection, Watermark, and Image controls for the selected level. Settings contains appearance, language, notification, and storage/runtime controls. The home screen exposes only import, Blend Mode, Configuration shortcut, and the primary Blend action.
 
 Primary protection methods are mutually exclusive: None, Flatten, Text Scrambling, or PDF Permission Restriction. v0.1.0 implements Flatten only. Watermarks and image processing can compose with the selected primary method.
 
@@ -90,9 +90,9 @@ Do not block v0.1.0 on Text Scrambling, PDF permission restrictions, keyed/dynam
 
 Cloud processing, accounts, DRM, guaranteed copy prevention, custom update checks, and advanced experimental protection features are not part of the initial release.
 
-## v0.6.0 Configuration Presets
+## v0.7.0 Configuration Presets
 
-Configuration is organized as cards. The page shows five Home blend slots first, a separator, then one merged `Blend configurations` section. On first use the application seeds three editable configurations named with the localized `Preset`/`预设` prefix. Users can create, rename, edit, lock, unlock, and delete any configuration. A locked configuration cannot be edited or deleted. Settings provides a confirmation action that adds missing default preset IDs without replacing existing edits.
+Configuration is organized as cards. The page shows five Home blend slots first, a separator, then one merged `Blend configurations` section. On first use the application seeds three editable configurations named with the localized `Preset`/`预设` prefix. Users can create custom configurations or add a copy of a built-in preset from the New configuration flow. Copied presets receive a unique suffix when the name already exists. Users can rename, edit, lock, unlock, and delete any configuration. A locked configuration cannot be edited or deleted.
 
 Each configuration owns its enabled features and feature-specific values. Only enabled features expand their detail controls. The implemented feature set is Normalize Content Width, Flatten, Watermark, and conservative Pixel Noise. Deferred protection and prompt-injection ideas remain absent from the working controls.
 

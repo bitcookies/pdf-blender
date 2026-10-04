@@ -1,6 +1,6 @@
 # PDF Blender Design Overview
 
-Status: v0.6.0 WPF-UI visual standardization
+Status: v0.7.0 configuration workflow
 Detailed requirements: `SPEC.md`  
 Architecture boundaries: `ARCHITECTURE.md`  
 Interface and localization: `INTERFACE.md`
@@ -11,9 +11,9 @@ PDF Blender helps authors publish documents that remain readable to everyone whi
 
 The product uses a hands-on Blender metaphor: users select a blend level, optionally tune its Configuration, and blend a PDF. Blend levels are named presets over normal settings. They do not represent security levels. The application should feel like a focused Windows utility with a recognizable identity, not a generic PDF editor or security dashboard.
 
-## v0.6.0 Product Shape
+## v0.7.0 Product Shape
 
-The home screen is a compact single-window tool. It centers the PDF drop/browse action and keeps the recurring path short: select a file, select a Blend level, then blend. Theme and language are software settings, not home-screen workflow controls. Detailed processing options live in Configuration; Settings only contains theme and language.
+The home screen is a compact single-window tool. It centers the PDF drop/browse action and keeps the recurring path short: select a file, select a Blend level, then blend. Theme and language are software settings, not home-screen workflow controls. Detailed processing options live in Configuration; Settings contains theme, language, notification, storage, and runtime preferences.
 
 ## Visual System
 
@@ -29,17 +29,17 @@ The main window is 820×600 with a 760×540 minimum. It uses WPF-UI `NavigationV
 
 ## Blend Level Rail
 
-`BlendLevelRail` is a data-driven WPF control backed by a snapped `Slider`. v0.6.0 exposes only the validated `STIR`, `BLEND`, and `PULSE` presets. It supports mouse dragging, arrow keys, Home, End, visible name/summary text, keyboard focus, and an accessible slider name. The control API leaves room for one to five data items without presenting future algorithms.
+`BlendLevelRail` is a data-driven WPF control backed by a snapped `Slider`. v0.7.0 exposes only the validated `STIR`, `BLEND`, and `PULSE` presets. It supports mouse dragging, arrow keys, Home, End, visible name/summary text, keyboard focus, and an accessible slider name. The control API leaves room for one to five data items without presenting future algorithms.
 
 ## Settings and Preferences
 
-Settings contains software preferences: System/Light/Dark, System/English/Simplified Chinese, an Allow multiple instances toggle (off by default), and a Restore presets button with confirmation. Theme, language, and instance policy changes apply immediately. When multiple instances are disabled, startup uses a per-user mutex to keep one running window. Configuration cards own their feature values. Preferences and configurations are stored under the roaming AppData folder named PDF Blender; malformed or out-of-range values fall back to safe defaults.
+Settings contains software preferences: System/Light/Dark, System/English/Simplified Chinese, and an Allow multiple instances toggle (off by default). Theme, language, and instance policy changes apply immediately. When multiple instances are disabled, startup uses a per-user mutex to keep one running window. Configuration cards own their feature values. Preferences and configurations are stored under the roaming AppData folder named PDF Blender; malformed or out-of-range values fall back to safe defaults.
 
 The initial presets are `STIR`, `BLEND`, and `PULSE`. `CRUSH` and `OVERBLEND` remain future/experimental until their quality and behavior are validated. Users can independently toggle supported options, and manual edits turn the selected preset into a modified/custom configuration.
 
 The application uses the pinned `WPF-UI` 4.3.0 package for Fluent controls, themes, and icons. PDF processing remains in the existing Core/Pdf projects; the UI dependency does not alter output or protection semantics.
 
-## v0.6.0 Interaction Patterns
+## v0.7.0 Interaction Patterns
 
 The shell follows the Microsoft Store compact navigation pattern using WPF-UI `NavigationView` and the neutral light/dark palette. PDF Blender uses a coral/red accent derived from its logo. A scoped WPF-UI item template provides consistent four-corner hover and active surfaces plus the red selection indicator; navigation state is driven by `SelectionChanged` rather than visual-tree inspection. Pages fade in with a short vertical translation, while WPF-UI owns buttons, cards, dialogs, and snackbars. Transitions respect Windows client-area animation and render-tier settings.
 
@@ -63,8 +63,8 @@ Text scrambling, permission restrictions, keyed watermarking, secret management,
 
 The sole release channel is Microsoft Store, packaged as MSIX with the reserved identity recorded in `SPEC.md`. Store delivery handles application updates. A portable build is for development/testing only. The WPF shell should start promptly and defer heavy PDF initialization until required. The UI supports system/light/dark themes and Simplified Chinese/English. WPF's mature .NET desktop stack avoids a Windows App SDK runtime dependency; use HWND interop only behind isolated adapters where necessary because hosted controls have airspace constraints.
 
-## v0.6.0 Configuration Card Pattern
+## v0.7.0 Configuration Card Pattern
 
-The Configuration page is ordered as five fixed Home blend slots, a separator, and one merged "Blend configurations" section. Initial use seeds three editable configurations with localized `Preset`/`预设` prefixes; all cards use the same edit, lock, delete, and drag actions. Cards show a name, enabled-feature summary, and a ten-step intensity bar in a three-column grid. Dragging a card to a slot preserves that exact position; dropping onto an occupied slot replaces its occupant. Empty positions remain visible and disabled on Home. Settings can restore missing default IDs through a confirmed action without overwriting existing edits.
+The Configuration page is ordered as five fixed Home blend slots, a separator, and one merged "Blend configurations" section. Initial use seeds three editable configurations with localized `Preset`/`预设` prefixes. New configuration offers two illustrated choices for custom editing or copying a built-in preset. The full-window dialog dims the title bar, navigation, and page behind it. Cards use a three-dot action menu and drag support; slot and configuration cards share a compact fixed height. Cards show a name, enabled-feature summary, and a ten-step intensity bar in a three-column grid. Dragging a card to a slot preserves that exact position; dropping onto an occupied slot replaces its occupant. Empty positions remain visible and disabled on Home. Built-in presets can be added again from the New configuration flow without overwriting existing edits.
 
 Feature rows in the modal editor follow progressive disclosure. A disabled feature occupies one compact row. Enabling it reveals only that feature's detail controls below the row. Watermark text and all other values belong to the selected configuration, so two configurations can use different values. A configuration becomes non-editable and non-deletable only while its lock is enabled.

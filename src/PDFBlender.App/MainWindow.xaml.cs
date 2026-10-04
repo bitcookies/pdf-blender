@@ -63,6 +63,9 @@ public partial class MainWindow : FluentWindow
     {
         if (sender is Wpf.Ui.Controls.NavigationViewItem { Tag: string page })
         {
+            if (string.Equals(page, _currentPage, StringComparison.Ordinal))
+                return;
+
             SelectNavigationItem(page);
             NavigateTo(page, synchronizeSelection: false);
         }
@@ -170,6 +173,13 @@ public partial class MainWindow : FluentWindow
 
     private void NavigateTo(string page, bool synchronizeSelection = true)
     {
+        if (string.Equals(page, _currentPage, StringComparison.Ordinal) && ContentFrame.Content is not null)
+        {
+            if (synchronizeSelection)
+                SelectNavigationItem(page);
+            return;
+        }
+
         _currentPage = page;
         ContentFrame.Content = page switch
         {
