@@ -1,0 +1,90 @@
+using System.Windows;
+using System.Windows.Controls;
+using TextBlock = System.Windows.Controls.TextBlock;
+using System.Windows.Media;
+using PDFBlender.Core.Models;
+using UiButton = Wpf.Ui.Controls.Button;
+using UiCard = Wpf.Ui.Controls.CardControl;
+using ControlAppearance = Wpf.Ui.Controls.ControlAppearance;
+using Wpf.Ui.Controls;
+
+namespace PDFBlender.App.Pages;
+
+public partial class ConfigurationPresetPage : Page
+{
+    private readonly AppSession _session;
+    private readonly Action<string> _add;
+    private readonly Action _createBack;
+    private readonly Action _listBack;
+
+    internal ConfigurationPresetPage(AppSession session, Action<string> add, Action createBack, Action listBack)
+    {
+        _session = session;
+        _add = add;
+        _createBack = createBack;
+        _listBack = listBack;
+        InitializeComponent();
+        Refresh();
+    }
+
+    private void Refresh()
+    {
+        BreadcrumbBar.Items.Clear();
+        BreadcrumbBar.Items.Add(new BreadcrumbBarItem { Content = UiText.Get("configuration"), Tag = "root" });
+        BreadcrumbBar.Items.Add(new BreadcrumbBarItem { Content = UiText.Get("newConfiguration"), Tag = "new" });
+        BreadcrumbBar.Items.Add(new BreadcrumbBarItem { Content = UiText.Get("choosePreset"), IsLast = true, Tag = "preset" });
+        TitleText.Text = UiText.Get("choosePreset");
+        SubtitleText.Text = UiText.Get("presetConfigurationDescription");
+        PresetPanel.Children.Clear();
+        foreach (var preset in _session.BuiltInConfigurations)
+        {
+            var card = new UiCard { Padding = new Thickness(12), Margin = new Thickness(0, 0, 0, 8), Height = 78, Background = (Brush)FindResource("CardBrush"), BorderBrush = ConfigurationPalette.GetBrush(ConfigurationPalette.ForIndex(PresetPanel.Children.Count)), BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8) };
+            var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(32) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            grid.Children.Add(new SymbolIcon { Symbol = ConfigurationIconCatalog.GetSymbol(ConfigurationIconCatalog.ForIndex(PresetPanel.Children.Count)), FontSize = 22, Foreground = (Brush)FindResource("AccentBrush"), VerticalAlignment = VerticalAlignment.Center });
+            var text = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 8, 0) };
+            text.Children.Add(new TextBlock { Text = LocalizedPresetName(preset), FontSize = 13, FontWeight = FontWeights.SemiBold });
+            text.Children.Add(new TextBlock { Text = $"{FeatureSummary(preset)} · {UiText.Get(ConfigurationIntensity.LabelKey(preset.Intensity))}", FontSize = 10.5, Foreground = (Brush)FindResource("MutedTextBrush"), TextTrimming = TextTrimming.CharacterEllipsis });
+            Grid.SetColumn(text, 1);
+            grid.Children.Add(text);
+            var add = new UiButton { Content = UiText.Get("add"), Appearance = ControlAppearance.Secondary, Padding = new Thickness(12, 4, 12, 4), Cursor = System.Windows.Input.Cursors.Hand, Tag = preset.Id };
+            add.Click += AddPreset_Click;
+            Grid.SetColumn(add, 2);
+            grid.Children.Add(add);
+            card.Content = grid;
+            PresetPanel.Children.Add(card);
+        }
+    }
+
+    private void AddPreset_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: string id }) _add(id);
+    }
+
+    private void BreadcrumbBar_ItemClicked(object sender, BreadcrumbBarItemClickedEventArgs e)
+    {
+        if (e.Index == 0) _listBack();
+        else if (e.Index == 1) _createBack();
+    }
+
+    private string LocalizedPresetName(BlendConfiguration preset) => preset.Id switch
+    {
+        "builtin-light" => $"{UiText.Get("presetPrefix")} {UiText.Get("light")}",
+        "builtin-medium" => $"{UiText.Get("presetPrefix")} {UiText.Get("medium")}",
+        "builtin-heavy" => $"{UiText.Get("presetPrefix")} {UiText.Get("heavy")}",
+        _ => preset.Name
+    };
+
+    private string FeatureSummary(BlendConfiguration configuration) => string.Join(" · ", configuration.EnabledFeatures.Select(feature => feature switch
+    {
+        BlendFeature.NormalizeContentWidth => UiText.Get("normalizeWidth"),
+        BlendFeature.Flatten => UiText.Get("flatten"),
+        BlendFeature.Watermark => UiText.Get("watermark"),
+        BlendFeature.PixelNoise => UiText.Get("noise"),
+        _ => feature.ToString()
+    }).DefaultIfEmpty(UiText.Get("noFeatures")));
+}
+
+

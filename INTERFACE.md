@@ -57,4 +57,12 @@ The WPF process is Per-Monitor V2 DPI aware. Windows scaling from 100% through 3
 
 ## v0.7.0 Configuration Cards
 
-The Configuration page is ordered as five fixed Home blend slots, a separator, and one merged "Blend configurations" section. Each slot uses a compact 72 px tile with a solid outer border and dashed inner drop target; configuration cards use the same fixed height for direct drag-and-drop feedback. The first run creates three editable cards named with the localized `Preset`/`预设` prefix. Every card shows only enabled features and provides a three-dot menu containing edit, lock/unlock, and delete actions, plus drag support; a lock disables edit and delete. Editing opens a modal editor and only enabled features reveal detail controls. Dragging onto an occupied slot replaces that slot, while dragging a configuration from one slot to another leaves its old position empty. Cards render three per row. The New configuration flow opens a full-window dimmed ContentDialog with two side-by-side illustrated choices: custom configuration or built-in preset. Choosing a preset opens the preset picker; duplicate names receive a numbered suffix. Preferences and configurations use the roaming AppData folder named PDF Blender.
+The Configuration page shows five fixed 72 px Home blend slots followed by a separator and a five-column compact configuration grid. Empty slots center the Add icon above the level-specific drop label. Occupied slots use one solid rounded border and show the configuration icon, name, short ID, intensity label, and remove action.
+
+Configuration cards are fixed at approximately 104 px high. The icon, content, metadata, and three-dot action area use stable grid columns. The menu uses WPF-UI MenuItem entries and an explicit PlacementTarget so it opens below the clicked button.
+
+New configuration, preset selection, and editing are nested pages under BreadcrumbBar. The creation flow has no ContentDialog. A locked configuration disables edit and delete while leaving unlock available. Configuration persistence schema 6 adds IconKey and migrates older files.
+
+## Configuration Page Revision
+
+Empty slots render the Add icon and the level-specific drop label inside the tile. Configuration cards use WPF-UI icons, five fixed columns, stable grid alignment, and a menu whose PlacementTarget is the three-dot button. Schema 6 adds IconKey and migrates older configuration files.

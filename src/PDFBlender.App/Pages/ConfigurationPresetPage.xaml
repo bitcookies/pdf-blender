@@ -1,0 +1,13 @@
+<Page x:Class="PDFBlender.App.Pages.ConfigurationPresetPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="24,20,24,24" MaxWidth="760">
+            <ui:BreadcrumbBar x:Name="BreadcrumbBar" ItemClicked="BreadcrumbBar_ItemClicked" Margin="0,0,0,12" />
+            <TextBlock x:Name="TitleText" Style="{StaticResource PageTitleTextStyle}" />
+            <TextBlock x:Name="SubtitleText" Style="{StaticResource PageDescriptionTextStyle}" Margin="0,3,0,14" />
+            <StackPanel x:Name="PresetPanel" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

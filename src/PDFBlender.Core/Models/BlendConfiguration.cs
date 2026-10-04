@@ -64,7 +64,8 @@ public sealed record BlendConfiguration(
     BlendSettings Settings,
     bool IsLocked = false,
     string? ShortId = null,
-    string? ColorKey = null)
+    string? ColorKey = null,
+    string? IconKey = null)
 {
     public int Intensity => ConfigurationIntensity.For(Settings);
 

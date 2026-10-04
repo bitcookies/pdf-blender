@@ -1,0 +1,31 @@
+<Page x:Class="PDFBlender.App.Pages.ConfigurationEditorPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="24,20,24,24" MaxWidth="760">
+            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+            <ui:BreadcrumbBar x:Name="BreadcrumbBar" ItemClicked="BreadcrumbBar_ItemClicked" Margin="0,0,0,12" />
+            <StackPanel Grid.Row="1">
+                <TextBlock x:Name="TitleText" Style="{StaticResource PageTitleTextStyle}" />
+                <ui:TextBox x:Name="NameBox" Margin="0,12,0,8" AutomationProperties.Name="Configuration name" />
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                    <TextBlock x:Name="ColorText" Text="Color" VerticalAlignment="Center" Margin="0,0,14,0" />
+                    <StackPanel x:Name="ColorPanel" Grid.Column="1" Orientation="Horizontal" />
+                </Grid>
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                    <TextBlock x:Name="IconText" Text="Icon" VerticalAlignment="Center" Margin="0,0,14,0" />
+                    <StackPanel x:Name="IconPanel" Grid.Column="1" Orientation="Horizontal" />
+                </Grid>
+                <TextBlock x:Name="ErrorText" Foreground="{DynamicResource AccentBrush}" TextWrapping="Wrap" Margin="0,0,0,8" />
+            </StackPanel>
+            <StackPanel x:Name="FeaturePanel" Grid.Row="2" />
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+                <ui:Button x:Name="CancelButton" Appearance="Secondary" Content="Cancel" Click="CancelButton_Click" Margin="0,0,8,0" Cursor="Hand" />
+                <ui:Button x:Name="SaveButton" Appearance="Primary" Content="Save" Click="SaveButton_Click" Cursor="Hand" />
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>

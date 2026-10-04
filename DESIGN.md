@@ -65,6 +65,16 @@ The sole release channel is Microsoft Store, packaged as MSIX with the reserved 
 
 ## v0.7.0 Configuration Card Pattern
 
-The Configuration page is ordered as five fixed Home blend slots, a separator, and one merged "Blend configurations" section. Initial use seeds three editable configurations with localized `Preset`/`预设` prefixes. New configuration offers two illustrated choices for custom editing or copying a built-in preset. The full-window dialog dims the title bar, navigation, and page behind it. Cards use a three-dot action menu and drag support; slot and configuration cards share a compact fixed height. Cards show a name, enabled-feature summary, and a ten-step intensity bar in a three-column grid. Dragging a card to a slot preserves that exact position; dropping onto an occupied slot replaces its occupant. Empty positions remain visible and disabled on Home. Built-in presets can be added again from the New configuration flow without overwriting existing edits.
+The Configuration page is ordered as five fixed Home blend slots, a separator, and one merged "Blend configurations" section. Empty slots show a centered Add icon above a level-specific drop label inside one solid rounded border. Occupied slots show the configuration icon, name, short ID, intensity label, and remove action.
 
-Feature rows in the modal editor follow progressive disclosure. A disabled feature occupies one compact row. Enabling it reveals only that feature's detail controls below the row. Watermark text and all other values belong to the selected configuration, so two configurations can use different values. A configuration becomes non-editable and non-deletable only while its lock is enabled.
+The configuration list uses five compact columns with fixed 104 px cards. Each card has a left WPF-UI icon, stable name/summary/metadata rows, and an anchored three-dot menu. Dragging preserves the existing slot replacement behavior and uses a short opacity/scale animation.
+
+Feature rows use progressive disclosure in the nested editor page. A disabled feature remains compact; enabling it reveals only its own details. A locked configuration cannot be edited or deleted.
+
+## v0.7.0 Configuration Page Revision
+
+The Configuration page starts with five fixed 72 px Home blend slots. Empty slots show a centered Add icon on the first line and a centered level-specific drop label on the second line. Occupied slots show the selected configuration icon, name, short ID, intensity label, and remove action inside one solid rounded border.
+
+The configuration list uses five compact columns with fixed 104 px card height. Each card has a WPF-UI icon on the left, name and enabled-feature summary in the center, short ID and qualitative intensity on the bottom row, and an anchored three-dot menu in the top-right.
+
+Configuration metadata includes ShortId, ColorKey, and IconKey. Schema 6 loads schemas 1-5 and fills missing metadata. Creation, preset selection, and editing use nested pages with BreadcrumbBar; delete confirmation remains a ContentDialog.

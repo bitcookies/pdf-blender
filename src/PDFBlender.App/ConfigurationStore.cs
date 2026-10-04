@@ -13,7 +13,7 @@ internal sealed record ConfigurationDocument(
 
 internal static class ConfigurationStore
 {
-    private const int CurrentSchemaVersion = 5;
+    private const int CurrentSchemaVersion = 6;
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         WriteIndented = true,

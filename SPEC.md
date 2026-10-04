@@ -99,3 +99,7 @@ Each configuration owns its enabled features and feature-specific values. Only e
 Configuration intensity is the strongest enabled feature weight on a 0-9 scale. Width normalization is 0; text watermark is 3; full-page watermark is 5; flatten and high noise are 6; medium noise is 4; low noise is 2. Home has five ordered slot positions, preserves empty positions, and displays only occupied positions as selectable levels; empty positions are visibly disabled.
 
 Configuration and preferences are stored under the roaming AppData folder named PDF Blender. The application does not read the removed local PDFBlender folder.
+
+## v0.7.0 Configuration UI Revision
+
+The configuration page uses five compact slot tiles and a five-column configuration card grid. Slot instructions are rendered inside empty tiles rather than as a separate paragraph. New and edit flows are nested pages with BreadcrumbBar; creation is not a dialog. Configuration schema 6 persists ShortId, ColorKey, and IconKey, with migration from schemas 1-5.

@@ -73,7 +73,7 @@ internal sealed class AppSession
         RaiseChanged(SessionChangeKind.BlendSelection);
     }
 
-    public string AddUserConfiguration(string? name = null, BlendSettings? settings = null, string? colorKey = null)
+    public string AddUserConfiguration(string? name = null, BlendSettings? settings = null, string? colorKey = null, string? iconKey = null)
     {
         var id = "custom-" + Guid.NewGuid().ToString("N");
         var requestedName = string.IsNullOrWhiteSpace(name) ? UiText.Get("customConfiguration") : name.Trim();
@@ -83,7 +83,7 @@ internal sealed class AppSession
             Protection = ProtectionMethod.None,
             Watermark = WatermarkStyle.None,
             Noise = NoiseStrength.Off
-        }, false, CreateShortId(), ConfigurationPalette.Normalize(colorKey ?? ConfigurationPalette.ForIndex(_userConfigurations.Count))));
+        }, false, CreateShortId(), ConfigurationPalette.Normalize(colorKey ?? ConfigurationPalette.ForIndex(_userConfigurations.Count)), ConfigurationIconCatalog.Normalize(iconKey ?? ConfigurationIconCatalog.ForIndex(_userConfigurations.Count))));
         _selectedConfigurationId = id;
         SaveAll();
         RaiseChanged(SessionChangeKind.Configurations);
@@ -95,7 +95,7 @@ internal sealed class AppSession
         var preset = BuiltInConfigurations.FirstOrDefault(item => string.Equals(item.Id, presetId, StringComparison.OrdinalIgnoreCase));
         if (preset is null) return string.Empty;
         var id = "preset-" + Guid.NewGuid().ToString("N");
-        _userConfigurations.Add(preset with { Id = id, Name = MakeUniqueName(LocalizedPresetName(preset)), IsBuiltIn = false, IsLocked = false, ShortId = CreateShortId(), ColorKey = ConfigurationPalette.ForIndex(_userConfigurations.Count) });
+        _userConfigurations.Add(preset with { Id = id, Name = MakeUniqueName(LocalizedPresetName(preset)), IsBuiltIn = false, IsLocked = false, ShortId = CreateShortId(), ColorKey = ConfigurationPalette.ForIndex(_userConfigurations.Count), IconKey = ConfigurationIconCatalog.ForIndex(_userConfigurations.Count) });
         _selectedConfigurationId = id;
         SaveAll();
         RaiseChanged(SessionChangeKind.Configurations);
@@ -113,11 +113,11 @@ internal sealed class AppSession
         return true;
     }
 
-    public bool UpdateConfiguration(string id, BlendSettings settings, string? colorKey = null)
+    public bool UpdateConfiguration(string id, BlendSettings settings, string? colorKey = null, string? iconKey = null)
     {
         var index = _userConfigurations.FindIndex(configuration => string.Equals(configuration.Id, id, StringComparison.OrdinalIgnoreCase));
         if (index < 0 || _userConfigurations[index].IsLocked) return false;
-        _userConfigurations[index] = _userConfigurations[index] with { Settings = settings, ColorKey = ConfigurationPalette.Normalize(colorKey ?? _userConfigurations[index].ColorKey) };
+        _userConfigurations[index] = _userConfigurations[index] with { Settings = settings, ColorKey = ConfigurationPalette.Normalize(colorKey ?? _userConfigurations[index].ColorKey), IconKey = ConfigurationIconCatalog.Normalize(iconKey ?? _userConfigurations[index].IconKey) };
         SaveAll();
         RaiseChanged(SessionChangeKind.Configurations);
         return true;
@@ -188,7 +188,7 @@ internal sealed class AppSession
         EnsureSelectedSlot();
         Preferences = Preferences with { SelectedBlendLevel = SelectedBlendLevel };
         SavePreferences();
-        try { ConfigurationStore.Save(new ConfigurationDocument(5, _userConfigurations, _slotIds, _selectedConfigurationId)); }
+        try { ConfigurationStore.Save(new ConfigurationDocument(6, _userConfigurations, _slotIds, _selectedConfigurationId)); }
         catch (IOException) { }
         catch (UnauthorizedAccessException) { }
     }
@@ -235,9 +235,10 @@ internal sealed class AppSession
                 ? configuration.ShortId
                 : CreateShortId(usedIds);
             var colorKey = ConfigurationPalette.Normalize(configuration.ColorKey);
-            if (!string.Equals(configuration.ShortId, shortId, StringComparison.Ordinal) || !string.Equals(configuration.ColorKey, colorKey, StringComparison.OrdinalIgnoreCase))
+            var iconKey = ConfigurationIconCatalog.Normalize(configuration.IconKey);
+            if (!string.Equals(configuration.ShortId, shortId, StringComparison.Ordinal) || !string.Equals(configuration.ColorKey, colorKey, StringComparison.OrdinalIgnoreCase) || !string.Equals(configuration.IconKey, iconKey, StringComparison.Ordinal))
             {
-                _userConfigurations[index] = configuration with { ShortId = shortId, ColorKey = colorKey };
+                _userConfigurations[index] = configuration with { ShortId = shortId, ColorKey = colorKey, IconKey = iconKey };
                 changed = true;
             }
         }
