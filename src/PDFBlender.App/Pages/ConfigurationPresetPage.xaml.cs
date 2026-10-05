@@ -38,18 +38,18 @@ public partial class ConfigurationPresetPage : Page
         PresetPanel.Children.Clear();
         foreach (var preset in _session.BuiltInConfigurations)
         {
-            var card = new UiCard { Padding = new Thickness(12), Margin = new Thickness(0, 0, 0, 8), Height = 78, Background = (Brush)FindResource("CardBrush"), BorderBrush = ConfigurationPalette.GetBrush(ConfigurationPalette.ForIndex(PresetPanel.Children.Count)), BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8) };
-            var grid = new Grid();
+            var card = new UiCard { Padding = new Thickness(16, 12, 16, 12), Margin = new Thickness(0, 0, 0, 10), Height = 88, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch, Background = (Brush)FindResource("CardBrush"), BorderBrush = ConfigurationPalette.GetBrush(ConfigurationPalette.ForIndex(PresetPanel.Children.Count)), BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8) };
+            var grid = new Grid { HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(32) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            grid.Children.Add(new SymbolIcon { Symbol = ConfigurationIconCatalog.GetSymbol(ConfigurationIconCatalog.ForIndex(PresetPanel.Children.Count)), FontSize = 22, Foreground = (Brush)FindResource("AccentBrush"), VerticalAlignment = VerticalAlignment.Center });
-            var text = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 8, 0) };
-            text.Children.Add(new TextBlock { Text = LocalizedPresetName(preset), FontSize = 13, FontWeight = FontWeights.SemiBold });
-            text.Children.Add(new TextBlock { Text = $"{FeatureSummary(preset)} · {UiText.Get(ConfigurationIntensity.LabelKey(preset.Intensity))}", FontSize = 10.5, Foreground = (Brush)FindResource("MutedTextBrush"), TextTrimming = TextTrimming.CharacterEllipsis });
+            grid.Children.Add(new SymbolIcon { Symbol = ConfigurationIconCatalog.GetSymbol(ConfigurationIconCatalog.ForIndex(PresetPanel.Children.Count)), FontSize = 26, Foreground = ConfigurationPalette.GetBrush(ConfigurationPalette.ForIndex(PresetPanel.Children.Count)), VerticalAlignment = VerticalAlignment.Center });
+            var text = new StackPanel { HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(14, 0, 14, 0) };
+            text.Children.Add(new TextBlock { Text = LocalizedPresetName(preset), FontSize = 15, FontWeight = FontWeights.SemiBold, HorizontalAlignment = HorizontalAlignment.Left, TextAlignment = TextAlignment.Left });
+            text.Children.Add(new TextBlock { Text = $"{FeatureSummary(preset)} · {UiText.Get(ConfigurationIntensity.LabelKey(preset.Intensity))}", FontSize = 11, Foreground = (Brush)FindResource("MutedTextBrush"), TextTrimming = TextTrimming.CharacterEllipsis, HorizontalAlignment = HorizontalAlignment.Left, TextAlignment = TextAlignment.Left });
             Grid.SetColumn(text, 1);
             grid.Children.Add(text);
-            var add = new UiButton { Content = UiText.Get("add"), Appearance = ControlAppearance.Secondary, Padding = new Thickness(12, 4, 12, 4), Cursor = System.Windows.Input.Cursors.Hand, Tag = preset.Id };
+            var add = new UiButton { Content = UiText.Get("add"), Appearance = ControlAppearance.Secondary, Width = 76, Height = 34, Padding = new Thickness(8, 4, 8, 4), Cursor = System.Windows.Input.Cursors.Hand, Tag = preset.Id };
             add.Click += AddPreset_Click;
             Grid.SetColumn(add, 2);
             grid.Children.Add(add);

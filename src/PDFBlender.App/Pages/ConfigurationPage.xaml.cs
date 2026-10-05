@@ -346,7 +346,7 @@ public partial class ConfigurationPage : Page
             Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.Edit16 },
             IsEnabled = !configuration.IsLocked
         };
-        edit.Click += (_, _) => OpenEditor(configuration, false);
+        edit.Click += (_, _) => Dispatcher.BeginInvoke(new Action(() => OpenEditor(configuration, false)), DispatcherPriority.ContextIdle);
         var lockItem = new UiMenuItem
         {
             Header = configuration.IsLocked ? UiText.Get("unlock") : UiText.Get("lock"),
@@ -459,6 +459,8 @@ public partial class ConfigurationPage : Page
         ChildContent.Content = page;
     }
 
+    public void ReturnToList() => ShowList();
+
     private void ShowList()
     {
         if (_listTransitionPending)
@@ -502,7 +504,7 @@ public partial class ConfigurationPage : Page
             IsTabStop = false,
             FocusVisualStyle = null
         };
-        custom.Click += (_, _) => OpenEditor(null, true);
+        custom.Click += (_, _) => Dispatcher.BeginInvoke(new Action(() => OpenEditor(null, true)), DispatcherPriority.ContextIdle);
         var preset = new UiMenuItem
         {
             Header = UiText.Get("newPresetConfiguration"),
@@ -511,7 +513,7 @@ public partial class ConfigurationPage : Page
             IsTabStop = false,
             FocusVisualStyle = null
         };
-        preset.Click += (_, _) => OpenPresets();
+        preset.Click += (_, _) => Dispatcher.BeginInvoke(new Action(OpenPresets), DispatcherPriority.ContextIdle);
         menu.Items.Add(custom);
         menu.Items.Add(preset);
         menu.IsOpen = true;

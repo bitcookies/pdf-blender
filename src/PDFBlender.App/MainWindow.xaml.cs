@@ -64,7 +64,11 @@ public partial class MainWindow : FluentWindow
         if (sender is Wpf.Ui.Controls.NavigationViewItem { Tag: string page })
         {
             if (string.Equals(page, _currentPage, StringComparison.Ordinal))
+            {
+                if (page == "configuration")
+                    _configurationPage?.ReturnToList();
                 return;
+            }
 
             SelectNavigationItem(page);
             NavigateTo(page, synchronizeSelection: false);
