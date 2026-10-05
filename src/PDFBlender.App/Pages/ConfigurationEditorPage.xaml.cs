@@ -17,6 +17,7 @@ namespace PDFBlender.App.Pages;
 public partial class ConfigurationEditorPage : Page
 {
     private readonly AppSession _session;
+    private readonly DialogService _dialogs;
     private readonly BlendConfiguration _source;
     private readonly bool _isNew;
     private readonly Action _parentBack;
@@ -35,10 +36,11 @@ public partial class ConfigurationEditorPage : Page
     private string _selectedIconKey;
     private BlendSettings _settings;
 
-    internal ConfigurationEditorPage(AppSession session, BlendConfiguration? source, bool isNew, Action back, Action<BlendConfiguration, bool, string, BlendSettings, string, string> save, Action listBack)
+    internal ConfigurationEditorPage(AppSession session, DialogService dialogs, BlendConfiguration? source, bool isNew, Action back, Action<BlendConfiguration, bool, string, BlendSettings, string, string> save, Action listBack)
     {
         _session = session;
-        _source = source ?? new BlendConfiguration("new", UiText.Get("configurationName"), false, new BlendSettings { NormalizeContentWidth = true }, false, null, ConfigurationPalette.ForIndex(session.AllConfigurations.Count), ConfigurationIconCatalog.ForIndex(session.AllConfigurations.Count));
+        _dialogs = dialogs;
+        _source = source ?? new BlendConfiguration("new", UiText.Get("configurationName"), false, new BlendSettings { NormalizeContentWidth = false, Protection = ProtectionMethod.None, Watermark = WatermarkStyle.None, Noise = NoiseStrength.Off }, false, null, ConfigurationPalette.ForIndex(session.AllConfigurations.Count), ConfigurationIconCatalog.ForIndex(session.AllConfigurations.Count));
         _isNew = isNew;
         _parentBack = back;
         _listBack = listBack;
@@ -51,7 +53,9 @@ public partial class ConfigurationEditorPage : Page
         RefreshText();
         BuildFeatureRows();
         BuildColorChoices();
-        BuildIconChoices();
+        UpdateIconPreview();
+        NameBox.TextChanged += (_, _) => UpdateSaveState();
+        UpdateSaveState();
     }
 
     private void ConfigureBreadcrumb(Action listBack)
@@ -65,6 +69,7 @@ public partial class ConfigurationEditorPage : Page
     private void RefreshText()
     {
         TitleText.Text = UiText.Get(_isNew ? "newCustomConfiguration" : "editConfiguration");
+        NameLabel.Text = UiText.Get("configurationName");
         NameBox.Text = _source.Name;
         ColorText.Text = UiText.Get("selectColor");
         IconText.Text = UiText.Get("selectIcon");
@@ -78,21 +83,35 @@ public partial class ConfigurationEditorPage : Page
         foreach (var key in ConfigurationPalette.Keys)
         {
             var selected = string.Equals(key, _selectedColorKey, StringComparison.OrdinalIgnoreCase);
-            var button = new UiButton { Width = 26, Height = 26, Padding = new Thickness(0), Margin = new Thickness(0, 0, 7, 0), Background = ConfigurationPalette.GetBrush(key), BorderBrush = selected ? (Brush)FindResource("TextBrush") : null, BorderThickness = new Thickness(selected ? 2 : 0), CornerRadius = new CornerRadius(13), Cursor = Cursors.Hand, ToolTip = key, Tag = key };
+            var button = new UiButton { Width = 28, Height = 28, Padding = new Thickness(0), Margin = new Thickness(3, 2, 3, 2), Background = ConfigurationPalette.GetBrush(key), BorderBrush = selected ? (Brush)FindResource("TextBrush") : null, BorderThickness = new Thickness(selected ? 2 : 0), CornerRadius = new CornerRadius(14), Cursor = Cursors.Hand, ToolTip = key, Tag = key };
             button.Click += (_, _) => { _selectedColorKey = key; BuildColorChoices(); };
             ColorPanel.Children.Add(button);
         }
     }
 
-    private void BuildIconChoices()
+    private void UpdateIconPreview()
     {
-        IconPanel.Children.Clear();
-        foreach (var key in ConfigurationIconCatalog.Keys)
+        var descriptor = ConfigurationIconCatalog.GetDescriptor(_selectedIconKey);
+        IconButton.Content = new StackPanel
         {
-            var selected = string.Equals(key, _selectedIconKey, StringComparison.OrdinalIgnoreCase);
-            var button = new UiButton { Width = 30, Height = 30, Padding = new Thickness(3), Margin = new Thickness(0, 0, 6, 0), Appearance = selected ? ControlAppearance.Secondary : ControlAppearance.Transparent, BorderBrush = selected ? (Brush)FindResource("AccentBrush") : null, BorderThickness = new Thickness(selected ? 1 : 0), Cursor = Cursors.Hand, ToolTip = key, Tag = key, Content = new SymbolIcon { Symbol = ConfigurationIconCatalog.GetSymbol(key), FontSize = 20 } };
-            button.Click += (_, _) => { _selectedIconKey = key; BuildIconChoices(); };
-            IconPanel.Children.Add(button);
+            Orientation = Orientation.Horizontal,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Children =
+            {
+                new SymbolIcon { Symbol = descriptor.Symbol, Filled = descriptor.Filled, FontSize = 17, Margin = new Thickness(0, 0, 8, 0) },
+                new TextBlock { Text = descriptor.Name, VerticalAlignment = VerticalAlignment.Center }
+            }
+        };
+        IconButton.ToolTip = descriptor.Key;
+    }
+
+    private async void IconButton_Click(object sender, RoutedEventArgs e)
+    {
+        var selected = await _dialogs.ShowIconPickerAsync(_selectedIconKey, IconButton);
+        if (!string.IsNullOrWhiteSpace(selected))
+        {
+            _selectedIconKey = selected;
+            UpdateIconPreview();
         }
     }
 
@@ -144,6 +163,13 @@ public partial class ConfigurationEditorPage : Page
         return panel;
     }
 
+    private void UpdateSaveState()
+    {
+        var hasName = !string.IsNullOrWhiteSpace(NameBox.Text);
+        var hasFeature = _normalize.IsChecked == true || _flatten.IsChecked == true || _watermark.IsChecked == true || _noise.IsChecked == true;
+        SaveButton.IsEnabled = hasName && (!_isNew || hasFeature);
+    }
+
     private void BreadcrumbBar_ItemClicked(object sender, BreadcrumbBarItemClickedEventArgs e)
     {
         if (e.Index == 0)
@@ -179,5 +205,6 @@ public partial class ConfigurationEditorPage : Page
 
     private void CancelButton_Click(object sender, RoutedEventArgs e) => _parentBack();
 }
+
 
 

@@ -75,7 +75,7 @@ public partial class ConfigurationPage : Page
             new Thickness(3),
             configuration is null
                 ? (Brush)FindResource("SurfaceMutedBrush")
-                : (Brush)FindResource("CardBrush"));
+                : (Brush)FindResource("CardBrush"), useColorBorder: false);
         card.Tag = index;
         card.AllowDrop = true;
         card.ToolTip = string.Format(UiText.Get("slotDropHint"), index + 1);
@@ -136,7 +136,7 @@ public partial class ConfigurationPage : Page
         var card = CreateCardSurface(
             configuration,
             new Thickness(3, 0, 3, 6),
-            (Brush)FindResource("CardBrush"));
+            (Brush)FindResource("CardBrush"), useColorBorder: true);
         card.ToolTip = used ? UiText.Get("configurationInUse") : UiText.Get("dragToSlots");
         card.Opacity = used ? 0.52 : 1;
         card.Content = CreateConfigurationContent(configuration, isSlot: false, used);
@@ -145,7 +145,7 @@ public partial class ConfigurationPage : Page
         return card;
     }
 
-    private UiCard CreateCardSurface(BlendConfiguration? configuration, Thickness margin, Brush background)
+    private UiCard CreateCardSurface(BlendConfiguration? configuration, Thickness margin, Brush background, bool useColorBorder)
     {
         return new UiCard
         {
@@ -157,11 +157,7 @@ public partial class ConfigurationPage : Page
             HorizontalContentAlignment = HorizontalAlignment.Stretch,
             VerticalContentAlignment = VerticalAlignment.Stretch,
             Background = background,
-            BorderBrush = configuration is null
-                ? (Brush)FindResource("BorderBrush")
-                : configuration.IsLocked
-                    ? (Brush)FindResource("BorderBrush")
-                    : ConfigurationPalette.GetBrush(configuration.ColorKey),
+            BorderBrush = configuration != null && useColorBorder && !configuration.IsLocked ? ConfigurationPalette.GetBrush(configuration.ColorKey) : (Brush)FindResource("BorderBrush"),
             BorderThickness = new Thickness(1),
             Focusable = false
         };
@@ -266,7 +262,7 @@ public partial class ConfigurationPage : Page
                     ? "LockClosed16"
                     : "MoreHorizontal24";
         var tooltip = isSlot
-            ? UiText.Get("remove")
+            ? UiText.Get("takeDown")
             : used
                 ? UiText.Get("configurationInUse")
                 : configuration.IsLocked
@@ -314,9 +310,7 @@ public partial class ConfigurationPage : Page
                 e.Handled = true;
             };
         }
-        var actionBorderBrush = configuration.IsLocked && !used
-            ? ConfigurationPalette.GetBrush(configuration.ColorKey)
-            : (Brush)FindResource("BorderBrush");
+        var actionBorderBrush = configuration.IsLocked || isSlot ? ConfigurationPalette.GetBrush(configuration.ColorKey) : (Brush)FindResource("BorderBrush");
 
         // Match the Home PDF remove control with a separate circular surface.
         return new Border
@@ -428,7 +422,7 @@ public partial class ConfigurationPage : Page
     private void OpenEditor(BlendConfiguration? source, bool isNew)
     {
         Action parentBack = ShowList;
-        ShowChild(new ConfigurationEditorPage(_session, source, isNew, parentBack, SaveEditor, ShowList));
+        ShowChild(new ConfigurationEditorPage(_session, _dialogs, source, isNew, parentBack, SaveEditor, ShowList));
     }
 
     private void OpenPresets()
@@ -564,7 +558,7 @@ public partial class ConfigurationPage : Page
     private void ResetSlotVisual(UiCard card)
     {
         var configuration = card.Tag is int index ? _session.SlotConfigurations.ElementAtOrDefault(index) : null;
-        card.BorderBrush = configuration is null || configuration.IsLocked ? (Brush)FindResource("BorderBrush") : ConfigurationPalette.GetBrush(configuration.ColorKey);
+        card.BorderBrush = (Brush)FindResource("BorderBrush");
         card.BorderThickness = new Thickness(1);
         card.Background = configuration is null ? (Brush)FindResource("SurfaceMutedBrush") : (Brush)FindResource("CardBrush");
         card.Opacity = 1;

@@ -1,8 +1,10 @@
 <Page x:Class="PDFBlender.App.Pages.ConfigurationPresetPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:local="clr-namespace:PDFBlender.App"
+>
+    <ScrollViewer local:ScrollBarAutoHideBehavior.Enabled="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="24,20,24,24" MaxWidth="760">
             <ui:BreadcrumbBar x:Name="BreadcrumbBar"
                               ItemClicked="BreadcrumbBar_ItemClicked"
@@ -16,3 +18,4 @@
         </StackPanel>
     </ScrollViewer>
 </Page>
+

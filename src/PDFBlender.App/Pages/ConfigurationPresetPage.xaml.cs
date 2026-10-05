@@ -43,13 +43,14 @@ public partial class ConfigurationPresetPage : Page
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(32) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            grid.Children.Add(new SymbolIcon { Symbol = ConfigurationIconCatalog.GetSymbol(ConfigurationIconCatalog.ForIndex(PresetPanel.Children.Count)), FontSize = 26, Foreground = ConfigurationPalette.GetBrush(ConfigurationPalette.ForIndex(PresetPanel.Children.Count)), VerticalAlignment = VerticalAlignment.Center });
-            var text = new StackPanel { HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(14, 0, 14, 0) };
+            var presetIcon = ConfigurationIconCatalog.GetDescriptor(ConfigurationIconCatalog.ForIndex(PresetPanel.Children.Count));
+            grid.Children.Add(new SymbolIcon { Symbol = presetIcon.Symbol, Filled = presetIcon.Filled, FontSize = 26, Foreground = ConfigurationPalette.GetBrush(ConfigurationPalette.ForIndex(PresetPanel.Children.Count)), VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Left });
+            var text = new StackPanel { HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(14, 0, 14, 0) };
             text.Children.Add(new TextBlock { Text = LocalizedPresetName(preset), FontSize = 15, FontWeight = FontWeights.SemiBold, HorizontalAlignment = HorizontalAlignment.Left, TextAlignment = TextAlignment.Left });
             text.Children.Add(new TextBlock { Text = $"{FeatureSummary(preset)} · {UiText.Get(ConfigurationIntensity.LabelKey(preset.Intensity))}", FontSize = 11, Foreground = (Brush)FindResource("MutedTextBrush"), TextTrimming = TextTrimming.CharacterEllipsis, HorizontalAlignment = HorizontalAlignment.Left, TextAlignment = TextAlignment.Left });
             Grid.SetColumn(text, 1);
             grid.Children.Add(text);
-            var add = new UiButton { Content = UiText.Get("add"), Appearance = ControlAppearance.Secondary, Width = 76, Height = 34, Padding = new Thickness(8, 4, 8, 4), Cursor = System.Windows.Input.Cursors.Hand, Tag = preset.Id };
+            var add = new UiButton { Content = UiText.Get("add"), Appearance = ControlAppearance.Primary, Foreground = (Brush)FindResource("AccentTextBrush"), Width = 76, Height = 34, Padding = new Thickness(8, 4, 8, 4), Cursor = System.Windows.Input.Cursors.Hand, Tag = preset.Id };
             add.Click += AddPreset_Click;
             Grid.SetColumn(add, 2);
             grid.Children.Add(add);
