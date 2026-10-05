@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using TextBlock = System.Windows.Controls.TextBlock;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Wpf.Ui.Controls;
 
 namespace PDFBlender.App.Pages;
@@ -24,8 +25,8 @@ public partial class ConfigurationCreatePage : Page
     private void RefreshText()
     {
         BreadcrumbBar.Items.Clear();
-        BreadcrumbBar.Items.Add(new BreadcrumbBarItem { Content = UiText.Get("configuration"), Tag = "root" });
-        BreadcrumbBar.Items.Add(new BreadcrumbBarItem { Content = UiText.Get("newConfiguration"), IsLast = true, Tag = "new" });
+        BreadcrumbBar.Items.Add(UiText.Get("configuration"));
+        BreadcrumbBar.Items.Add(UiText.Get("newConfiguration"));
         TitleText.Text = UiText.Get("newConfiguration");
         SubtitleText.Text = UiText.Get("newConfigurationHint");
         CustomButton.Content = ChoiceContent("BookAdd24", UiText.Get("newCustomConfiguration"), UiText.Get("customConfigurationDescription"));
@@ -46,7 +47,8 @@ public partial class ConfigurationCreatePage : Page
 
     private void BreadcrumbBar_ItemClicked(object sender, BreadcrumbBarItemClickedEventArgs e)
     {
-        if (e.Index == 0) _back();
+        if (e.Index == 0)
+            Dispatcher.BeginInvoke(new Action(_back), DispatcherPriority.ContextIdle);
     }
 
     private void CustomButton_Click(object sender, RoutedEventArgs e) => _custom();

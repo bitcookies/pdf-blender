@@ -4,7 +4,12 @@
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="24,20,24,24" MaxWidth="760">
-            <ui:BreadcrumbBar x:Name="BreadcrumbBar" ItemClicked="BreadcrumbBar_ItemClicked" Margin="0,0,0,12" />
+            <ui:BreadcrumbBar x:Name="BreadcrumbBar" ItemClicked="BreadcrumbBar_ItemClicked" Margin="0,0,0,12" Cursor="Hand">
+                <ui:BreadcrumbBar.Resources>
+                    <SolidColorBrush x:Key="BreadcrumbBarHoverForegroundBrush" Color="#C9021E" />
+                    <SolidColorBrush x:Key="BreadcrumbBarNormalForegroundBrush" Color="#868686" />
+                </ui:BreadcrumbBar.Resources>
+            </ui:BreadcrumbBar>
             <TextBlock x:Name="TitleText" Style="{StaticResource PageTitleTextStyle}" />
             <TextBlock x:Name="SubtitleText" Style="{StaticResource PageDescriptionTextStyle}" Margin="0,3,0,18" />
             <Grid>

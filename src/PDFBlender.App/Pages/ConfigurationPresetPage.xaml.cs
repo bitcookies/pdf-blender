@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using TextBlock = System.Windows.Controls.TextBlock;
 using System.Windows.Media;
+using System.Windows.Threading;
 using PDFBlender.Core.Models;
 using UiButton = Wpf.Ui.Controls.Button;
 using UiCard = Wpf.Ui.Controls.CardControl;
@@ -30,9 +31,8 @@ public partial class ConfigurationPresetPage : Page
     private void Refresh()
     {
         BreadcrumbBar.Items.Clear();
-        BreadcrumbBar.Items.Add(new BreadcrumbBarItem { Content = UiText.Get("configuration"), Tag = "root" });
-        BreadcrumbBar.Items.Add(new BreadcrumbBarItem { Content = UiText.Get("newConfiguration"), Tag = "new" });
-        BreadcrumbBar.Items.Add(new BreadcrumbBarItem { Content = UiText.Get("choosePreset"), IsLast = true, Tag = "preset" });
+        BreadcrumbBar.Items.Add(UiText.Get("configuration"));
+        BreadcrumbBar.Items.Add(UiText.Get("newPresetConfiguration"));
         TitleText.Text = UiText.Get("choosePreset");
         SubtitleText.Text = UiText.Get("presetConfigurationDescription");
         PresetPanel.Children.Clear();
@@ -65,8 +65,8 @@ public partial class ConfigurationPresetPage : Page
 
     private void BreadcrumbBar_ItemClicked(object sender, BreadcrumbBarItemClickedEventArgs e)
     {
-        if (e.Index == 0) _listBack();
-        else if (e.Index == 1) _createBack();
+        if (e.Index == 0)
+            Dispatcher.BeginInvoke(new Action(_listBack), DispatcherPriority.ContextIdle);
     }
 
     private string LocalizedPresetName(BlendConfiguration preset) => preset.Id switch

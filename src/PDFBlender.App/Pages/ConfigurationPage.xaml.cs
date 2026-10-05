@@ -5,6 +5,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 using PDFBlender.Core.Models;
 using UiCard = Wpf.Ui.Controls.Card;
 using UiButton = Wpf.Ui.Controls.Button;
@@ -23,6 +24,7 @@ public partial class ConfigurationPage : Page
     private Point _dragStart;
     private UiCard? _dragCandidate;
     private bool _dragInProgress;
+    private bool _listTransitionPending;
 
     internal ConfigurationPage(AppSession session, DialogService dialogs)
     {
@@ -38,7 +40,9 @@ public partial class ConfigurationPage : Page
         TitleText.Text = UiText.Get("configuration");
         SubtitleText.Text = UiText.Get("configurationSubtitle");
         SlotsHeader.Text = UiText.Get("blendSlots");
+        SlotsHintText.Text = UiText.Get("blendSlotsHint");
         ConfigurationsHeader.Text = UiText.Get("blendConfigurations");
+        ConfigurationsHintText.Text = UiText.Get("blendConfigurationsHint");
         AddButtonText.Text = UiText.Get("addConfiguration");
         EmptyText.Text = _session.AllConfigurations.Count == 0 ? UiText.Get("noConfigurations") : string.Empty;
         EmptyText.Visibility = _session.AllConfigurations.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -155,7 +159,9 @@ public partial class ConfigurationPage : Page
             Background = background,
             BorderBrush = configuration is null
                 ? (Brush)FindResource("BorderBrush")
-                : ConfigurationPalette.GetBrush(configuration.ColorKey),
+                : configuration.IsLocked
+                    ? (Brush)FindResource("BorderBrush")
+                    : ConfigurationPalette.GetBrush(configuration.ColorKey),
             BorderThickness = new Thickness(1),
             Focusable = false
         };
@@ -253,7 +259,7 @@ public partial class ConfigurationPage : Page
     private Border MakeStatusAction(BlendConfiguration configuration, bool isSlot, bool used, Brush foreground)
     {
         var symbol = isSlot
-            ? "Checkmark16"
+            ? "ArrowDown16"
             : used
                 ? "Checkmark16"
                 : configuration.IsLocked
@@ -308,6 +314,10 @@ public partial class ConfigurationPage : Page
                 e.Handled = true;
             };
         }
+        var actionBorderBrush = configuration.IsLocked && !used
+            ? ConfigurationPalette.GetBrush(configuration.ColorKey)
+            : (Brush)FindResource("BorderBrush");
+
         // Match the Home PDF remove control with a separate circular surface.
         return new Border
         {
@@ -315,7 +325,7 @@ public partial class ConfigurationPage : Page
             Height = 22,
             CornerRadius = new CornerRadius(11),
             Background = (Brush)FindResource("CardBrush"),
-            BorderBrush = new SolidColorBrush(Color.FromRgb(0xE6, 0xE6, 0xE6)),
+            BorderBrush = actionBorderBrush,
             BorderThickness = new Thickness(1),
             HorizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment = VerticalAlignment.Top,
@@ -417,9 +427,7 @@ public partial class ConfigurationPage : Page
 
     private void OpenEditor(BlendConfiguration? source, bool isNew)
     {
-        Action parentBack = isNew
-            ? () => ShowChild(new ConfigurationCreatePage(_session, () => OpenEditor(null, true), OpenPresets, ShowList))
-            : ShowList;
+        Action parentBack = ShowList;
         ShowChild(new ConfigurationEditorPage(_session, source, isNew, parentBack, SaveEditor, ShowList));
     }
 
@@ -429,7 +437,7 @@ public partial class ConfigurationPage : Page
         {
             _session.AddPresetConfiguration(presetId);
             ShowList();
-        }, () => ShowChild(new ConfigurationCreatePage(_session, () => OpenEditor(null, true), OpenPresets, ShowList)), ShowList));
+        }, ShowList, ShowList));
     }
 
     private void SaveEditor(BlendConfiguration source, bool isNew, string name, BlendSettings settings, string colorKey, string iconKey)
@@ -453,14 +461,61 @@ public partial class ConfigurationPage : Page
 
     private void ShowList()
     {
-        ChildContent.Content = null;
+        if (_listTransitionPending)
+            return;
+
+        // Hide the child page first. Clear the Frame content after the
+        // current BreadcrumbBar event and layout pass have completed.
+        // This prevents WPF from detaching the clicked Page while its
+        // routed event is still unwinding.
+        _listTransitionPending = true;
         ChildContent.Visibility = Visibility.Collapsed;
         ListScroller.Visibility = Visibility.Visible;
         RefreshFromSession();
+        Dispatcher.BeginInvoke(new Action(() =>
+        {
+            ChildContent.Content = null;
+            _listTransitionPending = false;
+        }), DispatcherPriority.ApplicationIdle);
     }
 
-    private void AddButton_Click(object sender, RoutedEventArgs e) =>
-        ShowChild(new ConfigurationCreatePage(_session, () => OpenEditor(null, true), OpenPresets, ShowList));
+    private void AddButton_Click(object sender, RoutedEventArgs e)
+    {
+        const double menuWidth = 120;
+        var menu = new ContextMenu
+        {
+            PlacementTarget = AddButton,
+            Placement = PlacementMode.Bottom,
+            HorizontalOffset = 0,
+            Width = menuWidth,
+            MinWidth = menuWidth,
+            MaxWidth = menuWidth,
+            StaysOpen = false,
+            Focusable = false,
+            FocusVisualStyle = null
+        };
+        var custom = new UiMenuItem
+        {
+            Header = UiText.Get("newCustomConfiguration"),
+            Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.BookAdd24 },
+            Focusable = false,
+            IsTabStop = false,
+            FocusVisualStyle = null
+        };
+        custom.Click += (_, _) => OpenEditor(null, true);
+        var preset = new UiMenuItem
+        {
+            Header = UiText.Get("newPresetConfiguration"),
+            Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.BoxMultiple24 },
+            Focusable = false,
+            IsTabStop = false,
+            FocusVisualStyle = null
+        };
+        preset.Click += (_, _) => OpenPresets();
+        menu.Items.Add(custom);
+        menu.Items.Add(preset);
+        menu.IsOpen = true;
+    }
 
     private static bool IsActionElement(DependencyObject? source)
     {
@@ -507,7 +562,7 @@ public partial class ConfigurationPage : Page
     private void ResetSlotVisual(UiCard card)
     {
         var configuration = card.Tag is int index ? _session.SlotConfigurations.ElementAtOrDefault(index) : null;
-        card.BorderBrush = configuration is null ? (Brush)FindResource("BorderBrush") : ConfigurationPalette.GetBrush(configuration.ColorKey);
+        card.BorderBrush = configuration is null || configuration.IsLocked ? (Brush)FindResource("BorderBrush") : ConfigurationPalette.GetBrush(configuration.ColorKey);
         card.BorderThickness = new Thickness(1);
         card.Background = configuration is null ? (Brush)FindResource("SurfaceMutedBrush") : (Brush)FindResource("CardBrush");
         card.Opacity = 1;

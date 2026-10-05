@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using TextBlock = System.Windows.Controls.TextBlock;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using PDFBlender.Core.Models;
 using UiCard = Wpf.Ui.Controls.Card;
 using UiButton = Wpf.Ui.Controls.Button;
@@ -56,15 +57,14 @@ public partial class ConfigurationEditorPage : Page
     private void ConfigureBreadcrumb(Action listBack)
     {
         BreadcrumbBar.Items.Clear();
-        BreadcrumbBar.Items.Add(new BreadcrumbBarItem { Content = UiText.Get("configuration"), Tag = "root" });
-        if (_isNew) BreadcrumbBar.Items.Add(new BreadcrumbBarItem { Content = UiText.Get("newConfiguration"), Tag = "new" });
-        BreadcrumbBar.Items.Add(new BreadcrumbBarItem { Content = UiText.Get("editConfiguration"), IsLast = true, Tag = "edit" });
+        BreadcrumbBar.Items.Add(UiText.Get("configuration"));
+        BreadcrumbBar.Items.Add(UiText.Get(_isNew ? "newCustomConfiguration" : "editConfiguration"));
         BreadcrumbBar.Tag = listBack;
     }
 
     private void RefreshText()
     {
-        TitleText.Text = UiText.Get("editConfiguration");
+        TitleText.Text = UiText.Get(_isNew ? "newCustomConfiguration" : "editConfiguration");
         NameBox.Text = _source.Name;
         ColorText.Text = UiText.Get("selectColor");
         IconText.Text = UiText.Get("selectIcon");
@@ -146,8 +146,8 @@ public partial class ConfigurationEditorPage : Page
 
     private void BreadcrumbBar_ItemClicked(object sender, BreadcrumbBarItemClickedEventArgs e)
     {
-        if (e.Index == 0) _listBack();
-        else if (_isNew && e.Index == 1) _parentBack();
+        if (e.Index == 0)
+            Dispatcher.BeginInvoke(new Action(_listBack), DispatcherPriority.ContextIdle);
     }
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)

@@ -5,7 +5,12 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <Grid Margin="24,20,24,24" MaxWidth="760">
             <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
-            <ui:BreadcrumbBar x:Name="BreadcrumbBar" ItemClicked="BreadcrumbBar_ItemClicked" Margin="0,0,0,12" />
+            <ui:BreadcrumbBar x:Name="BreadcrumbBar" ItemClicked="BreadcrumbBar_ItemClicked" Margin="0,0,0,12" Cursor="Hand">
+                <ui:BreadcrumbBar.Resources>
+                    <SolidColorBrush x:Key="BreadcrumbBarHoverForegroundBrush" Color="#C9021E" />
+                    <SolidColorBrush x:Key="BreadcrumbBarNormalForegroundBrush" Color="#868686" />
+                </ui:BreadcrumbBar.Resources>
+            </ui:BreadcrumbBar>
             <StackPanel Grid.Row="1">
                 <TextBlock x:Name="TitleText" Style="{StaticResource PageTitleTextStyle}" />
                 <ui:TextBox x:Name="NameBox" Margin="0,12,0,8" AutomationProperties.Name="Configuration name" />
