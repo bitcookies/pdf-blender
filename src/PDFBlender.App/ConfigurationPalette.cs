@@ -24,19 +24,19 @@ internal static class ConfigurationPalette
 
     public static string ForIndex(int index) => Keys[Math.Abs(index) % Keys.Count];
 
-    public static Brush GetBrush(string? key)
-    {
-        var pair = Colors[Normalize(key)];
-        var value = ThemeManager.IsDark ? pair.Dark : pair.Light;
-        var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(value)!);
-        brush.Freeze();
-        return brush;
-    }
+    public static Brush GetBrush(string? key) => CreateBrush(GetColor(key));
 
     public static Color GetColor(string? key)
     {
         var pair = Colors[Normalize(key)];
         var value = ThemeManager.IsDark ? pair.Dark : pair.Light;
         return (Color)ColorConverter.ConvertFromString(value)!;
+    }
+
+    private static Brush CreateBrush(Color color)
+    {
+        var brush = new SolidColorBrush(color);
+        brush.Freeze();
+        return brush;
     }
 }

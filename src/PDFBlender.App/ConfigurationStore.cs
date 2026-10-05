@@ -13,7 +13,7 @@ internal sealed record ConfigurationDocument(
 
 internal static class ConfigurationStore
 {
-    private const int CurrentSchemaVersion = 6;
+    private const int CurrentSchemaVersion = 7;
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         WriteIndented = true,
@@ -34,46 +34,49 @@ internal static class ConfigurationStore
             if (File.Exists(FilePath))
             {
                 var document = JsonSerializer.Deserialize<ConfigurationDocument>(File.ReadAllText(FilePath), SerializerOptions);
-                if (document is not null && document.SchemaVersion is >= 1 and <= CurrentSchemaVersion)
-                {
-                    var normalized = Normalize(document);
-                    // Persist legacy repairs immediately. This makes the schema-3
-                    // empty-slot migration durable even before the user changes a
-                    // setting or opens the configuration page.
-                    if (document.SchemaVersion != CurrentSchemaVersion || !(document.SlotIds ?? []).SequenceEqual(normalized.SlotIds))
-                    {
-                        try
-                        {
-                            Save(normalized);
-                        }
-                        catch (IOException) { }
-                        catch (UnauthorizedAccessException) { }
-                    }
-                    return normalized;
-                }
+                if (document is not null && document.SchemaVersion == CurrentSchemaVersion)
+                    return NormalizeCurrent(document);
             }
         }
         catch (JsonException) { }
         catch (IOException) { }
         catch (UnauthorizedAccessException) { }
 
-        return new ConfigurationDocument(CurrentSchemaVersion, [], [null, "builtin-medium", null, null, null], "builtin-medium");
+        // Development data is intentionally reset when the stored schema is
+        // from an earlier iteration. There are no released user configurations
+        // to migrate yet.
+        return CreateDefault();
     }
 
     public static void Save(ConfigurationDocument document)
     {
         var directory = Path.GetDirectoryName(FilePath)!;
         Directory.CreateDirectory(directory);
-        var json = JsonSerializer.Serialize(Normalize(document), SerializerOptions);
+        var json = JsonSerializer.Serialize(NormalizeCurrent(document), SerializerOptions);
         var temporaryPath = FilePath + ".tmp";
         File.WriteAllText(temporaryPath, json);
         File.Move(temporaryPath, FilePath, true);
     }
 
-    private static ConfigurationDocument Normalize(ConfigurationDocument document)
+    private static ConfigurationDocument CreateDefault()
     {
-        var user = document.UserConfigurations ?? [];
-        var uniqueUser = user
+        var configurations = BuiltInConfigurations.All
+            .Select(configuration => configuration with
+            {
+                IsBuiltIn = false,
+                IsLocked = false
+            })
+            .ToList();
+        return new ConfigurationDocument(
+            CurrentSchemaVersion,
+            configurations,
+            [null, "builtin-medium", null, null, null],
+            "builtin-medium");
+    }
+
+    private static ConfigurationDocument NormalizeCurrent(ConfigurationDocument document)
+    {
+        var uniqueUser = (document.UserConfigurations ?? [])
             .Where(configuration => !string.IsNullOrWhiteSpace(configuration.Id))
             .GroupBy(configuration => configuration.Id, StringComparer.OrdinalIgnoreCase)
             .Select(group => group.First() with
@@ -83,10 +86,10 @@ internal static class ConfigurationStore
                 Settings = group.First().Settings ?? BlendSettings.Default
             })
             .ToList();
-        // Built-in presets are persisted in UserConfigurations after first use. Do not
-        // keep stale slot references to a preset that is no longer present in the file.
-        var validIds = new HashSet<string>(uniqueUser.Select(configuration => configuration.Id), StringComparer.OrdinalIgnoreCase);
 
+        var validIds = new HashSet<string>(
+            uniqueUser.Select(configuration => configuration.Id),
+            StringComparer.OrdinalIgnoreCase);
         var seenSlots = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var slots = (document.SlotIds ?? [])
             .Take(5)
@@ -94,20 +97,6 @@ internal static class ConfigurationStore
             .ToList();
         while (slots.Count < 5) slots.Add(null);
 
-        // Version 3 could persist the configurations while losing every slot id.
-        // Repair that one-time migration using the stable light/medium/heavy order;
-        // later saves use schema 4, so an intentional empty slot remains empty.
-        if (document.SchemaVersion < CurrentSchemaVersion && slots.All(id => id is null))
-        {
-            var preferredIds = new[] { "builtin-light", "builtin-medium", "builtin-heavy" };
-            var migrationIds = preferredIds
-                .Concat(uniqueUser.Select(configuration => configuration.Id))
-                .Where(validIds.Contains)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .Take(5)
-                .ToArray();
-            for (var index = 0; index < migrationIds.Length; index++) slots[index] = migrationIds[index];
-        }
         var selected = document.SelectedConfigurationId is not null && validIds.Contains(document.SelectedConfigurationId)
             ? document.SelectedConfigurationId
             : slots.FirstOrDefault();

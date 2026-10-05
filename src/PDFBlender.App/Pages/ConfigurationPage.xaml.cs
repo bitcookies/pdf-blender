@@ -6,7 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using PDFBlender.Core.Models;
-using UiCard = Wpf.Ui.Controls.CardControl;
+using UiCard = Wpf.Ui.Controls.Card;
 using UiButton = Wpf.Ui.Controls.Button;
 using UiMenuItem = Wpf.Ui.Controls.MenuItem;
 using ControlAppearance = Wpf.Ui.Controls.ControlAppearance;
@@ -16,6 +16,8 @@ namespace PDFBlender.App.Pages;
 public partial class ConfigurationPage : Page
 {
     private const string ConfigurationDragFormat = "PDFBlender.ConfigurationId";
+    private const double CardHeight = 72;
+    private const double CardContentMinHeight = CardHeight - 8;
     private readonly AppSession _session;
     private readonly DialogService _dialogs;
     private Point _dragStart;
@@ -39,6 +41,7 @@ public partial class ConfigurationPage : Page
         ConfigurationsHeader.Text = UiText.Get("blendConfigurations");
         AddButtonText.Text = UiText.Get("addConfiguration");
         EmptyText.Text = _session.AllConfigurations.Count == 0 ? UiText.Get("noConfigurations") : string.Empty;
+        EmptyText.Visibility = _session.AllConfigurations.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         ErrorText.Text = string.Empty;
         if (ChildContent.Visibility != Visibility.Visible)
         {
@@ -51,6 +54,7 @@ public partial class ConfigurationPage : Page
     {
         SlotsPanel.Children.Clear();
         SlotsPanel.ColumnDefinitions.Clear();
+
         for (var index = 0; index < 5; index++)
         {
             SlotsPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -62,76 +66,51 @@ public partial class ConfigurationPage : Page
 
     private UiCard CreateSlot(BlendConfiguration? configuration, int index)
     {
-        var card = new UiCard
-        {
-            Margin = new Thickness(index == 0 ? 0 : 4, 0, index == 4 ? 0 : 4, 0),
-            Padding = new Thickness(8),
-            Height = 72,
-            MinHeight = 72,
-            MaxHeight = 72,
-            VerticalContentAlignment = VerticalAlignment.Stretch,
-            Background = (Brush)FindResource(configuration is null ? "SurfaceMutedBrush" : "CardBrush"),
-            BorderBrush = configuration is null ? (Brush)FindResource("BorderBrush") : ConfigurationPalette.GetBrush(configuration.ColorKey),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
-            AllowDrop = true,
-            Tag = index,
-            ToolTip = string.Format(UiText.Get("slotDropHint"), index + 1)
-        };
+        var card = CreateCardSurface(
+            configuration,
+            new Thickness(3),
+            configuration is null
+                ? (Brush)FindResource("SurfaceMutedBrush")
+                : (Brush)FindResource("CardBrush"));
+        card.Tag = index;
+        card.AllowDrop = true;
+        card.ToolTip = string.Format(UiText.Get("slotDropHint"), index + 1);
 
         if (configuration is null)
         {
-            var empty = new Grid { VerticalAlignment = VerticalAlignment.Center };
-            empty.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            empty.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            empty.Children.Add(new Wpf.Ui.Controls.SymbolIcon
+            var empty = new Grid
             {
-                Symbol = Wpf.Ui.Controls.SymbolRegular.Add24,
-                FontSize = 17,
-                Foreground = (Brush)FindResource("MutedTextBrush"),
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                MinHeight = CardContentMinHeight
+            };
+            var stack = new StackPanel
+            {
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center
+            };
+            stack.Children.Add(new Wpf.Ui.Controls.SymbolIcon
+            {
+                Symbol = Wpf.Ui.Controls.SymbolRegular.Add24,
+                FontSize = 20,
+                Foreground = (Brush)FindResource("MutedTextBrush"),
+                HorizontalAlignment = HorizontalAlignment.Center
             });
-            var hint = new TextBlock
+            stack.Children.Add(new TextBlock
             {
                 Text = string.Format(UiText.Get("slotDropHint"), index + 1),
                 FontSize = 9.5,
                 Foreground = (Brush)FindResource("MutedTextBrush"),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 TextAlignment = TextAlignment.Center,
-                Margin = new Thickness(0, 3, 0, 0)
-            };
-            Grid.SetRow(hint, 1);
-            empty.Children.Add(hint);
+                Margin = new Thickness(0, 4, 0, 0)
+            });
+            empty.Children.Add(stack);
             card.Content = empty;
         }
         else
         {
-            var root = new Grid();
-            root.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(26) });
-            root.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            root.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            var icon = new Wpf.Ui.Controls.SymbolIcon
-            {
-                Symbol = ConfigurationIconCatalog.GetSymbol(configuration.IconKey),
-                FontSize = 20,
-                Foreground = ConfigurationPalette.GetBrush(configuration.ColorKey),
-                VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Left
-            };
-            root.Children.Add(icon);
-            var details = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(5, 0, 3, 0) };
-            details.Children.Add(new TextBlock { Text = configuration.Name, FontSize = 10.5, FontWeight = FontWeights.SemiBold, TextTrimming = TextTrimming.CharacterEllipsis });
-            details.Children.Add(new TextBlock { Text = $"ID {configuration.ShortId} · {UiText.Get(ConfigurationIntensity.LabelKey(configuration.Intensity))}", FontSize = 9, Foreground = (Brush)FindResource("MutedTextBrush"), TextTrimming = TextTrimming.CharacterEllipsis, Margin = new Thickness(0, 2, 0, 0) });
-            Grid.SetColumn(details, 1);
-            root.Children.Add(details);
-            var remove = MakeIconAction("Dismiss16", UiText.Get("remove"), true);
-            remove.Padding = new Thickness(2);
-            remove.Margin = new Thickness(0);
-            remove.Click += (_, _) => _session.RemoveFromSlots(configuration.Id);
-            Grid.SetColumn(remove, 2);
-            root.Children.Add(remove);
-            card.Content = root;
+            card.Content = CreateConfigurationContent(configuration, isSlot: true);
             AttachDragHandlers(card, configuration.Id);
         }
 
@@ -140,98 +119,250 @@ public partial class ConfigurationPage : Page
         card.AddHandler(UIElement.PreviewDropEvent, new DragEventHandler(Slot_Drop), true);
         return card;
     }
-
     private void BuildCards(IEnumerable<BlendConfiguration> configurations)
     {
         ConfigurationCardsPanel.Children.Clear();
-        foreach (var configuration in configurations) ConfigurationCardsPanel.Children.Add(CreateCard(configuration));
+        foreach (var configuration in configurations)
+            ConfigurationCardsPanel.Children.Add(CreateConfigurationCard(configuration));
     }
 
-    private UiCard CreateCard(BlendConfiguration configuration)
+    private UiCard CreateConfigurationCard(BlendConfiguration configuration)
     {
-        var card = new UiCard
+        var used = _session.SlotIds.Any(id => string.Equals(id, configuration.Id, StringComparison.OrdinalIgnoreCase));
+        var card = CreateCardSurface(
+            configuration,
+            new Thickness(3, 0, 3, 6),
+            (Brush)FindResource("CardBrush"));
+        card.ToolTip = used ? UiText.Get("configurationInUse") : UiText.Get("dragToSlots");
+        card.Opacity = used ? 0.52 : 1;
+        card.Content = CreateConfigurationContent(configuration, isSlot: false, used);
+        if (!used)
+            AttachDragHandlers(card, configuration.Id);
+        return card;
+    }
+
+    private UiCard CreateCardSurface(BlendConfiguration? configuration, Thickness margin, Brush background)
+    {
+        return new UiCard
         {
-            Margin = new Thickness(0, 0, 6, 8),
-            Padding = new Thickness(8),
-            Height = 104,
-            MinHeight = 104,
-            MaxHeight = 104,
+            Margin = margin,
+            Padding = new Thickness(3),
+            Height = CardHeight,
+            MinHeight = CardHeight,
+            MaxHeight = CardHeight,
+            HorizontalContentAlignment = HorizontalAlignment.Stretch,
             VerticalContentAlignment = VerticalAlignment.Stretch,
-            Background = (Brush)FindResource("CardBrush"),
-            BorderBrush = ConfigurationPalette.GetBrush(configuration.ColorKey),
+            Background = background,
+            BorderBrush = configuration is null
+                ? (Brush)FindResource("BorderBrush")
+                : ConfigurationPalette.GetBrush(configuration.ColorKey),
             BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
-            ToolTip = UiText.Get("dragToSlots"),
             Focusable = false
         };
-        var grid = new Grid();
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(26) });
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+    }
+    private Grid CreateConfigurationContent(BlendConfiguration configuration, bool isSlot, bool used = false)
+    {
+        var foreground = (Brush)FindResource("TextBrush");
+        var root = new Grid
+        {
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
+            MinHeight = CardContentMinHeight
+        };
+        root.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        root.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
         var icon = new Wpf.Ui.Controls.SymbolIcon
         {
             Symbol = ConfigurationIconCatalog.GetSymbol(configuration.IconKey),
-            FontSize = 21,
+            FontSize = 18,
             Foreground = ConfigurationPalette.GetBrush(configuration.ColorKey),
-            VerticalAlignment = VerticalAlignment.Center,
-            HorizontalAlignment = HorizontalAlignment.Left
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top
         };
-        Grid.SetRowSpan(icon, 3);
-        grid.Children.Add(icon);
+        Grid.SetColumn(icon, 0);
+        Grid.SetRow(icon, 0);
+        root.Children.Add(icon);
 
-        var name = new TextBlock { Text = configuration.Name, FontSize = 12, FontWeight = FontWeights.SemiBold, TextTrimming = TextTrimming.CharacterEllipsis, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(5, 0, 2, 0) };
-        Grid.SetColumn(name, 1);
-        grid.Children.Add(name);
+        var action = MakeStatusAction(configuration, isSlot, used, foreground);
+        Grid.SetColumn(action, 1);
+        Grid.SetRow(action, 0);
+        root.Children.Add(action);
 
-        var menuButton = MakeIconAction("MoreHorizontal24", UiText.Get("more"), true);
-        menuButton.Padding = new Thickness(4);
-        menuButton.Margin = new Thickness(0);
-        Grid.SetColumn(menuButton, 2);
-        Grid.SetRow(menuButton, 0);
-        grid.Children.Add(menuButton);
-        menuButton.ContextMenu = CreateConfigurationMenu(menuButton, configuration);
-        menuButton.Click += (_, e) =>
+        var footer = new Grid
         {
-            if (menuButton.ContextMenu is { } menu)
-            {
-                menu.PlacementTarget = menuButton;
-                menu.Placement = PlacementMode.Bottom;
-                menu.IsOpen = true;
-            }
-            e.Handled = true;
+            Margin = new Thickness(0, 2, 0, 0),
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Bottom
         };
+        footer.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        footer.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-        var summary = new TextBlock { Text = FeatureSummary(configuration), Foreground = (Brush)FindResource("MutedTextBrush"), FontSize = 9.5, TextTrimming = TextTrimming.CharacterEllipsis, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(5, 0, 2, 0) };
-        Grid.SetColumn(summary, 1);
-        Grid.SetRow(summary, 1);
-        grid.Children.Add(summary);
+        var name = new TextBlock
+        {
+            Text = configuration.Name,
+            FontSize = 10,
+            Foreground = foreground,
+            FontWeight = FontWeights.SemiBold,
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            MaxWidth = 110,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        Grid.SetColumn(name, 0);
+        footer.Children.Add(name);
 
-        var meta = new TextBlock { Text = $"ID {configuration.ShortId} · {UiText.Get(ConfigurationIntensity.LabelKey(configuration.Intensity))}", Foreground = ConfigurationPalette.GetBrush(configuration.ColorKey), FontSize = 9, FontWeight = FontWeights.SemiBold, TextTrimming = TextTrimming.CharacterEllipsis, Margin = new Thickness(5, 4, 2, 0) };
-        Grid.SetColumn(meta, 1);
-        Grid.SetRow(meta, 2);
-        grid.Children.Add(meta);
+        var id = CreatePill(
+            configuration.ShortId ?? string.Empty,
+            foreground,
+            new Thickness(3, 0, 3, 0),
+            7.5,
+            new Thickness(4, 0, 0, 0));
+        Grid.SetColumn(id, 1);
+        footer.Children.Add(id);
 
-        card.Content = grid;
-        AttachDragHandlers(card, configuration.Id);
-        return card;
+        Grid.SetColumnSpan(footer, 2);
+        Grid.SetRow(footer, 1);
+        root.Children.Add(footer);
+        return root;
     }
+    private static Border CreatePill(string text, Brush foreground, Thickness padding, double fontSize, Thickness margin)
+    {
+        var color = foreground is SolidColorBrush solid ? solid.Color : Colors.Black;
+        var border = new Border
+        {
+            Background = (Brush)Application.Current.FindResource("PillBrush"),
+            BorderBrush = (Brush)Application.Current.FindResource("BorderBrush"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(5),
+            Padding = padding,
+            Margin = margin,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        border.Child = new TextBlock
+        {
+            Text = text,
+            FontFamily = new FontFamily("Cascadia Mono"),
+            FontSize = fontSize,
+            Foreground = foreground,
+            TextTrimming = TextTrimming.CharacterEllipsis
+        };
+        return border;
+    }
+    private Border MakeStatusAction(BlendConfiguration configuration, bool isSlot, bool used, Brush foreground)
+    {
+        var symbol = isSlot
+            ? "Checkmark16"
+            : used
+                ? "Checkmark16"
+                : configuration.IsLocked
+                    ? "LockClosed16"
+                    : "MoreHorizontal24";
+        var tooltip = isSlot
+            ? UiText.Get("remove")
+            : used
+                ? UiText.Get("configurationInUse")
+                : configuration.IsLocked
+                    ? UiText.Get("unlock")
+                    : UiText.Get("more");
 
+        var button = MakeIconAction(symbol, tooltip, isSlot || !used);
+        button.Width = 20;
+        button.Height = 20;
+        button.MinWidth = 0;
+        button.MinHeight = 0;
+        button.Padding = new Thickness(0);
+        button.Margin = new Thickness(0);
+        button.Background = Brushes.Transparent;
+        button.BorderBrush = Brushes.Transparent;
+        button.BorderThickness = new Thickness(0);
+        button.Foreground = foreground;
+        button.CornerRadius = new CornerRadius(10);
+        button.HorizontalAlignment = HorizontalAlignment.Center;
+        button.VerticalAlignment = VerticalAlignment.Center;
+        button.HorizontalContentAlignment = HorizontalAlignment.Center;
+        button.VerticalContentAlignment = VerticalAlignment.Center;
+        button.FocusVisualStyle = null;
+        if (button.Content is Wpf.Ui.Controls.SymbolIcon statusIcon)
+        {
+            statusIcon.FontSize = 12;
+            statusIcon.Foreground = foreground;
+        }
+
+        if (isSlot)
+        {
+            button.Click += (_, _) => _session.RemoveFromSlots(configuration.Id);
+        }
+        else if (!used)
+        {
+            button.ContextMenu = CreateConfigurationMenu(button, configuration);
+            button.Click += (_, e) =>
+            {
+                if (button.ContextMenu is { } menu)
+                {
+                    menu.PlacementTarget = button;
+                    menu.Placement = PlacementMode.Bottom;
+                    menu.IsOpen = true;
+                }
+                e.Handled = true;
+            };
+        }
+        // Match the Home PDF remove control with a separate circular surface.
+        return new Border
+        {
+            Width = 22,
+            Height = 22,
+            CornerRadius = new CornerRadius(11),
+            Background = (Brush)FindResource("CardBrush"),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(0xE6, 0xE6, 0xE6)),
+            BorderThickness = new Thickness(1),
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment = VerticalAlignment.Top,
+            Child = button
+        };
+    }
     private ContextMenu CreateConfigurationMenu(UiButton target, BlendConfiguration configuration)
     {
-        var menu = new ContextMenu { PlacementTarget = target, Placement = PlacementMode.Bottom, StaysOpen = false };
-        var edit = new UiMenuItem { Header = UiText.Get("edit"), Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.Edit16 }, IsEnabled = !configuration.IsLocked };
+        var menu = new ContextMenu
+        {
+            PlacementTarget = target,
+            Placement = PlacementMode.Bottom,
+            StaysOpen = false
+        };
+        var edit = new UiMenuItem
+        {
+            Header = UiText.Get("edit"),
+            Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.Edit16 },
+            IsEnabled = !configuration.IsLocked
+        };
         edit.Click += (_, _) => OpenEditor(configuration, false);
-        var lockItem = new UiMenuItem { Header = configuration.IsLocked ? UiText.Get("unlock") : UiText.Get("lock"), Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = configuration.IsLocked ? Wpf.Ui.Controls.SymbolRegular.LockOpen16 : Wpf.Ui.Controls.SymbolRegular.LockClosed16 } };
+        var lockItem = new UiMenuItem
+        {
+            Header = configuration.IsLocked ? UiText.Get("unlock") : UiText.Get("lock"),
+            Icon = new Wpf.Ui.Controls.SymbolIcon
+            {
+                Symbol = configuration.IsLocked
+                    ? Wpf.Ui.Controls.SymbolRegular.LockOpen16
+                    : Wpf.Ui.Controls.SymbolRegular.LockClosed16
+            }
+        };
         lockItem.Click += (_, _) => _session.SetConfigurationLocked(configuration.Id, !configuration.IsLocked);
-        var delete = new UiMenuItem { Header = UiText.Get("delete"), Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.Delete16 }, IsEnabled = !configuration.IsLocked };
+        var delete = new UiMenuItem
+        {
+            Header = UiText.Get("delete"),
+            Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.Delete16 },
+            IsEnabled = !configuration.IsLocked
+        };
         delete.Click += async (_, _) =>
         {
             if (configuration.IsLocked) return;
-            var confirmed = await _dialogs.ShowConfirmationAsync(UiText.Get("delete"), UiText.Get("deleteConfigurationConfirm"), UiText.Get("delete"), UiText.Get("cancel"), Wpf.Ui.Controls.SymbolRegular.Delete24);
+            var confirmed = await _dialogs.ShowConfirmationAsync(
+                UiText.Get("delete"),
+                UiText.Get("deleteConfigurationConfirm"),
+                UiText.Get("delete"),
+                UiText.Get("cancel"),
+                Wpf.Ui.Controls.SymbolRegular.Delete24);
             if (confirmed) _session.DeleteConfiguration(configuration.Id);
         };
         menu.Items.Add(edit);
@@ -357,14 +488,19 @@ public partial class ConfigurationPage : Page
             card.Background = (Brush)FindResource("AccentSoftBrush");
             e.Effects = DragDropEffects.Move;
         }
-        else e.Effects = DragDropEffects.None;
+        else
+        {
+            e.Effects = DragDropEffects.None;
+        }
         e.Handled = true;
     }
 
     private void Slot_Drop(object sender, DragEventArgs e)
     {
-        if (sender is UiCard card && card.Tag is int target && GetDraggedConfigurationId(e) is string id) _session.AddToSlots(id, target);
-        if (sender is UiCard dropped) ResetSlotVisual(dropped);
+        if (sender is UiCard card && card.Tag is int target && GetDraggedConfigurationId(e) is string id)
+            _session.AddToSlots(id, target);
+        if (sender is UiCard dropped)
+            ResetSlotVisual(dropped);
         e.Handled = true;
     }
 
@@ -372,23 +508,27 @@ public partial class ConfigurationPage : Page
     {
         var configuration = card.Tag is int index ? _session.SlotConfigurations.ElementAtOrDefault(index) : null;
         card.BorderBrush = configuration is null ? (Brush)FindResource("BorderBrush") : ConfigurationPalette.GetBrush(configuration.ColorKey);
-        card.Background = (Brush)FindResource(configuration is null ? "SurfaceMutedBrush" : "CardBrush");
+        card.BorderThickness = new Thickness(1);
+        card.Background = configuration is null ? (Brush)FindResource("SurfaceMutedBrush") : (Brush)FindResource("CardBrush");
         card.Opacity = 1;
     }
 
     private UiButton MakeIconAction(string symbol, string tooltip, bool enabled)
     {
-        var button = new UiButton { Content = new Wpf.Ui.Controls.SymbolIcon { Symbol = Enum.Parse<Wpf.Ui.Controls.SymbolRegular>(symbol), FontSize = 16 }, ToolTip = tooltip, IsEnabled = enabled, Appearance = ControlAppearance.Transparent, Padding = new Thickness(7), Margin = new Thickness(2, 0, 0, 0), Cursor = Cursors.Hand };
+        var parsed = Enum.TryParse<Wpf.Ui.Controls.SymbolRegular>(symbol, out var value)
+            ? value
+            : Wpf.Ui.Controls.SymbolRegular.Add24;
+        var button = new UiButton
+        {
+            Content = new Wpf.Ui.Controls.SymbolIcon { Symbol = parsed, FontSize = 16 },
+            ToolTip = tooltip,
+            IsEnabled = enabled,
+            Appearance = ControlAppearance.Transparent,
+            Padding = new Thickness(7),
+            Margin = new Thickness(2, 0, 0, 0),
+            Cursor = Cursors.Hand
+        };
         AutomationProperties.SetName(button, tooltip);
         return button;
     }
-
-    private string FeatureSummary(BlendConfiguration configuration) => string.Join(" · ", configuration.EnabledFeatures.Select(feature => feature switch
-    {
-        BlendFeature.NormalizeContentWidth => UiText.Get("normalizeWidth"),
-        BlendFeature.Flatten => UiText.Get("flatten"),
-        BlendFeature.Watermark => UiText.Get("watermark"),
-        BlendFeature.PixelNoise => UiText.Get("noise"),
-        _ => feature.ToString()
-    }).DefaultIfEmpty(UiText.Get("noFeatures")));
 }

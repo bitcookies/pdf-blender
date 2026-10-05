@@ -188,7 +188,7 @@ internal sealed class AppSession
         EnsureSelectedSlot();
         Preferences = Preferences with { SelectedBlendLevel = SelectedBlendLevel };
         SavePreferences();
-        try { ConfigurationStore.Save(new ConfigurationDocument(6, _userConfigurations, _slotIds, _selectedConfigurationId)); }
+        try { ConfigurationStore.Save(new ConfigurationDocument(7, _userConfigurations, _slotIds, _selectedConfigurationId)); }
         catch (IOException) { }
         catch (UnauthorizedAccessException) { }
     }
