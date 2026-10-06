@@ -15,8 +15,7 @@ public enum BlendFeature
     UnicodeScramble,
     TextLayoutPerturbation,
     GibberishCopyLayer,
-    HiddenAiText,
-    MetadataNormalization,
+    HiddenAiText, PromptInjection, GanAdversarialPerturbation, MetadataNormalization,
     PermissionRestriction
 }
 
@@ -28,8 +27,7 @@ public static class BlendFeatureCatalog
         BlendFeature.Watermark, BlendFeature.PixelNoise, BlendFeature.Texture,
         BlendFeature.GeometryPerturbation, BlendFeature.MicroTextPattern,
         BlendFeature.UnicodeScramble, BlendFeature.TextLayoutPerturbation,
-        BlendFeature.GibberishCopyLayer, BlendFeature.HiddenAiText,
-        BlendFeature.MetadataNormalization, BlendFeature.PermissionRestriction
+        BlendFeature.GibberishCopyLayer, BlendFeature.HiddenAiText, BlendFeature.PromptInjection, BlendFeature.GanAdversarialPerturbation, BlendFeature.MetadataNormalization, BlendFeature.PermissionRestriction
     ];
 
     public static bool IsEnabled(BlendSettings settings, BlendFeature feature) => feature switch
@@ -45,8 +43,7 @@ public static class BlendFeatureCatalog
         BlendFeature.UnicodeScramble => settings.CopyLayer == CopyLayerMode.UnicodeScramble,
         BlendFeature.TextLayoutPerturbation => settings.CopyLayer == CopyLayerMode.TextLayoutPerturbation,
         BlendFeature.GibberishCopyLayer => settings.CopyLayer == CopyLayerMode.ReplaceWithGibberish,
-        BlendFeature.HiddenAiText => settings.HiddenAiText,
-        BlendFeature.MetadataNormalization => settings.MetadataNormalization || settings.ProtectionDeclaration,
+        BlendFeature.HiddenAiText => settings.HiddenAiText, BlendFeature.PromptInjection => !string.IsNullOrWhiteSpace(settings.PromptInjectionText), BlendFeature.GanAdversarialPerturbation => settings.GanAdversarialPerturbation, BlendFeature.MetadataNormalization => settings.MetadataNormalization || settings.ProtectionDeclaration,
         BlendFeature.PermissionRestriction => settings.PermissionRestriction,
         _ => false
     };
@@ -68,8 +65,7 @@ public static class BlendFeatureCatalog
         BlendFeature.UnicodeScramble when settings.CopyLayer == CopyLayerMode.UnicodeScramble => 4,
         BlendFeature.TextLayoutPerturbation when settings.CopyLayer == CopyLayerMode.TextLayoutPerturbation => 5,
         BlendFeature.GibberishCopyLayer when settings.CopyLayer == CopyLayerMode.ReplaceWithGibberish => 7,
-        BlendFeature.HiddenAiText when settings.HiddenAiText => 7,
-        BlendFeature.PermissionRestriction when settings.PermissionRestriction => 1,
+        BlendFeature.HiddenAiText when settings.HiddenAiText => 7, BlendFeature.PromptInjection when !string.IsNullOrWhiteSpace(settings.PromptInjectionText) => 7, BlendFeature.GanAdversarialPerturbation when settings.GanAdversarialPerturbation => 8, BlendFeature.PermissionRestriction when settings.PermissionRestriction => 1,
         _ => 0
     };
 }

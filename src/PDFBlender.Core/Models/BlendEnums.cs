@@ -59,3 +59,18 @@ public enum TextureStrength
     Low,
     Medium
 }
+
+public enum PageImageFormat
+{
+    WebP,
+    Jpeg,
+    Png
+}
+
+public enum ImageQuality
+{
+    Low,
+    Medium,
+    High,
+    Maximum
+}

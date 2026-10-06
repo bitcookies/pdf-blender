@@ -30,16 +30,14 @@ internal sealed class AppSession
         UiText.SetLanguage(Preferences.Language);
         var document = ConfigurationStore.Load();
         _userConfigurations = document.UserConfigurations ?? [];
-        var seededInitialPresets = !ConfigurationStore.Exists && _userConfigurations.Count == 0;
-        if (seededInitialPresets)
-            SeedInitialPresets();
         var metadataChanged = EnsureConfigurationMetadata();
+        var removedDevelopmentPresets = (document.UserConfigurations ?? []).Any(configuration => PDFBlender.Core.Models.BuiltInConfigurations.All.Any(preset => string.Equals(preset.Id, configuration.Id, StringComparison.OrdinalIgnoreCase)));
         _slotIds = document.SlotIds ?? [];
         _selectedConfigurationId = document.SelectedConfigurationId;
         _slotIds = NormalizeSlots(_slotIds);
         SelectedBlendLevel = Math.Clamp(Preferences.SelectedBlendLevel, 0, 4);
         EnsureSelectedSlot();
-        if (seededInitialPresets || metadataChanged)
+        if (metadataChanged || removedDevelopmentPresets)
             SaveAll();
     }
 
@@ -77,7 +75,7 @@ internal sealed class AppSession
     {
         var id = "custom-" + Guid.NewGuid().ToString("N");
         var requestedName = string.IsNullOrWhiteSpace(name) ? UiText.Get("customConfiguration") : name.Trim();
-        _userConfigurations.Add(new BlendConfiguration(id, MakeUniqueName(requestedName), false, settings ?? BlendSettings.Default, false, CreateShortId(), ConfigurationPalette.Normalize(colorKey ?? ConfigurationPalette.ForIndex(_userConfigurations.Count)), ConfigurationIconCatalog.Normalize(iconKey ?? ConfigurationIconCatalog.ForIndex(_userConfigurations.Count))));
+        _userConfigurations.Add(new BlendConfiguration(id, MakeUniqueName(requestedName), false, settings ?? BlendSettings.Default, false, CreateShortId(), ConfigurationPalette.Normalize(colorKey ?? ConfigurationPalette.Keys[0]), ConfigurationIconCatalog.Normalize(iconKey ?? ConfigurationIconCatalog.ForIndex(_userConfigurations.Count))));
         _selectedConfigurationId = id;
         SaveAll();
         RaiseChanged(SessionChangeKind.Configurations);
@@ -202,20 +200,6 @@ internal sealed class AppSession
         UiText.SetLanguage(Preferences.Language);
         SaveAll();
         RaiseChanged(SessionChangeKind.Preferences);
-    }
-
-    private void SeedInitialPresets()
-    {
-        foreach (var preset in BuiltInConfigurations)
-        {
-            if (_userConfigurations.Any(configuration => string.Equals(configuration.Id, preset.Id, StringComparison.OrdinalIgnoreCase))) continue;
-            _userConfigurations.Add(preset with
-            {
-                Name = LocalizedPresetName(preset),
-                IsBuiltIn = false,
-                IsLocked = false
-            });
-        }
     }
 
     private bool EnsureConfigurationMetadata()

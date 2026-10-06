@@ -60,24 +60,14 @@ internal static class ConfigurationStore
 
     private static ConfigurationDocument CreateDefault()
     {
-        var configurations = BuiltInConfigurations.All
-            .Select(configuration => configuration with
-            {
-                IsBuiltIn = false,
-                IsLocked = false
-            })
-            .ToList();
-        return new ConfigurationDocument(
-            CurrentSchemaVersion,
-            configurations,
-            [null, null, null, null, null],
-            null);
+        return new ConfigurationDocument(CurrentSchemaVersion, [], [null, null, null, null, null], null);
     }
 
     private static ConfigurationDocument NormalizeCurrent(ConfigurationDocument document)
     {
         var uniqueUser = (document.UserConfigurations ?? [])
             .Where(configuration => !string.IsNullOrWhiteSpace(configuration.Id))
+            .Where(configuration => !BuiltInConfigurations.All.Any(preset => string.Equals(preset.Id, configuration.Id, StringComparison.OrdinalIgnoreCase)))
             .GroupBy(configuration => configuration.Id, StringComparer.OrdinalIgnoreCase)
             .Select(group => group.First() with
             {

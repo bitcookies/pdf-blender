@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using TextBlock = System.Windows.Controls.TextBlock;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using PDFBlender.Core.Models;
 using UiCard = Wpf.Ui.Controls.Card;
@@ -35,9 +36,16 @@ public partial class ConfigurationEditorPage : Page
     private readonly UiToggleSwitch _hiddenAi = new();
     private readonly UiToggleSwitch _metadata = new();
     private readonly UiToggleSwitch _permissions = new();
+    private readonly ComboBox _contentWidthPreset = new();
     private readonly ComboBox _pageSizePreset = new();
+    private readonly ComboBox _imageFormat = new();
+    private readonly ComboBox _imageQuality = new();
+    private readonly ComboBox _watermarkAngle = new();
     private readonly ComboBox _copyLayerMode = new();
     private readonly ComboBox _textureLevel = new();
+    private readonly UiTextBox _promptInjectionText = new();
+    private readonly UiToggleSwitch _promptInjection = new();
+    private readonly UiToggleSwitch _gan = new();
     private readonly UiTextBox _width = new();
     private readonly ComboBox _dpi = new();
     private readonly ComboBox _watermarkType = new();
@@ -51,7 +59,7 @@ public partial class ConfigurationEditorPage : Page
     {
         _session = session;
         _dialogs = dialogs;
-        _source = source ?? new BlendConfiguration("new", string.Empty, false, new BlendSettings { NormalizeContentWidth = false, Protection = ProtectionMethod.None, Watermark = WatermarkStyle.None, Noise = NoiseStrength.Off }, false, null, ConfigurationPalette.ForIndex(session.AllConfigurations.Count), ConfigurationIconCatalog.Normalize("regular:DocumentSettings20"));
+        _source = source ?? new BlendConfiguration("new", string.Empty, false, new BlendSettings { NormalizeContentWidth = false, Protection = ProtectionMethod.None, Watermark = WatermarkStyle.None, Noise = NoiseStrength.Off }, false, null, ConfigurationPalette.Keys[0], ConfigurationIconCatalog.Normalize("regular:DocumentSettings20"));
         _isNew = isNew;
         _parentBack = back;
         _listBack = listBack;
@@ -171,29 +179,100 @@ public partial class ConfigurationEditorPage : Page
         _microText.IsChecked = _settings.MicroTextPattern;
         _copyLayer.IsChecked = _settings.CopyLayer != CopyLayerMode.Preserve;
         _hiddenAi.IsChecked = _settings.HiddenAiText;
+        _promptInjection.IsChecked = !string.IsNullOrWhiteSpace(_settings.PromptInjectionText);
+        _promptInjectionText.Text = _settings.PromptInjectionText;
+        _gan.IsChecked = _settings.GanAdversarialPerturbation;
         _metadata.IsChecked = _settings.MetadataNormalization || _settings.ProtectionDeclaration;
         _permissions.IsChecked = _settings.PermissionRestriction;
+
+        _contentWidthPreset.ItemsSource = new[] { PageSizePreset.A5, PageSizePreset.A4, PageSizePreset.A3, PageSizePreset.Letter, PageSizePreset.Legal, PageSizePreset.Custom };
+        _contentWidthPreset.SelectedItem = _settings.ContentWidthPreset == PageSizePreset.Original ? PageSizePreset.A4 : _settings.ContentWidthPreset;
         _width.Text = _settings.TargetWidthMillimeters.ToString("0.##", CultureInfo.InvariantCulture);
-        _dpi.ItemsSource = new[] { 120, 150, 180, 200, 300 }; _dpi.SelectedItem = _settings.Dpi;
-        _pageSizePreset.ItemsSource = new[] { PageSizePreset.A5, PageSizePreset.A4, PageSizePreset.A3, PageSizePreset.A2, PageSizePreset.Letter, PageSizePreset.Legal, PageSizePreset.Custom };
+        _dpi.ItemsSource = new[] { 120, 150, 180, 200, 300 };
+        _dpi.SelectedItem = _settings.Dpi;
+        _pageSizePreset.ItemsSource = new[] { PageSizePreset.A5, PageSizePreset.A4, PageSizePreset.A3, PageSizePreset.A2, PageSizePreset.Letter, PageSizePreset.Legal };
         _pageSizePreset.SelectedItem = _settings.PageSize == PageSizePreset.Original ? PageSizePreset.A4 : _settings.PageSize;
-        _watermarkType.ItemsSource = new[] { UiText.Get("text"), UiText.Get("fullPage") }; _watermarkType.SelectedIndex = Math.Max(0, (int)_settings.Watermark - 1);
+        _imageFormat.ItemsSource = new[] { PageImageFormat.WebP, PageImageFormat.Jpeg, PageImageFormat.Png };
+        _imageFormat.SelectedItem = _settings.ImageFormat;
+        _imageQuality.ItemsSource = new[] { ImageQuality.Low, ImageQuality.Medium, ImageQuality.High, ImageQuality.Maximum };
+        _imageQuality.SelectedItem = _settings.ImageQuality;
+        _watermarkType.ItemsSource = new[] { UiText.Get("text"), UiText.Get("fullPage") };
+        _watermarkType.SelectedIndex = Math.Max(0, (int)_settings.Watermark - 1);
+        _watermarkAngle.ItemsSource = new[] { -45d, 0d, 45d, 90d };
+        _watermarkAngle.SelectedItem = _settings.WatermarkAngle;
         _watermarkText.Text = _settings.WatermarkText;
-        _noiseLevel.ItemsSource = new[] { UiText.Get("low"), UiText.Get("medium"), UiText.Get("high") }; _noiseLevel.SelectedIndex = Math.Max(0, (int)_settings.Noise - 1);
-        _textureLevel.ItemsSource = new[] { UiText.Get("low"), UiText.Get("medium") }; _textureLevel.SelectedIndex = Math.Max(0, (int)_settings.Texture - 1);
-        _copyLayerMode.ItemsSource = new[] { UiText.Get("unicodeScramble"), UiText.Get("textLayoutPerturbation"), UiText.Get("gibberishCopyLayer") }; _copyLayerMode.SelectedIndex = Math.Clamp((int)_settings.CopyLayer - 1, 0, 2);
-        AddFeature(UiText.Get("normalizeWidth"), UiText.Get("normalizeHint"), _normalize, [Labeled(UiText.Get("targetWidth"), _width)]);
+        _watermarkText.AcceptsReturn = true;
+        _watermarkText.TextWrapping = TextWrapping.Wrap;
+        _watermarkText.Height = 74;
+        _noiseLevel.ItemsSource = new[] { UiText.Get("low"), UiText.Get("medium"), UiText.Get("high") };
+        _noiseLevel.SelectedIndex = Math.Max(0, (int)_settings.Noise - 1);
+        _textureLevel.ItemsSource = new[] { UiText.Get("low"), UiText.Get("medium") };
+        _textureLevel.SelectedIndex = Math.Max(0, (int)_settings.Texture - 1);
+        _copyLayerMode.ItemsSource = new[] { UiText.Get("unicodeScramble"), UiText.Get("textLayoutPerturbation"), UiText.Get("gibberishCopyLayer") };
+        _copyLayerMode.SelectedIndex = Math.Clamp((int)_settings.CopyLayer - 1, 0, 2);
+
+        AddSection(UiText.Get("pageFormat"));
+        AddFeature(UiText.Get("normalizeWidth"), UiText.Get("normalizeHint"), _normalize, [Labeled(UiText.Get("targetWidthPreset"), _contentWidthPreset), Labeled(UiText.Get("targetWidth"), _width)]);
         AddFeature(UiText.Get("normalizePageSize"), UiText.Get("normalizePageSizeHint"), _pageSize, [Labeled(UiText.Get("pageSize"), _pageSizePreset)]);
-        AddFeature(UiText.Get("flatten"), UiText.Get("protectionHint"), _flatten, [Labeled(UiText.Get("dpi"), _dpi)]);
-        AddFeature(UiText.Get("watermark"), UiText.Get("watermarkTypeHint"), _watermark, [Labeled(UiText.Get("watermarkType"), _watermarkType), Labeled(UiText.Get("watermarkText"), _watermarkText)]);
+
+        AddSection(UiText.Get("flattening"));
+        AddFeature(UiText.Get("flatten"), UiText.Get("protectionHint"), _flatten, [Labeled(UiText.Get("dpi"), _dpi), Labeled(UiText.Get("imageFormat"), _imageFormat), Labeled(UiText.Get("imageQuality"), _imageQuality)]);
+
+        AddSection(UiText.Get("watermarkGroup"));
+        AddFeature(UiText.Get("watermark"), UiText.Get("watermarkTypeHint"), _watermark, [Labeled(UiText.Get("watermarkType"), _watermarkType), Labeled(UiText.Get("watermarkAngle"), _watermarkAngle), Labeled(UiText.Get("watermarkText"), _watermarkText)]);
+
+        AddSection(UiText.Get("noisePerturbation"));
         AddFeature(UiText.Get("noise"), UiText.Get("noiseHint"), _noise, [Labeled(UiText.Get("noise"), _noiseLevel)], true);
         AddFeature(UiText.Get("texture"), UiText.Get("textureHint"), _texture, [Labeled(UiText.Get("texture"), _textureLevel)], true);
         AddFeature(UiText.Get("geometryPerturbation"), UiText.Get("geometryPerturbationHint"), _geometry, [], true);
         AddFeature(UiText.Get("microTextPattern"), UiText.Get("microTextPatternHint"), _microText, [], true);
+
+        AddSection(UiText.Get("copyGroup"));
         AddFeature(UiText.Get("copyLayer"), UiText.Get("copyLayerHint"), _copyLayer, [Labeled(UiText.Get("copyLayerMode"), _copyLayerMode)], true);
+
+        AddSection(UiText.Get("promptInjectionGroup"));
         AddFeature(UiText.Get("hiddenAiText"), UiText.Get("hiddenAiTextHint"), _hiddenAi, []);
+        AddFeature(UiText.Get("promptInjection"), UiText.Get("promptInjectionHint"), _promptInjection, [Labeled(UiText.Get("promptText"), _promptInjectionText)]);
+
+        AddSection(UiText.Get("ganGroup"));
+        AddFeature(UiText.Get("ganPerturbation"), UiText.Get("ganPerturbationHint"), _gan, [], true);
+
+        AddSection(UiText.Get("copyrightProtection"));
         AddFeature(UiText.Get("metadata"), UiText.Get("metadataHint"), _metadata, []);
         AddFeature(UiText.Get("permissionRestriction"), UiText.Get("permissionHint"), _permissions, [], true);
+
+        _normalize.Checked += (_, _) => { _pageSize.IsChecked = false; UpdateSaveState(); };
+        _pageSize.Checked += (_, _) => { _normalize.IsChecked = false; UpdateSaveState(); };
+        _contentWidthPreset.SelectionChanged += (_, _) => UpdateWidthFromPreset();
+        UpdateWidthFromPreset();
+    }
+
+    private void AddSection(string title)
+    {
+        FeaturePanel.Children.Add(new TextBlock
+        {
+            Text = title,
+            Style = (Style)FindResource("SectionTitleTextStyle"),
+            Margin = new Thickness(0, 14, 0, 8)
+        });
+    }
+
+    private void UpdateWidthFromPreset()
+    {
+        if (_contentWidthPreset.SelectedItem is not PageSizePreset preset)
+            return;
+        _width.Visibility = preset == PageSizePreset.Custom ? Visibility.Visible : Visibility.Collapsed;
+        if (preset == PageSizePreset.Custom)
+            return;
+        _width.Text = preset switch
+        {
+            PageSizePreset.A5 => "148",
+            PageSizePreset.A4 => "210",
+            PageSizePreset.A3 => "297",
+            PageSizePreset.Letter => "215.9",
+            PageSizePreset.Legal => "215.9",
+            _ => _width.Text
+        };
     }
 
     private void AddFeature(string title, string hint, UiToggleSwitch toggle, IEnumerable<UIElement> details, bool requiresFlatten = false)
@@ -208,13 +287,85 @@ public partial class ConfigurationEditorPage : Page
         header.Children.Add(toggle);
         header.Children.Add(labels);
         root.Children.Add(header);
-        var detail = new StackPanel { Visibility = toggle.IsChecked == true ? Visibility.Visible : Visibility.Collapsed, Margin = new Thickness(0, 8, 0, 0) };
-        foreach (var item in details) detail.Children.Add(item);
+
+        var detail = new StackPanel
+        {
+            Visibility = Visibility.Collapsed,
+            Height = 0,
+            Margin = new Thickness(0, 8, 0, 0)
+        };
+        foreach (var item in details)
+            detail.Children.Add(item);
         root.Children.Add(detail);
-        toggle.Checked += (_, _) => { detail.Visibility = Visibility.Visible; UpdateSaveState(); };
-        toggle.Unchecked += (_, _) => { detail.Visibility = Visibility.Collapsed; UpdateSaveState(); };
         card.Content = root;
         FeaturePanel.Children.Add(card);
+
+        void Expand()
+        {
+            detail.Visibility = Visibility.Visible;
+            detail.BeginAnimation(FrameworkElement.HeightProperty, null);
+            detail.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            var target = detail.DesiredSize.Height;
+            detail.Height = 0;
+            var animation = new DoubleAnimation(0, target, TimeSpan.FromMilliseconds(180))
+            {
+                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
+                FillBehavior = FillBehavior.HoldEnd
+            };
+            animation.Completed += (_, _) =>
+            {
+                detail.BeginAnimation(FrameworkElement.HeightProperty, null);
+                detail.Height = double.NaN;
+            };
+            detail.BeginAnimation(FrameworkElement.HeightProperty, animation);
+        }
+
+        void Collapse()
+        {
+            var current = double.IsNaN(detail.Height) ? detail.ActualHeight : detail.Height;
+            if (current <= 0)
+            {
+                detail.Visibility = Visibility.Collapsed;
+                detail.Height = 0;
+                return;
+            }
+
+            var animation = new DoubleAnimation(current, 0, TimeSpan.FromMilliseconds(150))
+            {
+                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn },
+                FillBehavior = FillBehavior.HoldEnd
+            };
+            animation.Completed += (_, _) =>
+            {
+                detail.Visibility = Visibility.Collapsed;
+                detail.Height = 0;
+            };
+            detail.BeginAnimation(FrameworkElement.HeightProperty, animation);
+        }
+
+        toggle.IsEnabled = !requiresFlatten || _flatten.IsChecked == true;
+        toggle.Checked += (_, _) =>
+        {
+            Expand();
+            UpdateSaveState();
+        };
+        toggle.Unchecked += (_, _) =>
+        {
+            Collapse();
+            UpdateSaveState();
+        };
+        if (requiresFlatten)
+        {
+            _flatten.Checked += (_, _) => toggle.IsEnabled = true;
+            _flatten.Unchecked += (_, _) =>
+            {
+                toggle.IsChecked = false;
+                toggle.IsEnabled = false;
+            };
+        }
+
+        if (toggle.IsChecked == true)
+            Dispatcher.BeginInvoke(new Action(Expand), DispatcherPriority.Loaded);
     }
 
     private UIElement Labeled(string label, Control control)
@@ -229,7 +380,7 @@ public partial class ConfigurationEditorPage : Page
 
     private void UpdateSaveState() {
         var hasName = !string.IsNullOrWhiteSpace(NameBox.Text);
-        var hasFeature = _normalize.IsChecked == true || _pageSize.IsChecked == true || _flatten.IsChecked == true || _watermark.IsChecked == true || _noise.IsChecked == true || _texture.IsChecked == true || _geometry.IsChecked == true || _microText.IsChecked == true || _copyLayer.IsChecked == true || _hiddenAi.IsChecked == true || _metadata.IsChecked == true || _permissions.IsChecked == true;
+        var hasFeature = _normalize.IsChecked == true || _pageSize.IsChecked == true || _flatten.IsChecked == true || _watermark.IsChecked == true || _noise.IsChecked == true || _texture.IsChecked == true || _geometry.IsChecked == true || _microText.IsChecked == true || _copyLayer.IsChecked == true || _hiddenAi.IsChecked == true || _promptInjection.IsChecked == true || _gan.IsChecked == true || _metadata.IsChecked == true || _permissions.IsChecked == true;
         SaveButton.IsEnabled = hasName && (!_isNew || hasFeature);
         var saveBrush = SaveButton.IsEnabled ? (Brush)FindResource("AccentTextBrush") : (Brush)FindResource("MutedTextBrush");
         SaveButton.Foreground = saveBrush;

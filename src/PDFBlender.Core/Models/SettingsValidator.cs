@@ -5,6 +5,7 @@ public static class SettingsValidator
     public static IReadOnlyList<string> Validate(BlendSettings settings)
     {
         var errors = new List<string>();
+        if (settings.NormalizeContentWidth && settings.NormalizePageSize) errors.Add("Content width and page size normalization cannot be enabled together.");
         if (settings.TargetWidthMillimeters is < 10 or > 2000) errors.Add("Target content width must be between 10 and 2000 millimeters.");
         if (settings.CustomPageWidthMillimeters is < 10 or > 2000) errors.Add("Custom page width must be between 10 and 2000 millimeters.");
         if (settings.Dpi is < 72 or > 600) errors.Add("DPI must be between 72 and 600.");
