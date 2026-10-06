@@ -62,12 +62,19 @@ internal sealed class DialogService
             Margin = new Thickness(12, 12, 12, 8),
             Height = 36
         };
-        var grid = new WrapPanel { Orientation = Orientation.Horizontal };
+        // Ten icon cells per row: each regular icon is followed by its filled variant.
+        var grid = new WrapPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Width = 300,
+            HorizontalAlignment = HorizontalAlignment.Left
+        };
         var scroll = new ScrollViewer
         {
-            Width = 300,
-            Height = 165,
-            Padding = new Thickness(8, 0, 8, 8),
+            Width = 316,
+            Height = 220,
+            Margin = new Thickness(12, 0, 12, 0),
+            Padding = new Thickness(0),
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             Content = grid
@@ -75,23 +82,16 @@ internal sealed class DialogService
         var border = new Border
         {
             Background = Brushes.Transparent,
-            Padding = new Thickness(6),
+            Padding = new Thickness(20),
             Child = new Border
             {
-                Width = 328,
+                Width = 340,
                 Background = (Brush)Application.Current.FindResource("SurfaceBrush"),
                 BorderBrush = (Brush)Application.Current.FindResource("BorderBrush"),
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(8),
                 SnapsToDevicePixels = true,
-                Effect = new DropShadowEffect
-                {
-                    BlurRadius = 16,
-                    ShadowDepth = 4,
-                    Direction = 270,
-                    Opacity = 0.24,
-                    Color = Color.FromRgb(32, 32, 32)
-                },
+                Effect = (Effect)Application.Current.FindResource("FlyoutShadowEffect"),
                 Child = new StackPanel { Children = { query, scroll } }
             }
         };
@@ -99,6 +99,7 @@ internal sealed class DialogService
         {
             PlacementTarget = placementTarget,
             Placement = PlacementMode.Bottom,
+            HorizontalOffset = -20,
             StaysOpen = false,
             AllowsTransparency = true,
             Child = border
@@ -113,36 +114,75 @@ internal sealed class DialogService
             if (popup.IsOpen) popup.IsOpen = false;
         }
 
-        void Refresh()
+        const int batchSize = 100;
+        var matches = Array.Empty<ConfigurationIconDescriptor>();
+        var loadedCount = 0;
+        var isLoading = false;
+
+        static string BaseName(ConfigurationIconDescriptor descriptor)
         {
-            grid.Children.Clear();
-            var matches = ConfigurationIconCatalog.Search(query.Text, false)
-                .Concat(ConfigurationIconCatalog.Search(query.Text, true))
-                .GroupBy(item => item.Key, StringComparer.OrdinalIgnoreCase)
-                .Select(group => group.First())
-                .Take(240);
-            foreach (var descriptor in matches)
+            var separator = descriptor.Key.IndexOf(':');
+            return separator >= 0 ? descriptor.Key[(separator + 1)..] : descriptor.Key;
+        }
+
+        void AddNextBatch()
+        {
+            if (isLoading || loadedCount >= matches.Length)
+                return;
+
+            isLoading = true;
+            try
             {
-                var selected = string.Equals(descriptor.Key, currentKey, StringComparison.OrdinalIgnoreCase);
-                var button = new Wpf.Ui.Controls.Button
+                foreach (var descriptor in matches.Skip(loadedCount).Take(batchSize))
                 {
-                    Width = 28,
-                    Height = 28,
-                    Margin = new Thickness(1),
-                    Padding = new Thickness(0),
-                    CornerRadius = new CornerRadius(6),
-                    Appearance = ControlAppearance.Secondary,
-                    BorderBrush = selected ? (Brush)Application.Current.FindResource("AccentBrush") : (Brush)Application.Current.FindResource("BorderBrush"),
-                    BorderThickness = new Thickness(selected ? 2 : 1),
-                    ToolTip = descriptor.Name,
-                    Cursor = Cursors.Hand,
-                    Content = new SymbolIcon { Symbol = descriptor.Symbol, Filled = descriptor.Filled, FontSize = 13 }
-                };
-                button.Click += (_, _) => Close(descriptor.Key);
-                grid.Children.Add(button);
+                    var selected = string.Equals(descriptor.Key, currentKey, StringComparison.OrdinalIgnoreCase);
+                    var button = new Wpf.Ui.Controls.Button
+                    {
+                        Width = 28,
+                        Height = 28,
+                        Margin = new Thickness(1),
+                        Padding = new Thickness(0),
+                        CornerRadius = new CornerRadius(6),
+                        Appearance = ControlAppearance.Secondary,
+                        BorderBrush = selected ? (Brush)Application.Current.FindResource("AccentBrush") : (Brush)Application.Current.FindResource("BorderBrush"),
+                        BorderThickness = new Thickness(selected ? 2 : 1),
+                        ToolTip = descriptor.Name,
+                        Cursor = Cursors.Hand,
+                        Content = new SymbolIcon { Symbol = descriptor.Symbol, Filled = descriptor.Filled, FontSize = 13 }
+                    };
+                    button.Click += (_, _) => Close(descriptor.Key);
+                    grid.Children.Add(button);
+                }
+
+                loadedCount = Math.Min(loadedCount + batchSize, matches.Length);
+            }
+            finally
+            {
+                isLoading = false;
             }
         }
 
+        void Refresh()
+        {
+            var filledByName = ConfigurationIconCatalog.Search(query.Text, true)
+                .GroupBy(BaseName, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(group => group.Key, group => group.First(), StringComparer.OrdinalIgnoreCase);
+            matches = ConfigurationIconCatalog.Search(query.Text, false)
+                .SelectMany(regular => filledByName.TryGetValue(BaseName(regular), out var filledDescriptor)
+                    ? new[] { regular, filledDescriptor }
+                    : new[] { regular })
+                .ToArray();
+            grid.Children.Clear();
+            loadedCount = 0;
+            scroll.ScrollToTop();
+            AddNextBatch();
+        }
+
+        scroll.ScrollChanged += (_, _) =>
+        {
+            if (scroll.VerticalOffset + scroll.ViewportHeight >= scroll.ExtentHeight - 72)
+                AddNextBatch();
+        };
         query.TextChanged += (_, _) => Refresh();
         popup.Closed += (_, _) => { if (!completed) { completed = true; resultSource.TrySetResult(null); } };
         query.PreviewKeyDown += (_, e) => { if (e.Key == Key.Escape) { e.Handled = true; Close(null); } };

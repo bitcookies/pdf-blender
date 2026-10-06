@@ -17,7 +17,7 @@
                         <Grid Margin="0,12,0,0">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
                             <TextBlock x:Name="ColorText" Text="颜色" VerticalAlignment="Top" Margin="0,0,14,0" />
-                            <WrapPanel x:Name="ColorPanel" Grid.Column="1" />
+                            <UniformGrid x:Name="ColorPanel" Grid.Column="1" Columns="16" Rows="2" />
                         </Grid>
                         <Grid Margin="0,12,0,0">
                             <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
@@ -36,5 +36,3 @@
         </Grid>
     </ScrollViewer>
 </Page>
-
-

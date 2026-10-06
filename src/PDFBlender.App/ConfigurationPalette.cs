@@ -38,7 +38,6 @@ internal static class ConfigurationPalette
         ("gray", "#9E9E9E", "#BDBDBD"),
         ("blueGray", "#607D8B", "#8DA8B5"),
         ("slate", "#34495E", "#668098"),
-        ("charcoal", "#2C3E50", "#587086")
     ];
 
     private static readonly IReadOnlyDictionary<string, string> LegacyAliases =

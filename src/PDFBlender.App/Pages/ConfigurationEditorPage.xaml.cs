@@ -40,7 +40,7 @@ public partial class ConfigurationEditorPage : Page
     {
         _session = session;
         _dialogs = dialogs;
-        _source = source ?? new BlendConfiguration("new", UiText.Get("configurationName"), false, new BlendSettings { NormalizeContentWidth = false, Protection = ProtectionMethod.None, Watermark = WatermarkStyle.None, Noise = NoiseStrength.Off }, false, null, ConfigurationPalette.ForIndex(session.AllConfigurations.Count), ConfigurationIconCatalog.ForIndex(session.AllConfigurations.Count));
+        _source = source ?? new BlendConfiguration("new", string.Empty, false, new BlendSettings { NormalizeContentWidth = false, Protection = ProtectionMethod.None, Watermark = WatermarkStyle.None, Noise = NoiseStrength.Off }, false, null, ConfigurationPalette.ForIndex(session.AllConfigurations.Count), ConfigurationIconCatalog.Normalize("regular:DocumentSettings20"));
         _isNew = isNew;
         _parentBack = back;
         _listBack = listBack;
@@ -70,11 +70,12 @@ public partial class ConfigurationEditorPage : Page
     {
         TitleText.Text = UiText.Get(_isNew ? "newCustomConfiguration" : "editConfiguration");
         NameLabel.Text = UiText.Get("configurationName");
+        NameBox.PlaceholderText = UiText.Get("configurationNamePlaceholder");
         NameBox.Text = _source.Name;
         ColorText.Text = UiText.Get("selectColor");
         IconText.Text = UiText.Get("selectIcon");
         CancelButton.Content = UiText.Get("cancel");
-        SaveButton.Content = UiText.Get("save");
+        SaveButton.Content = new TextBlock { Text = UiText.Get("save") };
     }
 
     private void BuildColorChoices()
@@ -83,8 +84,39 @@ public partial class ConfigurationEditorPage : Page
         foreach (var key in ConfigurationPalette.Keys)
         {
             var selected = string.Equals(key, _selectedColorKey, StringComparison.OrdinalIgnoreCase);
-            var button = new UiButton { Width = 28, Height = 28, Padding = new Thickness(0), Margin = new Thickness(3, 2, 3, 2), Background = ConfigurationPalette.GetBrush(key), BorderBrush = selected ? (Brush)FindResource("TextBrush") : null, BorderThickness = new Thickness(selected ? 2 : 0), CornerRadius = new CornerRadius(14), Cursor = Cursors.Hand, ToolTip = key, Tag = key };
-            button.Click += (_, _) => { _selectedColorKey = key; BuildColorChoices(); };
+            var button = new Border
+            {
+                Width = 28,
+                Height = 28,
+                Margin = new Thickness(3, 2, 3, 2),
+                Background = ConfigurationPalette.GetBrush(key),
+                BorderBrush = selected ? (Brush)FindResource("TextBrush") : Brushes.Transparent,
+                BorderThickness = new Thickness(selected ? 2 : 0),
+                CornerRadius = new CornerRadius(14),
+                Cursor = Cursors.Hand,
+                ToolTip = key,
+                Tag = key,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            button.MouseEnter += (_, _) =>
+            {
+                button.Background = ConfigurationPalette.GetBrush(key);
+                button.BorderBrush = new SolidColorBrush(Color.FromRgb(0x8C, 0x8C, 0x8C));
+                button.BorderThickness = new Thickness(2);
+            };
+            button.MouseLeave += (_, _) =>
+            {
+                button.Background = ConfigurationPalette.GetBrush(key);
+                button.BorderBrush = selected ? (Brush)FindResource("TextBrush") : Brushes.Transparent;
+                button.BorderThickness = new Thickness(selected ? 2 : 0);
+            };
+            button.MouseLeftButtonUp += (_, e) =>
+            {
+                e.Handled = true;
+                _selectedColorKey = key;
+                BuildColorChoices();
+            };
             ColorPanel.Children.Add(button);
         }
     }
@@ -147,8 +179,8 @@ public partial class ConfigurationEditorPage : Page
         var detail = new StackPanel { Visibility = toggle.IsChecked == true ? Visibility.Visible : Visibility.Collapsed, Margin = new Thickness(0, 8, 0, 0) };
         foreach (var item in details) detail.Children.Add(item);
         root.Children.Add(detail);
-        toggle.Checked += (_, _) => detail.Visibility = Visibility.Visible;
-        toggle.Unchecked += (_, _) => detail.Visibility = Visibility.Collapsed;
+        toggle.Checked += (_, _) => { detail.Visibility = Visibility.Visible; UpdateSaveState(); };
+        toggle.Unchecked += (_, _) => { detail.Visibility = Visibility.Collapsed; UpdateSaveState(); };
         card.Content = root;
         FeaturePanel.Children.Add(card);
     }
@@ -168,6 +200,14 @@ public partial class ConfigurationEditorPage : Page
         var hasName = !string.IsNullOrWhiteSpace(NameBox.Text);
         var hasFeature = _normalize.IsChecked == true || _flatten.IsChecked == true || _watermark.IsChecked == true || _noise.IsChecked == true;
         SaveButton.IsEnabled = hasName && (!_isNew || hasFeature);
+        var saveBrush = SaveButton.IsEnabled
+            ? (Brush)FindResource("AccentTextBrush")
+            : (Brush)FindResource("MutedTextBrush");
+        SaveButton.Foreground = saveBrush;
+        if (SaveButton.Content is TextBlock saveText)
+        {
+            saveText.Foreground = saveBrush;
+        }
     }
 
     private void BreadcrumbBar_ItemClicked(object sender, BreadcrumbBarItemClickedEventArgs e)
@@ -205,6 +245,3 @@ public partial class ConfigurationEditorPage : Page
 
     private void CancelButton_Click(object sender, RoutedEventArgs e) => _parentBack();
 }
-
-
-

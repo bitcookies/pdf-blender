@@ -40,9 +40,7 @@ public partial class ConfigurationPage : Page
         TitleText.Text = UiText.Get("configuration");
         SubtitleText.Text = UiText.Get("configurationSubtitle");
         SlotsHeader.Text = UiText.Get("blendSlots");
-        SlotsHintText.Text = UiText.Get("blendSlotsHint");
         ConfigurationsHeader.Text = UiText.Get("blendConfigurations");
-        ConfigurationsHintText.Text = UiText.Get("blendConfigurationsHint");
         AddButtonText.Text = UiText.Get("addConfiguration");
         EmptyText.Text = _session.AllConfigurations.Count == 0 ? UiText.Get("noConfigurations") : string.Empty;
         EmptyText.Visibility = _session.AllConfigurations.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
