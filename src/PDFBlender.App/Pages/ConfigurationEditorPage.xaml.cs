@@ -50,6 +50,7 @@ public partial class ConfigurationEditorPage : Page
         _settings = _source.Settings ?? BlendSettings.Default;
         InitializeComponent();
         ConfigureBreadcrumb(listBack);
+        BreadcrumbBarStyling.Attach(BreadcrumbBar);
         RefreshText();
         BuildFeatureRows();
         BuildColorChoices();

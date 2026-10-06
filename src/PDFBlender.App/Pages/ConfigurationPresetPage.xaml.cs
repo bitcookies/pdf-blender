@@ -25,6 +25,7 @@ public partial class ConfigurationPresetPage : Page
         _createBack = createBack;
         _listBack = listBack;
         InitializeComponent();
+        BreadcrumbBarStyling.Attach(BreadcrumbBar);
         Refresh();
     }
 

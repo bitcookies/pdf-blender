@@ -4,14 +4,33 @@
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:local="clr-namespace:PDFBlender.App"
 >
+
     <ScrollViewer local:ScrollBarAutoHideBehavior.Enabled="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="24,20,24,24" MaxWidth="760">
             <ui:BreadcrumbBar x:Name="BreadcrumbBar"
                               ItemClicked="BreadcrumbBar_ItemClicked"
                               Margin="0,0,0,12"
                               Cursor="Hand"
+                              FontSize="13"
                               FontWeight="Normal"
-                              Foreground="#333333" />
+                              Foreground="#333333">
+                <ui:BreadcrumbBar.Resources>
+                    <SolidColorBrush x:Key="BreadcrumbBarNormalForegroundBrush" Color="#333333" />
+                    <SolidColorBrush x:Key="BreadcrumbBarHoverForegroundBrush" Color="#909090" />
+                    <SolidColorBrush x:Key="BreadcrumbBarCurrentNormalForegroundBrush" Color="#333333" />
+                    <Style TargetType="{x:Type ui:BreadcrumbBarItem}" BasedOn="{StaticResource DefaultUiBreadcrumbBarItemStyle}">
+                        <Setter Property="FontSize" Value="13" />
+                        <Setter Property="FontWeight" Value="Normal" />
+                        <Setter Property="Icon">
+                            <Setter.Value>
+                                <ui:IconSourceElement>
+                                    <ui:SymbolIconSource Symbol="ChevronRight24" FontSize="12" FontWeight="Normal" />
+                                </ui:IconSourceElement>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ui:BreadcrumbBar.Resources>
+            </ui:BreadcrumbBar>
             <TextBlock x:Name="TitleText" Style="{StaticResource PageTitleTextStyle}" />
             <TextBlock x:Name="SubtitleText" Style="{StaticResource PageDescriptionTextStyle}" Margin="0,3,0,14" />
             <StackPanel x:Name="PresetPanel" />
