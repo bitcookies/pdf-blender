@@ -1,8 +1,10 @@
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 
 namespace PDFBlender.App;
@@ -16,6 +18,11 @@ public partial class BlendLevelRail : UserControl
     private const double RailTravelRatio = 0.8;
     private IReadOnlyList<BlendLevelItem> _levels = [];
     private bool _updating;
+    private bool _isDragging;
+    private int _dragStartIndex;
+    private int _dragTarget;
+    private int _animationVersion;
+    private static readonly Duration SelectionTransition = new(TimeSpan.FromMilliseconds(160));
 
     public event EventHandler<BlendLevelChangedEventArgs>? SelectionChanged;
     public event RoutedEventHandler? EditRequested;
@@ -26,6 +33,10 @@ public partial class BlendLevelRail : UserControl
     {
         InitializeComponent();
         LevelSlider.PreviewKeyDown += LevelSlider_PreviewKeyDown;
+        LevelSlider.PreviewMouseLeftButtonDown += LevelSlider_PreviewMouseLeftButtonDown;
+        LevelSlider.MouseMove += LevelSlider_MouseMove;
+        LevelSlider.PreviewMouseLeftButtonUp += LevelSlider_PreviewMouseLeftButtonUp;
+        LevelSlider.LostMouseCapture += LevelSlider_LostMouseCapture;
         SetLevels([]);
     }
 
@@ -36,10 +47,7 @@ public partial class BlendLevelRail : UserControl
         {
             if (_levels.Count == 0) return;
             var target = ResolveAvailableIndex(Math.Clamp(value, 0, SlotCount - 1), value >= SelectedIndex);
-            _updating = true;
-            LevelSlider.Value = target;
-            _updating = false;
-            UpdateSelectionText();
+            MoveToIndex(target, animate: IsLoaded);
         }
     }
 
@@ -47,7 +55,9 @@ public partial class BlendLevelRail : UserControl
     {
         var previousIndex = _levels.Count == 0 ? 0 : Math.Clamp((int)Math.Round(LevelSlider.Value), 0, SlotCount - 1);
         _levels = levels.Take(SlotCount).ToArray();
+        _animationVersion++;
         _updating = true;
+        LevelSlider.BeginAnimation(Slider.ValueProperty, null);
         LevelSlider.Minimum = 0;
         LevelSlider.Maximum = SlotCount - 1;
         LevelSlider.IsEnabled = _levels.Count(level => level.IsAvailable) > 1;
@@ -105,9 +115,134 @@ public partial class BlendLevelRail : UserControl
 
     private void EditButton_Click(object sender, RoutedEventArgs e) => EditRequested?.Invoke(this, e);
 
+    private void LevelSlider_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (IsThumbSource(e.OriginalSource as DependencyObject))
+        {
+            if (LevelSlider.IsEnabled && _levels.Count > 0)
+            {
+                _animationVersion++;
+                _updating = true;
+                LevelSlider.BeginAnimation(Slider.ValueProperty, null);
+                _updating = false;
+                _isDragging = true;
+                _dragStartIndex = SelectedIndex;
+                _dragTarget = _dragStartIndex;
+                LevelSlider.IsSnapToTickEnabled = false;
+                UpdateSelectionText(_dragTarget);
+                // The native Slider/Thumb drag continuously writes Value from
+                // the pointer. Capture the rail ourselves so only discrete
+                // animated transitions can move the thumb.
+                LevelSlider.CaptureMouse();
+            }
+            e.Handled = true;
+            return;
+        }
+
+        if (!LevelSlider.IsEnabled || _levels.Count == 0)
+            return;
+
+        var point = e.GetPosition(LevelSlider);
+        // The custom template reserves 10% of the control on either side of
+        // the track. Map the click into that same 80% travel range so clicks
+        // and drag positions resolve to the same five stops.
+        var ratio = Math.Clamp(point.X / Math.Max(1, LevelSlider.ActualWidth), 0, 1);
+        ratio = Math.Clamp((ratio - RailStartRatio) / RailTravelRatio, 0, 1);
+        var candidate = (int)Math.Round(LevelSlider.Minimum + ratio * (LevelSlider.Maximum - LevelSlider.Minimum));
+        var target = ResolveAvailableIndex(candidate, candidate >= SelectedIndex);
+        if (target == SelectedIndex)
+        {
+            e.Handled = true;
+            return;
+        }
+
+        MoveToIndex(target, animate: true);
+        SelectionChanged?.Invoke(this, new BlendLevelChangedEventArgs(target, _levels[target]));
+        e.Handled = true;
+    }
+
+
+    private void LevelSlider_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (!_isDragging || e.LeftButton != MouseButtonState.Pressed || _levels.Count == 0)
+            return;
+
+        // Read the pointer position directly. Value remains on a discrete stop,
+        // so it must never be used as the next pointer-position input.
+        var point = e.GetPosition(LevelSlider);
+        var ratio = Math.Clamp(point.X / Math.Max(1, LevelSlider.ActualWidth), 0, 1);
+        ratio = Math.Clamp((ratio - RailStartRatio) / RailTravelRatio, 0, 1);
+        var continuous = LevelSlider.Minimum + ratio * (LevelSlider.Maximum - LevelSlider.Minimum);
+        var target = _dragTarget;
+        const double hysteresis = 0.02;
+
+        while (true)
+        {
+            var next = NextAvailable(target);
+            if (next == target || continuous < (target + next) / 2d + hysteresis)
+                break;
+            target = next;
+        }
+
+        while (true)
+        {
+            var previous = PreviousAvailable(target);
+            if (previous == target || continuous > (target + previous) / 2d - hysteresis)
+                break;
+            target = previous;
+        }
+
+        if (target != _dragTarget)
+        {
+            // The Thumb is allowed to move only through this discrete,
+            // non-linear transition; it never follows the pointer directly.
+            MoveToIndex(target, animate: true);
+            _dragTarget = target;
+            UpdateSelectionText(_dragTarget);
+        }
+    }
+
+    private void LevelSlider_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e) => EndThumbDrag();
+
+    private void LevelSlider_LostMouseCapture(object sender, MouseEventArgs e) => EndThumbDrag();
+
+    private void EndThumbDrag()
+    {
+        if (!_isDragging) return;
+
+        var previous = _dragStartIndex;
+        var target = _dragTarget;
+        var from = Math.Clamp(LevelSlider.Value, LevelSlider.Minimum, LevelSlider.Maximum);
+        _isDragging = false;
+        if (LevelSlider.IsMouseCaptured)
+            LevelSlider.ReleaseMouseCapture();
+        MoveToIndex(target, animate: true, fromValue: from, restoreSnap: true);
+        if (target != previous)
+            SelectionChanged?.Invoke(this, new BlendLevelChangedEventArgs(target, _levels[target]));
+    }
+    private static bool IsThumbSource(DependencyObject? source)
+    {
+        while (source is not null)
+        {
+            if (source is Thumb)
+                return true;
+            source = VisualTreeHelper.GetParent(source);
+        }
+        return false;
+    }
     private void LevelSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
         if (_levels.Count == 0) return;
+        if (_isDragging)
+        {
+            UpdateSelectionText(_dragTarget);
+            return;
+        }
+
+        if (_updating)
+            return;
+
+        // Animated snapping may pass through empty slots; the animation owns Value.
         var candidate = Math.Clamp((int)Math.Round(e.NewValue), 0, SlotCount - 1);
         var wasIncreasing = e.NewValue >= e.OldValue;
         if (_levels.ElementAtOrDefault(candidate)?.IsAvailable != true)
@@ -123,7 +258,6 @@ public partial class BlendLevelRail : UserControl
         if (!_updating && _levels.ElementAtOrDefault(candidate)?.IsAvailable == true)
             SelectionChanged?.Invoke(this, new BlendLevelChangedEventArgs(candidate, _levels[candidate]));
     }
-
     private void LevelSlider_PreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (_levels.Count == 0) return;
@@ -138,13 +272,51 @@ public partial class BlendLevelRail : UserControl
         };
         if (target == current && e.Key is not (Key.Home or Key.End)) return;
 
-        _updating = true;
-        LevelSlider.Value = target;
-        _updating = false;
+        MoveToIndex(target, animate: IsLoaded);
         UpdateSelectionText();
         if (target != current)
             SelectionChanged?.Invoke(this, new BlendLevelChangedEventArgs(target, _levels[target]));
         e.Handled = true;
+    }
+
+    private void MoveToIndex(int target, bool animate, double? fromValue = null, bool restoreSnap = false)
+    {
+        target = Math.Clamp(target, 0, SlotCount - 1);
+        var current = Math.Clamp(fromValue ?? LevelSlider.Value, LevelSlider.Minimum, LevelSlider.Maximum);
+        var animationVersion = ++_animationVersion;
+        _updating = true;
+        LevelSlider.BeginAnimation(Slider.ValueProperty, null);
+
+        if (!animate || Math.Abs(current - target) < 0.001)
+        {
+            _updating = true;
+            LevelSlider.Value = target;
+            _updating = false;
+            LevelSlider.IsSnapToTickEnabled = true;
+            UpdateSelectionText();
+            return;
+        }
+
+        _updating = true;
+        var transition = new DoubleAnimation
+        {
+            From = current,
+            To = target,
+            Duration = SelectionTransition,
+            EasingFunction = new ExponentialEase { Exponent = 4, EasingMode = EasingMode.EaseOut }
+        };
+        transition.Completed += (_, _) =>
+        {
+            if (animationVersion != _animationVersion)
+                return;
+            LevelSlider.BeginAnimation(Slider.ValueProperty, null);
+            LevelSlider.Value = target;
+            _updating = false;
+            if (restoreSnap)
+                LevelSlider.IsSnapToTickEnabled = true;
+            UpdateSelectionText();
+        };
+        LevelSlider.BeginAnimation(Slider.ValueProperty, transition, HandoffBehavior.SnapshotAndReplace);
     }
 
     private int ResolveAvailableIndex(int candidate, bool forward)
@@ -211,7 +383,7 @@ public partial class BlendLevelRail : UserControl
         }
     }
 
-    private void UpdateSelectionText()
+    private void UpdateSelectionText(int? selectedIndexOverride = null)
     {
         if (_levels.Count == 0)
         {
@@ -219,7 +391,7 @@ public partial class BlendLevelRail : UserControl
             return;
         }
 
-        var index = SelectedIndex;
+        var index = selectedIndexOverride ?? SelectedIndex;
         var item = _levels.ElementAtOrDefault(index);
         IntensityText.Text = item?.IsAvailable == true ? item.Summary : string.Empty;
         IntensityText.ToolTip = IntensityText.Text;
@@ -228,8 +400,9 @@ public partial class BlendLevelRail : UserControl
             if (LabelsPanel.Children[labelIndex] is not TextBlock label) continue;
             var selected = labelIndex == index;
             var available = _levels.ElementAtOrDefault(labelIndex)?.IsAvailable == true;
-            label.Foreground = (Brush)FindResource(selected ? "AccentBrush" : available ? "MutedTextBrush" : "BorderBrush");
-            label.FontWeight = selected ? FontWeights.SemiBold : FontWeights.Medium;
+            var highlighted = selected && available;
+            label.Foreground = (Brush)FindResource(highlighted ? "AccentBrush" : available ? "MutedTextBrush" : "BorderBrush");
+            label.FontWeight = highlighted ? FontWeights.SemiBold : FontWeights.Medium;
         }
         UpdateTickBrushes(index);
     }

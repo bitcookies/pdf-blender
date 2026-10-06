@@ -113,8 +113,8 @@ public partial class HomePage : Page
             _processingCts.Cancel();
             return;
         }
-        if (_session.InputPaths.Count == 0) { StatusText.Text = UiText.Get("ready"); return; }
-        if (_session.SlotConfigurations.All(configuration => configuration is null)) { StatusText.Text = UiText.Get("noBlendSlots"); return; }
+        if (_session.InputPaths.Count == 0) { SetStatusText(UiText.Get("ready")); return; }
+        if (_session.SlotConfigurations.All(configuration => configuration is null)) { SetStatusText(UiText.Get("noBlendSlots")); return; }
         if (_processingCts is not null) return;
         var inputPaths = _session.InputPaths.ToArray();
         _processingCts = new CancellationTokenSource();
@@ -124,26 +124,26 @@ public partial class HomePage : Page
         {
             var overall = value.Fraction;
             ProcessingProgress.Value = overall * 100;
-            StatusText.Text = UiText.Get("processing");
+            SetStatusText(UiText.Get("processing"));
             _notifications.UpdateProgress(progressNotification, StatusText.Text, overall);
         });
         try
         {
             var results = await _workflow.BlendAsync(inputPaths, _session.Settings, progress, _processingCts.Token);
             var outputNames = results.Select(result => Path.GetFileName(result.OutputPath)).ToArray();
-            StatusText.Text = UiText.Get("completed");
+            SetStatusText(UiText.Get("completed"));
             _notifications.Dismiss(progressNotification);
             _notifications.Show(UiNotificationKind.Success, UiText.Get("completed"), string.Join(", ", outputNames));
         }
         catch (OperationCanceledException)
         {
-            StatusText.Text = UiText.Get("cancelled");
+            SetStatusText(UiText.Get("cancelled"));
             _notifications.Dismiss(progressNotification);
             _notifications.Show(UiNotificationKind.Info, UiText.Get("cancelled"), UiText.Get("ready"));
         }
         catch (Exception exception)
         {
-            StatusText.Text = UiText.Get("processingError");
+            SetStatusText(UiText.Get("processingError"));
             _notifications.Dismiss(progressNotification);
             _notifications.Show(UiNotificationKind.Error, UiText.Get("processingError"), exception.Message, autoDismiss: false);
         }
@@ -180,9 +180,9 @@ public partial class HomePage : Page
                     : string.Empty;
             }
             BlendButton.IsEnabled = selectedPaths.Length > 0 && _session.SlotConfigurations.Any(configuration => configuration is not null);
-            StatusText.Text = _session.SlotConfigurations.All(configuration => configuration is null)
+            SetStatusText(_session.SlotConfigurations.All(configuration => configuration is null)
                 ? UiText.Get("noBlendSlots")
-                : selectedPaths.Length > 0 ? UiText.Get("readyToBlend") : UiText.Get("ready");
+                : selectedPaths.Length > 0 ? UiText.Get("readyToBlend") : UiText.Get("ready"));
             return;
         }
         if (notify) _session.SetInputPaths(selectedPaths);
@@ -205,9 +205,9 @@ public partial class HomePage : Page
             PreviewStrip.Children.Add(preview.Container);
         }
         BlendButton.IsEnabled = hasFile && _session.SlotConfigurations.Any(configuration => configuration is not null);
-        StatusText.Text = _session.SlotConfigurations.All(configuration => configuration is null)
+        SetStatusText(_session.SlotConfigurations.All(configuration => configuration is null)
             ? UiText.Get("noBlendSlots")
-            : hasFile ? UiText.Get("readyToBlend") : UiText.Get("ready");
+            : hasFile ? UiText.Get("readyToBlend") : UiText.Get("ready"));
         if (hasFile) _ = LoadPreviewsAsync(selectedPaths, generation);
     }
 
@@ -353,6 +353,13 @@ public partial class HomePage : Page
         }
     }
 
+    private void SetStatusText(string text)
+    {
+        StatusText.Text = text;
+        var emptySlots = _session.SlotConfigurations.All(configuration => configuration is null);
+        StatusText.Foreground = (Brush)FindResource(emptySlots ? "MutedTextBrush" : "PillTextBrush");
+        StatusDot.Fill = (Brush)FindResource(emptySlots ? "MutedTextBrush" : "AccentBrush");
+    }
     private void SetProcessingState(bool processing)
     {
         BlendButton.IsEnabled = processing || (_session.InputPaths.Count > 0 && _session.SlotConfigurations.Any(configuration => configuration is not null));
