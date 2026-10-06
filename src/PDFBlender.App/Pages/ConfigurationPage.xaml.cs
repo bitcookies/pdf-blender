@@ -19,6 +19,7 @@ public partial class ConfigurationPage : Page
     private const string ConfigurationDragFormat = "PDFBlender.ConfigurationId";
     private const double CardHeight = 72;
     private const double CardContentMinHeight = CardHeight - 8;
+    private const double ChildTransitionOffset = 18;
     private readonly AppSession _session;
     private readonly DialogService _dialogs;
     private Point _dragStart;
@@ -45,7 +46,7 @@ public partial class ConfigurationPage : Page
         EmptyText.Text = _session.AllConfigurations.Count == 0 ? UiText.Get("noConfigurations") : string.Empty;
         EmptyText.Visibility = _session.AllConfigurations.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         ErrorText.Text = string.Empty;
-        if (ChildContent.Visibility != Visibility.Visible)
+        if (ChildContent.Visibility != Visibility.Visible || _listTransitionPending)
         {
             BuildSlots();
             BuildCards(_session.AllConfigurations);
@@ -446,9 +447,32 @@ public partial class ConfigurationPage : Page
 
     private void ShowChild(Page page)
     {
+        if (_listTransitionPending)
+            return;
+
+        _listTransitionPending = true;
         ListScroller.Visibility = Visibility.Collapsed;
+        ListScroller.IsHitTestVisible = false;
         ChildContent.Visibility = Visibility.Visible;
+        ChildContent.IsHitTestVisible = false;
         ChildContent.Content = page;
+
+        var motion = UiMotionPolicy.Resolve();
+        var offset = motion.Offset > 0 ? ChildTransitionOffset : 0;
+        SetTransitionState(ChildContent, offset, 0);
+
+        AnimateTransition(
+            ChildContent,
+            offset,
+            0,
+            0,
+            1,
+            motion.EnterSlide,
+            () =>
+            {
+                ChildContent.IsHitTestVisible = true;
+                _listTransitionPending = false;
+            });
     }
 
     public void ReturnToList() => ShowList();
@@ -458,19 +482,100 @@ public partial class ConfigurationPage : Page
         if (_listTransitionPending)
             return;
 
-        // Hide the child page first. Clear the Frame content after the
-        // current BreadcrumbBar event and layout pass have completed.
-        // This prevents WPF from detaching the clicked Page while its
-        // routed event is still unwinding.
         _listTransitionPending = true;
-        ChildContent.Visibility = Visibility.Collapsed;
         ListScroller.Visibility = Visibility.Visible;
+        ListScroller.IsHitTestVisible = false;
+        ChildContent.IsHitTestVisible = false;
         RefreshFromSession();
+
+        var motion = UiMotionPolicy.Resolve();
+        var offset = motion.Offset > 0 ? ChildTransitionOffset : 0;
+        SetTransitionState(ListScroller, -offset, 0);
+
+        AnimateTransition(
+            ChildContent,
+            0,
+            offset,
+            1,
+            0,
+            motion.EnterSlide,
+            null);
+        AnimateTransition(
+            ListScroller,
+            -offset,
+            0,
+            0,
+            1,
+            motion.EnterSlide,
+            CompleteListTransition);
+    }
+
+    private void CompleteListTransition()
+    {
+        ListScroller.Opacity = 1;
+        ListScroller.IsHitTestVisible = true;
+        ChildContent.Visibility = Visibility.Collapsed;
+        ChildContent.Opacity = 1;
+        ChildContent.IsHitTestVisible = false;
+
+        // Keep the child attached until the routed BreadcrumbBar event and
+        // the transition callback have both completed.
         Dispatcher.BeginInvoke(new Action(() =>
         {
             ChildContent.Content = null;
             _listTransitionPending = false;
         }), DispatcherPriority.ApplicationIdle);
+    }
+
+    private static void SetTransitionState(FrameworkElement element, double x, double opacity)
+    {
+        element.RenderTransform = new TranslateTransform(x, 0);
+        element.Opacity = opacity;
+    }
+
+    private static void AnimateTransition(
+        FrameworkElement element,
+        double fromX,
+        double toX,
+        double fromOpacity,
+        double toOpacity,
+        TimeSpan duration,
+        Action? completed)
+    {
+        if (duration <= TimeSpan.Zero)
+        {
+            element.RenderTransform = new TranslateTransform(toX, 0);
+            element.Opacity = toOpacity;
+            completed?.Invoke();
+            return;
+        }
+
+        var transform = element.RenderTransform as TranslateTransform ?? new TranslateTransform();
+        element.RenderTransform = transform;
+        transform.X = fromX;
+        element.Opacity = fromOpacity;
+
+        var easing = new CubicEase { EasingMode = EasingMode.EaseOut };
+        var slide = new DoubleAnimation(fromX, toX, duration)
+        {
+            EasingFunction = easing,
+            FillBehavior = FillBehavior.HoldEnd
+        };
+        var opacity = new DoubleAnimation(fromOpacity, toOpacity, duration)
+        {
+            EasingFunction = easing,
+            FillBehavior = FillBehavior.HoldEnd
+        };
+        opacity.Completed += (_, _) =>
+        {
+            transform.BeginAnimation(TranslateTransform.XProperty, null);
+            element.BeginAnimation(UIElement.OpacityProperty, null);
+            transform.X = toX;
+            element.Opacity = toOpacity;
+            completed?.Invoke();
+        };
+        transform.BeginAnimation(TranslateTransform.XProperty, slide);
+        element.BeginAnimation(UIElement.OpacityProperty, opacity);
     }
 
     private void AddButton_Click(object sender, RoutedEventArgs e)
