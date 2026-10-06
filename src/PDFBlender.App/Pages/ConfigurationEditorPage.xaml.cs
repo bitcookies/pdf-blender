@@ -68,6 +68,7 @@ public partial class ConfigurationEditorPage : Page
         _selectedIconKey = ConfigurationIconCatalog.Normalize(_source.IconKey);
         _settings = _source.Settings ?? BlendSettings.Default;
         InitializeComponent();
+        EditorScroller.RequestBringIntoView += (_, e) => e.Handled = true;
         ConfigureBreadcrumb(listBack);
         BreadcrumbBarStyling.Attach(BreadcrumbBar);
         RefreshText();
@@ -281,8 +282,17 @@ public partial class ConfigurationEditorPage : Page
         var root = new StackPanel();
         var header = new DockPanel();
         var labels = new StackPanel();
-        labels.Children.Add(new TextBlock { Text = title, FontWeight = FontWeights.SemiBold });
-        labels.Children.Add(new TextBlock { Text = hint, Foreground = (Brush)FindResource("MutedTextBrush"), FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 3, 10, 0) });
+        var titleText = new TextBlock { Text = title, FontWeight = FontWeights.SemiBold };
+        var hintText = new TextBlock
+        {
+            Text = hint,
+            Foreground = (Brush)FindResource("MutedTextBrush"),
+            FontSize = 11,
+            TextWrapping = TextWrapping.Wrap,
+            Margin = new Thickness(0, 3, 10, 0)
+        };
+        labels.Children.Add(titleText);
+        labels.Children.Add(hintText);
         DockPanel.SetDock(toggle, Dock.Right);
         header.Children.Add(toggle);
         header.Children.Add(labels);
@@ -299,6 +309,21 @@ public partial class ConfigurationEditorPage : Page
         root.Children.Add(detail);
         card.Content = root;
         FeaturePanel.Children.Add(card);
+
+        var disabledBrush = new SolidColorBrush(Color.FromRgb(0xA6, 0xA6, 0xA6));
+        disabledBrush.Freeze();
+
+        void RefreshEnabledVisual()
+        {
+            var foreground = toggle.IsEnabled
+                ? (Brush)FindResource("TextBrush")
+                : disabledBrush;
+            var descriptionForeground = toggle.IsEnabled
+                ? (Brush)FindResource("MutedTextBrush")
+                : disabledBrush;
+            titleText.Foreground = foreground;
+            hintText.Foreground = descriptionForeground;
+        }
 
         void Expand()
         {
@@ -344,6 +369,8 @@ public partial class ConfigurationEditorPage : Page
         }
 
         toggle.IsEnabled = !requiresFlatten || _flatten.IsChecked == true;
+        RefreshEnabledVisual();
+        toggle.IsEnabledChanged += (_, _) => RefreshEnabledVisual();
         toggle.Checked += (_, _) =>
         {
             Expand();
@@ -356,11 +383,16 @@ public partial class ConfigurationEditorPage : Page
         };
         if (requiresFlatten)
         {
-            _flatten.Checked += (_, _) => toggle.IsEnabled = true;
+            _flatten.Checked += (_, _) =>
+            {
+                toggle.IsEnabled = true;
+                RefreshEnabledVisual();
+            };
             _flatten.Unchecked += (_, _) =>
             {
                 toggle.IsChecked = false;
                 toggle.IsEnabled = false;
+                RefreshEnabledVisual();
             };
         }
 

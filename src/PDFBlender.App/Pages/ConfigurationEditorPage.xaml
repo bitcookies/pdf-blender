@@ -5,7 +5,7 @@
       xmlns:local="clr-namespace:PDFBlender.App"
 >
 
-    <ScrollViewer local:ScrollBarAutoHideBehavior.Enabled="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <ScrollViewer x:Name="EditorScroller" local:ScrollBarAutoHideBehavior.Enabled="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <Grid Margin="24,20,24,24" MaxWidth="760">
             <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
             <ui:BreadcrumbBar x:Name="BreadcrumbBar" ItemClicked="BreadcrumbBar_ItemClicked" Margin="0,0,0,12" Cursor="Hand" FontSize="13" FontWeight="Normal" Foreground="#333333">
