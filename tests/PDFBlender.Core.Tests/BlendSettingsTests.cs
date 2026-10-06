@@ -6,52 +6,53 @@ namespace PDFBlender.Core.Tests;
 public sealed class BlendSettingsTests
 {
     [Fact]
-    public void BlendPresetHasExpectedFlattenAndWatermarkDefaults()
+    public void CustomDefaultsHaveAllFeaturesDisabled()
     {
-        var settings = Presets.For(BlendMode.Blend);
-
-        Assert.True(settings.NormalizeContentWidth);
-        Assert.Equal(ProtectionMethod.Flatten, settings.Protection);
-        Assert.Equal(WatermarkStyle.Text, settings.Watermark);
-        Assert.Equal(NoiseStrength.Low, settings.Noise);
+        var settings = BlendSettings.Default;
+        Assert.False(settings.NormalizeContentWidth);
+        Assert.False(settings.NormalizePageSize);
+        Assert.Equal(ProtectionMethod.None, settings.Protection);
+        Assert.Equal(WatermarkStyle.None, settings.Watermark);
+        Assert.Equal(NoiseStrength.Off, settings.Noise);
+        Assert.Equal(TextureStrength.Off, settings.Texture);
+        Assert.Equal(CopyLayerMode.Preserve, settings.CopyLayer);
+        Assert.False(settings.HiddenAiText);
     }
 
     [Fact]
-    public void ValidatorRejectsDeferredProtectionMethods()
+    public void ValidatorRequiresFlatteningForGibberishAndVisualPerturbations()
     {
-        var errors = SettingsValidator.Validate(new BlendSettings { Protection = ProtectionMethod.TextScrambling });
+        var errors = SettingsValidator.Validate(new BlendSettings
+        {
+            CopyLayer = CopyLayerMode.ReplaceWithGibberish,
+            Noise = NoiseStrength.Low
+        });
 
-        Assert.Contains(errors, error => error.Contains("future release", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(errors, error => error.Contains("flattening", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
     public void ValidatorRejectsUnsafeDpiAndWidth()
     {
         var errors = SettingsValidator.Validate(new BlendSettings { Dpi = 20, TargetWidthMillimeters = 1 });
-
         Assert.Equal(2, errors.Count);
     }
 
     [Fact]
-    public void BuiltInConfigurationsAreReadOnlyAndUseStableIntensityLevels()
+    public void BuiltInConfigurationsContainStableLocalizedPresetIds()
     {
-        Assert.Equal(3, BuiltInConfigurations.All.Count);
+        Assert.Equal(8, BuiltInConfigurations.All.Count);
         Assert.All(BuiltInConfigurations.All, configuration => Assert.True(configuration.IsBuiltIn));
+        Assert.Equal("format-only", BuiltInConfigurations.All[0].Id);
+        Assert.Equal("ai-processing-resistance", BuiltInConfigurations.All[6].Id);
         Assert.Equal(0, BuiltInConfigurations.All[0].Intensity);
-        Assert.Equal(6, BuiltInConfigurations.All[1].Intensity);
-        Assert.Equal(6, BuiltInConfigurations.All[2].Intensity);
+        Assert.True(BuiltInConfigurations.All[6].Intensity >= 7);
     }
 
     [Fact]
     public void ConfigurationIntensityUsesTheStrongestEnabledFeature()
     {
-        var widthOnly = new BlendSettings
-        {
-            NormalizeContentWidth = true,
-            Protection = ProtectionMethod.None,
-            Watermark = WatermarkStyle.None,
-            Noise = NoiseStrength.Off
-        };
+        var widthOnly = new BlendSettings { NormalizeContentWidth = true };
         Assert.Equal(0, ConfigurationIntensity.For(widthOnly));
 
         var fullPageWatermarkAndLowNoise = widthOnly with
@@ -59,6 +60,6 @@ public sealed class BlendSettingsTests
             Watermark = WatermarkStyle.FullPage,
             Noise = NoiseStrength.Low
         };
-        Assert.Equal(5, ConfigurationIntensity.For(fullPageWatermarkAndLowNoise));
+        Assert.Equal(4, ConfigurationIntensity.For(fullPageWatermarkAndLowNoise));
     }
 }

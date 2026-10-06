@@ -27,6 +27,17 @@ public partial class ConfigurationEditorPage : Page
     private readonly UiToggleSwitch _flatten = new();
     private readonly UiToggleSwitch _watermark = new();
     private readonly UiToggleSwitch _noise = new();
+    private readonly UiToggleSwitch _pageSize = new();
+    private readonly UiToggleSwitch _texture = new();
+    private readonly UiToggleSwitch _geometry = new();
+    private readonly UiToggleSwitch _microText = new();
+    private readonly UiToggleSwitch _copyLayer = new();
+    private readonly UiToggleSwitch _hiddenAi = new();
+    private readonly UiToggleSwitch _metadata = new();
+    private readonly UiToggleSwitch _permissions = new();
+    private readonly ComboBox _pageSizePreset = new();
+    private readonly ComboBox _copyLayerMode = new();
+    private readonly ComboBox _textureLevel = new();
     private readonly UiTextBox _width = new();
     private readonly ComboBox _dpi = new();
     private readonly ComboBox _watermarkType = new();
@@ -151,21 +162,41 @@ public partial class ConfigurationEditorPage : Page
     private void BuildFeatureRows()
     {
         _normalize.IsChecked = _settings.NormalizeContentWidth;
+        _pageSize.IsChecked = _settings.NormalizePageSize;
         _flatten.IsChecked = _settings.Protection == ProtectionMethod.Flatten;
         _watermark.IsChecked = _settings.Watermark != WatermarkStyle.None;
         _noise.IsChecked = _settings.Noise != NoiseStrength.Off;
+        _texture.IsChecked = _settings.Texture != TextureStrength.Off;
+        _geometry.IsChecked = _settings.GeometryPerturbation;
+        _microText.IsChecked = _settings.MicroTextPattern;
+        _copyLayer.IsChecked = _settings.CopyLayer != CopyLayerMode.Preserve;
+        _hiddenAi.IsChecked = _settings.HiddenAiText;
+        _metadata.IsChecked = _settings.MetadataNormalization || _settings.ProtectionDeclaration;
+        _permissions.IsChecked = _settings.PermissionRestriction;
         _width.Text = _settings.TargetWidthMillimeters.ToString("0.##", CultureInfo.InvariantCulture);
-        _dpi.ItemsSource = new[] { 120, 150, 200, 300 }; _dpi.SelectedItem = _settings.Dpi;
+        _dpi.ItemsSource = new[] { 120, 150, 180, 200, 300 }; _dpi.SelectedItem = _settings.Dpi;
+        _pageSizePreset.ItemsSource = new[] { PageSizePreset.A5, PageSizePreset.A4, PageSizePreset.A3, PageSizePreset.A2, PageSizePreset.Letter, PageSizePreset.Legal, PageSizePreset.Custom };
+        _pageSizePreset.SelectedItem = _settings.PageSize == PageSizePreset.Original ? PageSizePreset.A4 : _settings.PageSize;
         _watermarkType.ItemsSource = new[] { UiText.Get("text"), UiText.Get("fullPage") }; _watermarkType.SelectedIndex = Math.Max(0, (int)_settings.Watermark - 1);
         _watermarkText.Text = _settings.WatermarkText;
         _noiseLevel.ItemsSource = new[] { UiText.Get("low"), UiText.Get("medium"), UiText.Get("high") }; _noiseLevel.SelectedIndex = Math.Max(0, (int)_settings.Noise - 1);
-        AddFeature(UiText.Get("normalizeWidth"), UiText.Get("normalizeHint"), _normalize, new UIElement[] { Labeled(UiText.Get("targetWidth"), _width) });
-        AddFeature(UiText.Get("flatten"), UiText.Get("protectionHint"), _flatten, new UIElement[] { Labeled(UiText.Get("dpi"), _dpi) });
-        AddFeature(UiText.Get("watermark"), UiText.Get("watermarkTypeHint"), _watermark, new UIElement[] { Labeled(UiText.Get("watermarkType"), _watermarkType), Labeled(UiText.Get("watermarkText"), _watermarkText) });
-        AddFeature(UiText.Get("noise"), UiText.Get("noiseHint"), _noise, new UIElement[] { Labeled(UiText.Get("noise"), _noiseLevel) });
+        _textureLevel.ItemsSource = new[] { UiText.Get("low"), UiText.Get("medium") }; _textureLevel.SelectedIndex = Math.Max(0, (int)_settings.Texture - 1);
+        _copyLayerMode.ItemsSource = new[] { UiText.Get("unicodeScramble"), UiText.Get("textLayoutPerturbation"), UiText.Get("gibberishCopyLayer") }; _copyLayerMode.SelectedIndex = Math.Clamp((int)_settings.CopyLayer - 1, 0, 2);
+        AddFeature(UiText.Get("normalizeWidth"), UiText.Get("normalizeHint"), _normalize, [Labeled(UiText.Get("targetWidth"), _width)]);
+        AddFeature(UiText.Get("normalizePageSize"), UiText.Get("normalizePageSizeHint"), _pageSize, [Labeled(UiText.Get("pageSize"), _pageSizePreset)]);
+        AddFeature(UiText.Get("flatten"), UiText.Get("protectionHint"), _flatten, [Labeled(UiText.Get("dpi"), _dpi)]);
+        AddFeature(UiText.Get("watermark"), UiText.Get("watermarkTypeHint"), _watermark, [Labeled(UiText.Get("watermarkType"), _watermarkType), Labeled(UiText.Get("watermarkText"), _watermarkText)]);
+        AddFeature(UiText.Get("noise"), UiText.Get("noiseHint"), _noise, [Labeled(UiText.Get("noise"), _noiseLevel)], true);
+        AddFeature(UiText.Get("texture"), UiText.Get("textureHint"), _texture, [Labeled(UiText.Get("texture"), _textureLevel)], true);
+        AddFeature(UiText.Get("geometryPerturbation"), UiText.Get("geometryPerturbationHint"), _geometry, [], true);
+        AddFeature(UiText.Get("microTextPattern"), UiText.Get("microTextPatternHint"), _microText, [], true);
+        AddFeature(UiText.Get("copyLayer"), UiText.Get("copyLayerHint"), _copyLayer, [Labeled(UiText.Get("copyLayerMode"), _copyLayerMode)], true);
+        AddFeature(UiText.Get("hiddenAiText"), UiText.Get("hiddenAiTextHint"), _hiddenAi, []);
+        AddFeature(UiText.Get("metadata"), UiText.Get("metadataHint"), _metadata, []);
+        AddFeature(UiText.Get("permissionRestriction"), UiText.Get("permissionHint"), _permissions, [], true);
     }
 
-    private void AddFeature(string title, string hint, UiToggleSwitch toggle, IEnumerable<UIElement> details)
+    private void AddFeature(string title, string hint, UiToggleSwitch toggle, IEnumerable<UIElement> details, bool requiresFlatten = false)
     {
         var card = new UiCard { Padding = new Thickness(12), Margin = new Thickness(0, 0, 0, 8), MinHeight = 72 };
         var root = new StackPanel();
@@ -196,19 +227,13 @@ public partial class ConfigurationEditorPage : Page
         return panel;
     }
 
-    private void UpdateSaveState()
-    {
+    private void UpdateSaveState() {
         var hasName = !string.IsNullOrWhiteSpace(NameBox.Text);
-        var hasFeature = _normalize.IsChecked == true || _flatten.IsChecked == true || _watermark.IsChecked == true || _noise.IsChecked == true;
+        var hasFeature = _normalize.IsChecked == true || _pageSize.IsChecked == true || _flatten.IsChecked == true || _watermark.IsChecked == true || _noise.IsChecked == true || _texture.IsChecked == true || _geometry.IsChecked == true || _microText.IsChecked == true || _copyLayer.IsChecked == true || _hiddenAi.IsChecked == true || _metadata.IsChecked == true || _permissions.IsChecked == true;
         SaveButton.IsEnabled = hasName && (!_isNew || hasFeature);
-        var saveBrush = SaveButton.IsEnabled
-            ? (Brush)FindResource("AccentTextBrush")
-            : (Brush)FindResource("MutedTextBrush");
+        var saveBrush = SaveButton.IsEnabled ? (Brush)FindResource("AccentTextBrush") : (Brush)FindResource("MutedTextBrush");
         SaveButton.Foreground = saveBrush;
-        if (SaveButton.Content is TextBlock saveText)
-        {
-            saveText.Foreground = saveBrush;
-        }
+        if (SaveButton.Content is TextBlock saveText) saveText.Foreground = saveBrush;
     }
 
     private void BreadcrumbBar_ItemClicked(object sender, BreadcrumbBarItemClickedEventArgs e)
@@ -229,11 +254,21 @@ public partial class ConfigurationEditorPage : Page
         {
             NormalizeContentWidth = _normalize.IsChecked == true,
             TargetWidthMillimeters = width,
+            NormalizePageSize = _pageSize.IsChecked == true,
+            PageSize = _pageSizePreset.SelectedItem is PageSizePreset pageSize ? pageSize : PageSizePreset.Original,
             Protection = _flatten.IsChecked == true ? ProtectionMethod.Flatten : ProtectionMethod.None,
             Dpi = _dpi.SelectedItem is int dpi ? dpi : 150,
             Watermark = _watermark.IsChecked == true ? (_watermarkType.SelectedIndex == 1 ? WatermarkStyle.FullPage : WatermarkStyle.Text) : WatermarkStyle.None,
             WatermarkText = _watermarkText.Text ?? string.Empty,
-            Noise = _noise.IsChecked == true ? (NoiseStrength)Math.Clamp(_noiseLevel.SelectedIndex + 1, 1, 3) : NoiseStrength.Off
+            Noise = _noise.IsChecked == true ? (NoiseStrength)Math.Clamp(_noiseLevel.SelectedIndex + 1, 1, 3) : NoiseStrength.Off,
+            Texture = _texture.IsChecked == true ? (TextureStrength)Math.Clamp(_textureLevel.SelectedIndex + 1, 1, 2) : TextureStrength.Off,
+            GeometryPerturbation = _geometry.IsChecked == true,
+            MicroTextPattern = _microText.IsChecked == true,
+            CopyLayer = _copyLayer.IsChecked == true ? (CopyLayerMode)Math.Clamp(_copyLayerMode.SelectedIndex + 1, 1, 3) : CopyLayerMode.Preserve,
+            HiddenAiText = _hiddenAi.IsChecked == true,
+            MetadataNormalization = _metadata.IsChecked == true,
+            ProtectionDeclaration = _metadata.IsChecked == true,
+            PermissionRestriction = _permissions.IsChecked == true
         };
         var errors = SettingsValidator.Validate(settings);
         if (errors.Count > 0)

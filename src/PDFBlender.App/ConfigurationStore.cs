@@ -13,7 +13,7 @@ internal sealed record ConfigurationDocument(
 
 internal static class ConfigurationStore
 {
-    private const int CurrentSchemaVersion = 7;
+    private const int CurrentSchemaVersion = 8;
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         WriteIndented = true,
@@ -70,8 +70,8 @@ internal static class ConfigurationStore
         return new ConfigurationDocument(
             CurrentSchemaVersion,
             configurations,
-            [null, "builtin-medium", null, null, null],
-            "builtin-medium");
+            [null, null, null, null, null],
+            null);
     }
 
     private static ConfigurationDocument NormalizeCurrent(ConfigurationDocument document)

@@ -6,32 +6,12 @@ public static class Presets
 {
     public static IReadOnlyList<BlendPreset> All { get; } =
     [
-        new(BlendMode.Stir, "STIR", "Light formatting touch", new BlendSettings
-        {
-            NormalizeContentWidth = true,
-            Protection = ProtectionMethod.None,
-            Dpi = 150,
-            Watermark = WatermarkStyle.None,
-            Noise = NoiseStrength.Off
-        }),
-        new(BlendMode.Blend, "BLEND", "Balanced everyday blend", new BlendSettings
-        {
-            NormalizeContentWidth = true,
-            Protection = ProtectionMethod.Flatten,
-            Dpi = 150,
-            Watermark = WatermarkStyle.Text,
-            Noise = NoiseStrength.Low
-        }),
-        new(BlendMode.Pulse, "PULSE", "Stronger visual signature", new BlendSettings
-        {
-            NormalizeContentWidth = true,
-            Protection = ProtectionMethod.Flatten,
-            Dpi = 120,
-            Watermark = WatermarkStyle.FullPage,
-            Noise = NoiseStrength.Medium
-        })
+        new(BlendMode.Stir, "Format Only", "Page layout normalization", BuiltInConfigurations.All[0].Settings),
+        new(BlendMode.Blend, "Balanced Protection", "Readable protection for everyday sharing", BuiltInConfigurations.All[3].Settings),
+        new(BlendMode.Pulse, "AI Processing Resistance", "Image, gibberish copy layer, and hidden text", BuiltInConfigurations.All[6].Settings),
+        new(BlendMode.Crush, "Visual Obstruction", "Stronger visual extraction resistance", BuiltInConfigurations.All[5].Settings),
+        new(BlendMode.Overblend, "Copy Layer Shield", "Readable image with a non-original copy layer", BuiltInConfigurations.All[4].Settings)
     ];
 
-    public static BlendSettings For(BlendMode mode) =>
-        All.FirstOrDefault(p => p.Mode == mode)?.Settings ?? BlendSettings.Default;
+    public static BlendSettings For(BlendMode mode) => All.FirstOrDefault(p => p.Mode == mode)?.Settings ?? BlendSettings.Default;
 }

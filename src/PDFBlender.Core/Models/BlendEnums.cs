@@ -32,3 +32,30 @@ public enum WatermarkStyle
     Text,
     FullPage
 }
+
+public enum CopyLayerMode
+{
+    Preserve,
+    UnicodeScramble,
+    TextLayoutPerturbation,
+    ReplaceWithGibberish
+}
+
+public enum PageSizePreset
+{
+    Original,
+    A5,
+    A4,
+    A3,
+    A2,
+    Letter,
+    Legal,
+    Custom
+}
+
+public enum TextureStrength
+{
+    Off,
+    Low,
+    Medium
+}

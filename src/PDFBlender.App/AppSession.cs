@@ -77,13 +77,7 @@ internal sealed class AppSession
     {
         var id = "custom-" + Guid.NewGuid().ToString("N");
         var requestedName = string.IsNullOrWhiteSpace(name) ? UiText.Get("customConfiguration") : name.Trim();
-        _userConfigurations.Add(new BlendConfiguration(id, MakeUniqueName(requestedName), false, settings ?? new BlendSettings
-        {
-            NormalizeContentWidth = true,
-            Protection = ProtectionMethod.None,
-            Watermark = WatermarkStyle.None,
-            Noise = NoiseStrength.Off
-        }, false, CreateShortId(), ConfigurationPalette.Normalize(colorKey ?? ConfigurationPalette.ForIndex(_userConfigurations.Count)), ConfigurationIconCatalog.Normalize(iconKey ?? ConfigurationIconCatalog.ForIndex(_userConfigurations.Count))));
+        _userConfigurations.Add(new BlendConfiguration(id, MakeUniqueName(requestedName), false, settings ?? BlendSettings.Default, false, CreateShortId(), ConfigurationPalette.Normalize(colorKey ?? ConfigurationPalette.ForIndex(_userConfigurations.Count)), ConfigurationIconCatalog.Normalize(iconKey ?? ConfigurationIconCatalog.ForIndex(_userConfigurations.Count))));
         _selectedConfigurationId = id;
         SaveAll();
         RaiseChanged(SessionChangeKind.Configurations);
@@ -188,7 +182,7 @@ internal sealed class AppSession
         EnsureSelectedSlot();
         Preferences = Preferences with { SelectedBlendLevel = SelectedBlendLevel };
         SavePreferences();
-        try { ConfigurationStore.Save(new ConfigurationDocument(7, _userConfigurations, _slotIds, _selectedConfigurationId)); }
+        try { ConfigurationStore.Save(new ConfigurationDocument(8, _userConfigurations, _slotIds, _selectedConfigurationId)); }
         catch (IOException) { }
         catch (UnauthorizedAccessException) { }
     }
@@ -280,14 +274,18 @@ internal sealed class AppSession
     {
         var name = preset.Id switch
         {
-            "builtin-light" => UiText.Get("light"),
-            "builtin-medium" => UiText.Get("medium"),
-            "builtin-heavy" => UiText.Get("heavy"),
+            "format-only" => UiText.Get("presetFormatOnly"),
+            "light-mark" => UiText.Get("presetLightMark"),
+            "reading-first" => UiText.Get("presetReadingFirst"),
+            "balanced-protection" => UiText.Get("presetBalancedProtection"),
+            "copy-layer-shield" => UiText.Get("presetCopyLayerShield"),
+            "visual-obstruction" => UiText.Get("presetVisualObstruction"),
+            "ai-processing-resistance" => UiText.Get("presetAiResistance"),
+            "custom" => UiText.Get("customConfiguration"),
             _ => preset.Name
         };
-        return $"{UiText.Get("presetPrefix")} {name}";
+        return name;
     }
-
     private static List<string?> NormalizeSlots(IEnumerable<string?> slots)
     {
         var result = slots.Take(5).ToList();

@@ -73,12 +73,16 @@ public partial class ConfigurationPresetPage : Page
 
     private string LocalizedPresetName(BlendConfiguration preset) => preset.Id switch
     {
-        "builtin-light" => $"{UiText.Get("presetPrefix")} {UiText.Get("light")}",
-        "builtin-medium" => $"{UiText.Get("presetPrefix")} {UiText.Get("medium")}",
-        "builtin-heavy" => $"{UiText.Get("presetPrefix")} {UiText.Get("heavy")}",
+        "format-only" => UiText.Get("presetFormatOnly"),
+        "light-mark" => UiText.Get("presetLightMark"),
+        "reading-first" => UiText.Get("presetReadingFirst"),
+        "balanced-protection" => UiText.Get("presetBalancedProtection"),
+        "copy-layer-shield" => UiText.Get("presetCopyLayerShield"),
+        "visual-obstruction" => UiText.Get("presetVisualObstruction"),
+        "ai-processing-resistance" => UiText.Get("presetAiResistance"),
+        "custom" => UiText.Get("customConfiguration"),
         _ => preset.Name
     };
-
     private string FeatureSummary(BlendConfiguration configuration) => string.Join(" · ", configuration.EnabledFeatures.Select(feature => feature switch
     {
         BlendFeature.NormalizeContentWidth => UiText.Get("normalizeWidth"),
@@ -88,5 +92,3 @@ public partial class ConfigurationPresetPage : Page
         _ => feature.ToString()
     }).DefaultIfEmpty(UiText.Get("noFeatures")));
 }
-
-

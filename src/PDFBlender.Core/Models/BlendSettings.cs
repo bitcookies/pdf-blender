@@ -2,13 +2,24 @@ namespace PDFBlender.Core.Models;
 
 public sealed record BlendSettings
 {
-    public bool NormalizeContentWidth { get; init; } = true;
+    public bool NormalizeContentWidth { get; init; }
     public double TargetWidthMillimeters { get; init; } = 210;
-    public ProtectionMethod Protection { get; init; } = ProtectionMethod.Flatten;
+    public bool NormalizePageSize { get; init; }
+    public PageSizePreset PageSize { get; init; } = PageSizePreset.Original;
+    public double CustomPageWidthMillimeters { get; init; } = 210;
+    public ProtectionMethod Protection { get; init; } = ProtectionMethod.None;
     public int Dpi { get; init; } = 150;
-    public WatermarkStyle Watermark { get; init; } = WatermarkStyle.Text;
+    public WatermarkStyle Watermark { get; init; } = WatermarkStyle.None;
     public string WatermarkText { get; init; } = "DO NOT PLAGIARIZE MY PDF.";
-    public NoiseStrength Noise { get; init; } = NoiseStrength.Low;
+    public NoiseStrength Noise { get; init; } = NoiseStrength.Off;
+    public TextureStrength Texture { get; init; } = TextureStrength.Off;
+    public bool GeometryPerturbation { get; init; }
+    public bool MicroTextPattern { get; init; }
+    public CopyLayerMode CopyLayer { get; init; } = CopyLayerMode.Preserve;
+    public bool HiddenAiText { get; init; }
+    public bool MetadataNormalization { get; init; }
+    public bool ProtectionDeclaration { get; init; }
+    public bool PermissionRestriction { get; init; }
 
-    public static BlendSettings Default => Presets.For(BlendMode.Blend);
+    public static BlendSettings Default => new();
 }
