@@ -9,7 +9,7 @@ using System.Windows.Shapes;
 
 namespace PDFBlender.App;
 
-public sealed record BlendLevelItem(string Name, string Summary, bool IsAvailable = true);
+public sealed record BlendLevelItem(string Name, string Summary, bool IsAvailable = true, string? IconKey = null, string? ColorKey = null);
 
 public partial class BlendLevelRail : UserControl
 {
@@ -85,17 +85,49 @@ public partial class BlendLevelRail : UserControl
             });
             UpperTickPanel.Children.Add(CreateTick(availableBrush));
             LowerTickPanel.Children.Add(CreateTick(availableBrush));
-            LabelsPanel.Children.Add(new TextBlock
+            var iconBrush = level.IsAvailable ? ConfigurationPalette.GetBrush(level.ColorKey) : (Brush)FindResource("BorderBrush");
+            var iconBorder = new Border
+            {
+                Width = 18,
+                Height = 18,
+                CornerRadius = new CornerRadius(9),
+                BorderThickness = new Thickness(0),
+                Background = Brushes.White,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Top,
+                Opacity = level.IsAvailable ? 1 : 0
+            };
+            iconBorder.Child = new Wpf.Ui.Controls.SymbolIcon
+            {
+                Symbol = ConfigurationIconCatalog.GetSymbol(level.IconKey),
+                Filled = ConfigurationIconCatalog.IsFilled(level.IconKey),
+                FontSize = 10,
+                Foreground = iconBrush,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            var labelPanel = new StackPanel
+            {
+                Width = 0,
+                Height = 38,
+                Orientation = Orientation.Vertical,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Top,
+                IsHitTestVisible = false
+            };
+            labelPanel.Children.Add(iconBorder);
+            labelPanel.Children.Add(new TextBlock
             {
                 Text = level.IsAvailable && !string.IsNullOrWhiteSpace(level.Name) ? level.Name : "—",
                 FontSize = 11,
-                Height = 18,
+                Height = 16,
                 Foreground = availableBrush,
                 FontWeight = FontWeights.Medium,
                 TextAlignment = TextAlignment.Center,
                 TextTrimming = TextTrimming.CharacterEllipsis,
-                Margin = new Thickness(0)
+                Margin = new Thickness(0, 1, 0, 0)
             });
+            LabelsPanel.Children.Add(labelPanel);
         }
 
         _updating = false;
@@ -365,11 +397,11 @@ public partial class BlendLevelRail : UserControl
         PositionMarkers(UpperTickPanel, railWidth, markerWidth: 2);
         PositionMarkers(LowerTickPanel, railWidth, markerWidth: 2);
         var labelWidth = Math.Max(24, railWidth * RailTravelRatio / (SlotCount - 1));
-        foreach (var label in LabelsPanel.Children.OfType<TextBlock>()) label.Width = labelWidth;
-        PositionMarkers(LabelsPanel, railWidth, labelWidth);
+        foreach (var label in LabelsPanel.Children.OfType<FrameworkElement>()) label.Width = labelWidth;
+        PositionMarkers(LabelsPanel, railWidth, labelWidth, 4);
     }
 
-    private static void PositionMarkers(Canvas panel, double railWidth, double markerWidth)
+    private static void PositionMarkers(Canvas panel, double railWidth, double markerWidth, double top = 0)
     {
         if (railWidth <= 0 || panel.Children.Count == 0) return;
         var interval = railWidth * RailTravelRatio / (SlotCount - 1);
@@ -380,7 +412,7 @@ public partial class BlendLevelRail : UserControl
             Canvas.SetLeft(marker, railWidth * RailStartRatio + index * interval - markerWidth / 2);
             // Every marker canvas has a fixed row height. Keep its top coordinate
             // stable instead of deriving it from transient layout measurements.
-            Canvas.SetTop(marker, 0);
+            Canvas.SetTop(marker, top);
         }
     }
 
@@ -398,12 +430,25 @@ public partial class BlendLevelRail : UserControl
         IntensityText.ToolTip = IntensityText.Text;
         for (var labelIndex = 0; labelIndex < LabelsPanel.Children.Count; labelIndex++)
         {
-            if (LabelsPanel.Children[labelIndex] is not TextBlock label) continue;
+            if (LabelsPanel.Children[labelIndex] is not StackPanel labelPanel) continue;
+            var label = labelPanel.Children.OfType<TextBlock>().FirstOrDefault();
+            var iconBorder = labelPanel.Children.OfType<Border>().FirstOrDefault();
+            var icon = iconBorder?.Child as Wpf.Ui.Controls.SymbolIcon;
             var selected = labelIndex == index;
             var available = _levels.ElementAtOrDefault(labelIndex)?.IsAvailable == true;
             var highlighted = selected && available;
-            label.Foreground = (Brush)FindResource(highlighted ? "AccentBrush" : available ? "MutedTextBrush" : "BorderBrush");
-            label.FontWeight = highlighted ? FontWeights.SemiBold : FontWeights.Medium;
+            var brush = (Brush)FindResource(highlighted ? "AccentBrush" : available ? "MutedTextBrush" : "BorderBrush");
+            if (label is not null)
+            {
+                label.Foreground = brush;
+                label.FontWeight = highlighted ? FontWeights.SemiBold : FontWeights.Medium;
+            }
+            if (iconBorder is not null)
+            {
+                iconBorder.Opacity = available ? 1 : 0;
+            }
+            if (icon is not null)
+                icon.Foreground = available ? ConfigurationPalette.GetBrush(_levels.ElementAtOrDefault(labelIndex)?.ColorKey) : brush;
         }
         UpdateTickBrushes(index);
     }

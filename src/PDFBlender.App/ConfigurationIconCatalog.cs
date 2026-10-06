@@ -75,7 +75,13 @@ internal static class ConfigurationIconCatalog
 
     private static bool TryParse(string? key, out ConfigurationIconDescriptor descriptor)
     {
-        var rawKey = key!;
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            descriptor = default;
+            return false;
+        }
+
+        var rawKey = key;
         var separator = rawKey.IndexOf(':');
         var filled = separator > 0 && rawKey[..separator].Equals("filled", StringComparison.OrdinalIgnoreCase);
         var name = separator > 0 ? rawKey[(separator + 1)..] : rawKey;
