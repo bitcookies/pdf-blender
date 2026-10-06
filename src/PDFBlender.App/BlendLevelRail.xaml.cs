@@ -22,7 +22,7 @@ public partial class BlendLevelRail : UserControl
     private int _dragStartIndex;
     private int _dragTarget;
     private int _animationVersion;
-    private static readonly Duration SelectionTransition = new(TimeSpan.FromMilliseconds(160));
+    private static readonly Duration SelectionTransition = new(TimeSpan.FromMilliseconds(120));
 
     public event EventHandler<BlendLevelChangedEventArgs>? SelectionChanged;
     public event RoutedEventHandler? EditRequested;
@@ -303,7 +303,8 @@ public partial class BlendLevelRail : UserControl
             From = current,
             To = target,
             Duration = SelectionTransition,
-            EasingFunction = new ExponentialEase { Exponent = 4, EasingMode = EasingMode.EaseOut }
+            // Ease-out exponential motion gives the Thumb a quick acceleration and a soft settle.
+            EasingFunction = new ExponentialEase { Exponent = 6, EasingMode = EasingMode.EaseOut }
         };
         transition.Completed += (_, _) =>
         {
