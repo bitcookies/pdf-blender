@@ -272,7 +272,7 @@ internal static class UiText
         ["unlock"] = "解锁",
         ["emptySlot"] = "空槽位",
         ["remove"] = "移除",
-        ["takeDown"] = "移出",
+        ["takeDown"] = "取下",
         ["rename"] = "重命名",
         ["deleteConfigurationConfirm"] = "确定删除此配置吗？",
         ["noBlendSlots"] = "请先在配置页面添加搅拌挡位。",
