@@ -8,6 +8,7 @@
     <SolidColorBrush x:Key="TitleBarButtonsHoverBrush" Color="#E6E6E6" />
     <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF" />
     <SolidColorBrush x:Key="CardBrush" Color="#FDFDFD" />
+    <SolidColorBrush x:Key="AboutCardHoverBrush" Color="#F8F8F8" />
     <SolidColorBrush x:Key="SettingItemBrush" Color="#FDFDFD" />
     <SolidColorBrush x:Key="LogoTileBrush" Color="#FFF1F3" />
     <SolidColorBrush x:Key="SurfaceRaisedBrush" Color="#F1F1F1" />

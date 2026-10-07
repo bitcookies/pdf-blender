@@ -33,8 +33,8 @@ internal static class ThemeManager
             SetBrush(resources, "SidebarBrush", "#1F1F1F");
             SetBrush(resources, "TitleBarBrush", "#1F1F1F");
             SetBrush(resources, "SurfaceBrush", "#252525");
-            SetBrush(resources, "CardBrush", "#2D2D2D");
-            SetBrush(resources, "SettingItemBrush", "#2D2D2D");
+            SetBrush(resources, "CardBrush", "#323232");
+            SetBrush(resources, "SettingItemBrush", "#323232");
             SetBrush(resources, "LogoTileBrush", "#3B252B");
             SetBrush(resources, "SurfaceRaisedBrush", "#383838");
             SetBrush(resources, "SurfaceMutedBrush", "#242424");
@@ -78,6 +78,7 @@ internal static class ThemeManager
             SetBrush(resources, "SliderThumbBorderBrush", "#6A6A6A");
             SetBrush(resources, "TitleBarButtonsForegroundBrush", "#FFFFFF");
             SetBrush(resources, "TitleBarButtonsHoverBrush", "#191919");
+            SetBrush(resources, "AboutCardHoverBrush", "#393939");
             SetColor(resources, "AccentButtonStartColor", "#E74856");
             SetColor(resources, "AccentButtonEndColor", "#D33D4D");
             SetColor(resources, "AccentButtonHoverStartColor", "#F05A67");
@@ -136,6 +137,7 @@ internal static class ThemeManager
             SetBrush(resources, "SliderThumbBorderBrush", "#E6E6E6");
             SetBrush(resources, "TitleBarButtonsForegroundBrush", "#202020");
             SetBrush(resources, "TitleBarButtonsHoverBrush", "#E6E6E6");
+            SetBrush(resources, "AboutCardHoverBrush", "#F6F6F6");
             SetColor(resources, "AccentButtonStartColor", "#EA7663");
             SetColor(resources, "AccentButtonEndColor", "#D84D31");
             SetColor(resources, "AccentButtonHoverStartColor", "#FB536D");
