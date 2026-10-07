@@ -62,7 +62,8 @@ public partial class BlendLevelRail : UserControl
         LevelSlider.Maximum = SlotCount - 1;
         LevelSlider.IsEnabled = _levels.Count(level => level.IsAvailable) > 1;
         var current = _levels.Count == 0 ? 0 : Math.Clamp(previousIndex, 0, SlotCount - 1);
-        LevelSlider.Value = _levels.Count == 0 ? 0 : ResolveAvailableIndex(current, true);
+        var selectedIndex = _levels.Count == 0 ? -1 : ResolveAvailableIndex(current, true);
+        LevelSlider.Value = selectedIndex < 0 ? 0 : selectedIndex;
 
         NumbersPanel.Children.Clear();
         UpperTickPanel.Children.Clear();
@@ -85,27 +86,35 @@ public partial class BlendLevelRail : UserControl
             });
             UpperTickPanel.Children.Add(CreateTick(availableBrush));
             LowerTickPanel.Children.Add(CreateTick(availableBrush));
-            var iconBrush = level.IsAvailable ? ConfigurationPalette.GetBrush(level.ColorKey) : (Brush)FindResource("BorderBrush");
+            var isSelected = level.IsAvailable && index == selectedIndex;
+            var iconBrush = !level.IsAvailable
+                ? (Brush)FindResource("BorderBrush")
+                : isSelected
+                    ? ConfigurationPalette.GetBrush(level.ColorKey)
+                    : new SolidColorBrush(Color.FromRgb(0x66, 0x66, 0x66));
             var iconBorder = new Border
             {
                 Width = 18,
                 Height = 18,
                 CornerRadius = new CornerRadius(9),
                 BorderThickness = new Thickness(0),
-                Background = Brushes.White,
+                Background = iconBrush,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Top,
                 Opacity = level.IsAvailable ? 1 : 0
             };
-            iconBorder.Child = new Wpf.Ui.Controls.SymbolIcon
+            var levelIcon = new Wpf.Ui.Controls.SymbolIcon
             {
                 Symbol = ConfigurationIconCatalog.GetSymbol(level.IconKey),
-                Filled = ConfigurationIconCatalog.IsFilled(level.IconKey),
-                FontSize = 10,
-                Foreground = iconBrush,
+                FontSize = 12,
+                Foreground = Brushes.White,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                Width = 18,
+                Height = 18,
             };
+            levelIcon.Foreground = new SolidColorBrush(Colors.White);
+            iconBorder.Child = levelIcon;
             var labelPanel = new StackPanel
             {
                 Width = 0,
@@ -121,7 +130,7 @@ public partial class BlendLevelRail : UserControl
                 Text = level.IsAvailable && !string.IsNullOrWhiteSpace(level.Name) ? level.Name : "—",
                 FontSize = 11,
                 Height = 16,
-                Foreground = availableBrush,
+                Foreground = level.IsAvailable ? iconBrush : availableBrush,
                 FontWeight = FontWeights.Medium,
                 TextAlignment = TextAlignment.Center,
                 TextTrimming = TextTrimming.CharacterEllipsis,
@@ -437,18 +446,26 @@ public partial class BlendLevelRail : UserControl
             var selected = labelIndex == index;
             var available = _levels.ElementAtOrDefault(labelIndex)?.IsAvailable == true;
             var highlighted = selected && available;
-            var brush = (Brush)FindResource(highlighted ? "AccentBrush" : available ? "MutedTextBrush" : "BorderBrush");
+            var configurationBrush = available
+                ? ConfigurationPalette.GetBrush(_levels.ElementAtOrDefault(labelIndex)?.ColorKey)
+                : (Brush)FindResource("BorderBrush");
+            var stateBrush = available
+                ? highlighted
+                    ? configurationBrush
+                    : new SolidColorBrush(Color.FromRgb(0x66, 0x66, 0x66))
+                : (Brush)FindResource("BorderBrush");
             if (label is not null)
             {
-                label.Foreground = brush;
+                label.Foreground = stateBrush;
                 label.FontWeight = highlighted ? FontWeights.SemiBold : FontWeights.Medium;
             }
             if (iconBorder is not null)
             {
+                iconBorder.Background = stateBrush;
                 iconBorder.Opacity = available ? 1 : 0;
             }
             if (icon is not null)
-                icon.Foreground = available ? ConfigurationPalette.GetBrush(_levels.ElementAtOrDefault(labelIndex)?.ColorKey) : brush;
+                icon.Foreground = Brushes.White;
         }
         UpdateTickBrushes(index);
     }
