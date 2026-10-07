@@ -140,6 +140,16 @@ internal sealed class DialogService
                 foreach (var descriptor in matches.Skip(loadedCount).Take(batchSize))
                 {
                     var selected = string.Equals(descriptor.Key, currentKey, StringComparison.OrdinalIgnoreCase);
+                    var iconBrush = (Brush)Application.Current.FindResource("IconPickerForegroundBrush");
+                    var icon = new SymbolIcon
+                    {
+                        Symbol = descriptor.Symbol,
+                        Filled = descriptor.Filled,
+                        FontSize = 13,
+                        Foreground = iconBrush
+                    };
+                    icon.SetResourceReference(IconElement.ForegroundProperty, "IconPickerForegroundBrush");
+
                     var button = new Wpf.Ui.Controls.Button
                     {
                         Width = 28,
@@ -148,12 +158,15 @@ internal sealed class DialogService
                         Padding = new Thickness(0),
                         CornerRadius = new CornerRadius(6),
                         Appearance = ControlAppearance.Secondary,
+                        Foreground = iconBrush,
                         BorderBrush = selected ? (Brush)Application.Current.FindResource("AccentBrush") : (Brush)Application.Current.FindResource("BorderBrush"),
                         BorderThickness = new Thickness(selected ? 2 : 1),
                         ToolTip = descriptor.Name,
                         Cursor = Cursors.Hand,
-                        Content = new SymbolIcon { Symbol = descriptor.Symbol, Filled = descriptor.Filled, FontSize = 13 }
+                        Content = icon
                     };
+                    button.SetResourceReference(Control.ForegroundProperty, "IconPickerForegroundBrush");
+                    button.SetResourceReference(IconElement.ForegroundProperty, "IconPickerForegroundBrush");
                     button.Click += (_, _) => Close(descriptor.Key);
                     grid.Children.Add(button);
                 }

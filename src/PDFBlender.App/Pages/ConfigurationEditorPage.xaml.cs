@@ -150,7 +150,14 @@ public partial class ConfigurationEditorPage : Page
             HorizontalAlignment = HorizontalAlignment.Center,
             Children =
             {
-                new SymbolIcon { Symbol = descriptor.Symbol, Filled = descriptor.Filled, FontSize = 17, Margin = new Thickness(0, 0, 8, 0) },
+                new SymbolIcon
+                {
+                    Symbol = descriptor.Symbol,
+                    Filled = descriptor.Filled,
+                    FontSize = 17,
+                    Foreground = (Brush)FindResource("IconPickerForegroundBrush"),
+                    Margin = new Thickness(0, 0, 8, 0)
+                },
                 new TextBlock { Text = descriptor.Name, VerticalAlignment = VerticalAlignment.Center }
             }
         };
@@ -432,9 +439,13 @@ public partial class ConfigurationEditorPage : Page
         var hasName = !string.IsNullOrWhiteSpace(NameBox.Text);
         var hasFeature = _normalize.IsChecked == true || _pageSize.IsChecked == true || _flatten.IsChecked == true || _watermark.IsChecked == true || _noise.IsChecked == true || _texture.IsChecked == true || _geometry.IsChecked == true || _microText.IsChecked == true || _copyLayer.IsChecked == true || _hiddenAi.IsChecked == true || _promptInjection.IsChecked == true || _gan.IsChecked == true || _metadata.IsChecked == true || _permissions.IsChecked == true;
         SaveButton.IsEnabled = hasName && (!_isNew || hasFeature);
-        var saveBrush = SaveButton.IsEnabled ? (Brush)FindResource("AccentTextBrush") : (Brush)FindResource("MutedTextBrush");
-        SaveButton.Foreground = saveBrush;
-        if (SaveButton.Content is TextBlock saveText) saveText.Foreground = saveBrush;
+        var saveTextResource = SaveButton.IsEnabled ? "AccentTextBrush" : "EditorSaveDisabledTextBrush";
+
+        if (SaveButton.Content is TextBlock saveText)
+        {
+            saveText.ClearValue(TextBlock.ForegroundProperty);
+            saveText.SetResourceReference(TextBlock.ForegroundProperty, saveTextResource);
+        }
     }
 
     private void BreadcrumbBar_ItemClicked(object sender, BreadcrumbBarItemClickedEventArgs e)

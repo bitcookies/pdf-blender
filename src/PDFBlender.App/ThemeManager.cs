@@ -40,6 +40,7 @@ internal static class ThemeManager
             SetBrush(resources, "SurfaceMutedBrush", "#242424");
             SetBrush(resources, "BorderBrush", "#454545");
             SetBrush(resources, "TextBrush", "#F2F2F2");
+            SetBrush(resources, "IconPickerForegroundBrush", "#FFFFFF");
             SetBrush(resources, "TitleTextBrush", "#F2F2F2");
             SetBrush(resources, "MutedTextBrush", "#B8B8B8");
             SetBrush(resources, "AccentBrush", "#E74856");
@@ -74,6 +75,7 @@ internal static class ThemeManager
             SetBrush(resources, "BreadcrumbBarHoverForegroundBrush", "#B8B8B8");
             SetBrush(resources, "BreadcrumbBarCurrentNormalForegroundBrush", "#F2F2F2");
             SetBrush(resources, "DisabledTextBrush", "#8A8A8A");
+            SetBrush(resources, "EditorSaveDisabledTextBrush", "#B8B8B8");
             SetBrush(resources, "SliderThumbBrush", "#F2F2F2");
             SetBrush(resources, "SliderThumbBorderBrush", "#6A6A6A");
             SetBrush(resources, "TitleBarButtonsForegroundBrush", "#FFFFFF");
@@ -83,6 +85,8 @@ internal static class ThemeManager
             SetColor(resources, "AccentButtonEndColor", "#D33D4D");
             SetColor(resources, "AccentButtonHoverStartColor", "#F05A67");
             SetColor(resources, "AccentButtonHoverEndColor", "#D93D4D");
+            SetColor(resources, "EditorSaveDisabledStartColor", "#454545");
+            SetColor(resources, "EditorSaveDisabledEndColor", "#3A3A3A");
             SetShadow(resources, dark: true);
         }
         else
@@ -99,6 +103,7 @@ internal static class ThemeManager
             SetBrush(resources, "SurfaceMutedBrush", "#F8F8F8");
             SetBrush(resources, "BorderBrush", "#E6E6E6");
             SetBrush(resources, "TextBrush", "#202020");
+            SetBrush(resources, "IconPickerForegroundBrush", "#202020");
             SetBrush(resources, "TitleTextBrush", "#5E5E5E");
             SetBrush(resources, "MutedTextBrush", "#666666");
             SetBrush(resources, "AccentBrush", "#C9021E");
@@ -133,6 +138,7 @@ internal static class ThemeManager
             SetBrush(resources, "BreadcrumbBarHoverForegroundBrush", "#909090");
             SetBrush(resources, "BreadcrumbBarCurrentNormalForegroundBrush", "#333333");
             SetBrush(resources, "DisabledTextBrush", "#777777");
+            SetBrush(resources, "EditorSaveDisabledTextBrush", "#666666");
             SetBrush(resources, "SliderThumbBrush", "#FFFFFF");
             SetBrush(resources, "SliderThumbBorderBrush", "#E6E6E6");
             SetBrush(resources, "TitleBarButtonsForegroundBrush", "#202020");
@@ -142,6 +148,8 @@ internal static class ThemeManager
             SetColor(resources, "AccentButtonEndColor", "#D84D31");
             SetColor(resources, "AccentButtonHoverStartColor", "#FB536D");
             SetColor(resources, "AccentButtonHoverEndColor", "#D23040");
+            SetColor(resources, "EditorSaveDisabledStartColor", "#D6D6D6");
+            SetColor(resources, "EditorSaveDisabledEndColor", "#C8C8C8");
             SetShadow(resources, dark: false);
         }
 

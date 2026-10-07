@@ -15,6 +15,7 @@
     <SolidColorBrush x:Key="SurfaceMutedBrush" Color="#F8F8F8" />
     <SolidColorBrush x:Key="BorderBrush" Color="#E6E6E6" />
     <SolidColorBrush x:Key="TextBrush" Color="#202020" />
+    <SolidColorBrush x:Key="IconPickerForegroundBrush" Color="#202020" />
     <SolidColorBrush x:Key="TitleTextBrush" Color="#5E5E5E" />
     <SolidColorBrush x:Key="MutedTextBrush" Color="#666666" />
     <SolidColorBrush x:Key="AccentBrush" Color="#C9021E" />
@@ -68,6 +69,9 @@
     <Color x:Key="AccentButtonHoverEndColor">#D23040</Color>
     <Color x:Key="AccentButtonDisabledStartColor">#C0C0C0</Color>
     <Color x:Key="AccentButtonDisabledEndColor">#B7B7B7</Color>
+    <Color x:Key="EditorSaveDisabledStartColor">#D6D6D6</Color>
+    <Color x:Key="EditorSaveDisabledEndColor">#C8C8C8</Color>
+    <SolidColorBrush x:Key="EditorSaveDisabledTextBrush" Color="#666666" />
     <DropShadowEffect x:Key="FlyoutShadowEffect" x:Shared="False" BlurRadius="20" ShadowDepth="8" Direction="270" Opacity="0.14" Color="#202020" />
     <QuadraticEase x:Key="EaseOut" EasingMode="EaseOut" />
     <QuadraticEase x:Key="EaseInOut" EasingMode="EaseInOut" />

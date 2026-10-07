@@ -14,8 +14,8 @@
             <GradientStop Color="{DynamicResource AccentButtonHoverEndColor}" Offset="1" />
         </LinearGradientBrush>
         <LinearGradientBrush x:Key="EditorSaveDisabledBrush" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="{DynamicResource AccentButtonDisabledStartColor}" Offset="0" />
-            <GradientStop Color="{DynamicResource AccentButtonDisabledEndColor}" Offset="1" />
+            <GradientStop Color="{DynamicResource EditorSaveDisabledStartColor}" Offset="0" />
+            <GradientStop Color="{DynamicResource EditorSaveDisabledEndColor}" Offset="1" />
         </LinearGradientBrush>
         <Style x:Key="EditorSaveButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
             <Setter Property="Template">
@@ -56,7 +56,7 @@
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Background" Value="{StaticResource EditorSaveDisabledBrush}" />
-                    <Setter Property="Foreground" Value="{DynamicResource DisabledTextBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource EditorSaveDisabledTextBrush}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
