@@ -494,7 +494,13 @@ public partial class ConfigurationPage : Page
             });
     }
 
-    public void ReturnToList() => ShowList();
+    public void ReturnToList()
+    {
+        if (ChildContent.Visibility != Visibility.Visible)
+            return;
+
+        ShowList();
+    }
 
     private void ShowList()
     {
