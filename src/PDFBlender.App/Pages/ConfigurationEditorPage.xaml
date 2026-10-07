@@ -4,6 +4,63 @@
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:local="clr-namespace:PDFBlender.App"
 >
+    <Page.Resources>
+        <LinearGradientBrush x:Key="EditorSaveBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#EA7663" Offset="0" />
+            <GradientStop Color="#D84D31" Offset="1" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="EditorSaveHoverBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#FB536D" Offset="0" />
+            <GradientStop Color="#D23040" Offset="1" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="EditorSaveDisabledBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#C0C0C0" Offset="0" />
+            <GradientStop Color="#B7B7B7" Offset="1" />
+        </LinearGradientBrush>
+        <Style x:Key="EditorSaveButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ui:Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              Margin="{TemplateBinding Padding}" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Appearance" Value="Transparent" />
+            <Setter Property="Background" Value="{StaticResource EditorSaveBrush}" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource EditorSaveHoverBrush}" />
+                    <Setter Property="Foreground" Value="White" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="{StaticResource EditorSaveHoverBrush}" />
+                    <Setter Property="Foreground" Value="White" />
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="{StaticResource EditorSaveDisabledBrush}" />
+                    <Setter Property="Foreground" Value="#777777" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Page.Resources>
 
     <ScrollViewer x:Name="EditorScroller" local:ScrollBarAutoHideBehavior.Enabled="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch">
         <Grid Margin="24,20,24,24" MaxWidth="760" VerticalAlignment="Top">
@@ -49,7 +106,7 @@
             <StackPanel x:Name="FeaturePanel" Grid.Row="2" />
             <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
                 <ui:Button x:Name="CancelButton" Appearance="Secondary" Content="Cancel" Click="CancelButton_Click" Margin="0,0,8,0" Cursor="Hand" />
-                <ui:Button x:Name="SaveButton" Appearance="Primary" Background="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}" Foreground="{DynamicResource AccentTextBrush}" Content="Save" Click="SaveButton_Click" Cursor="Hand" />
+                <ui:Button x:Name="SaveButton" Style="{StaticResource EditorSaveButtonStyle}" Content="Save" Click="SaveButton_Click" Cursor="Hand" />
             </StackPanel>
         </Grid>
     </ScrollViewer>
