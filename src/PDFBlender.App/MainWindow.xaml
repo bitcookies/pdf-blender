@@ -7,14 +7,14 @@
                  Icon="/PDFBlender.App;component/Assets/logo.ico"
                  Width="820" Height="600" MinWidth="760" MinHeight="540"
                  WindowStartupLocation="CenterScreen"
-                 WindowBackdropType="Mica"
+                 WindowBackdropType="None"
                  WindowCornerPreference="Round"
                  ExtendsContentIntoTitleBar="True"
                  Background="{DynamicResource WindowBackgroundBrush}"
                  TextElement.FontFamily="{DynamicResource AppFontFamily}"
                  UseLayoutRounding="True"
                  SnapsToDevicePixels="True">
-    <Grid Background="{DynamicResource WindowBackgroundBrush}"
+    <Grid x:Name="RootLayout" Background="{DynamicResource WindowBackgroundBrush}"
           TextElement.FontFamily="{DynamicResource AppFontFamily}"
           TextElement.FontSize="13"
           UseLayoutRounding="True"
@@ -28,7 +28,7 @@
                 <ui:ImageIcon Source="/PDFBlender.App;component/Assets/logo.ico" Width="16" Height="16" />
             </ui:TitleBar.Icon>
         </ui:TitleBar>
-        <Grid Grid.Row="1" Background="{DynamicResource SidebarBrush}">
+        <Grid x:Name="ShellSurfaceGrid" Grid.Row="1" Background="{DynamicResource SidebarBrush}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="72" />
                 <ColumnDefinition Width="*" />
@@ -69,9 +69,9 @@
                     </ui:NavigationViewItem>
                 </ui:NavigationView.FooterMenuItems>
             </ui:NavigationView>
-            <Border Grid.Column="1" Background="{DynamicResource WindowBackgroundBrush}" CornerRadius="12,0,0,0" ClipToBounds="True">
+            <Border x:Name="MainContentSurface" Grid.Column="1" Background="{DynamicResource WindowBackgroundBrush}" CornerRadius="12,0,0,0" ClipToBounds="True">
                 <Grid>
-                    <Frame x:Name="ContentFrame" NavigationUIVisibility="Hidden" Margin="0" />
+                    <Frame x:Name="ContentFrame" NavigationUIVisibility="Hidden" Margin="0" Background="{DynamicResource WindowBackgroundBrush}" />
                     <local:UiNotificationHost x:Name="AppNotificationHost" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,16,20,0" />
                 </Grid>
             </Border>

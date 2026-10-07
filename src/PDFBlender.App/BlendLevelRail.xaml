@@ -65,8 +65,8 @@
                                         <Thumb.Template>
                                             <ControlTemplate TargetType="Thumb">
                                                 <Border x:Name="ThumbBorder"
-                                                        Background="White"
-                                                        BorderBrush="#E6E6E6"
+                                                        Background="{DynamicResource SliderThumbBrush}"
+                                                        BorderBrush="{DynamicResource SliderThumbBorderBrush}"
                                                         BorderThickness="1"
                                                         CornerRadius="15" />
                                                 <ControlTemplate.Triggers>
@@ -194,7 +194,7 @@
                    Height="48"
                    Padding="0"
                    CornerRadius="24"
-                   Background="White"
+                   Background="{DynamicResource SurfaceBrush}"
                    BorderBrush="{DynamicResource BorderBrush}"
                    BorderThickness="1"
                    Appearance="Transparent"

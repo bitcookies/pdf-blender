@@ -224,11 +224,23 @@ public partial class MainWindow : FluentWindow
             ThemePreference.Light => false,
             _ => ThemeManager.SystemUsesLightTheme() is false
         };
-        ApplicationThemeManager.Apply(isDark ? ApplicationTheme.Dark : ApplicationTheme.Light);
-        var accent = (Color)ColorConverter.ConvertFromString("#C9021E")!;
+        var applicationTheme = isDark ? ApplicationTheme.Dark : ApplicationTheme.Light;
+        var backdrop = isDark ? WindowBackdropType.None : WindowBackdropType.Mica;
+        ApplicationThemeManager.Apply(applicationTheme, backdrop, true);
+        WindowBackdropType = backdrop;
+        var accent = (Color)ColorConverter.ConvertFromString(isDark ? "#E74856" : "#C9021E")!;
         ApplicationAccentColorManager.Apply(accent, accent, accent, accent);
         ThemeManager.ApplyPalette(isDark);
-        Background = (Brush)Application.Current.Resources["WindowBackgroundBrush"];
+        var windowBrush = (Brush)Application.Current.Resources["WindowBackgroundBrush"];
+        var shellBrush = (Brush)Application.Current.Resources["ShellChromeBrush"];
+        var sidebarBrush = (Brush)Application.Current.Resources["SidebarBrush"];
+        Background = windowBrush;
+        RootLayout.Background = windowBrush;
+        ShellTitleBar.Background = shellBrush;
+        ShellSurfaceGrid.Background = sidebarBrush;
+        ShellNavigationView.Background = sidebarBrush;
+        MainContentSurface.Background = windowBrush;
+        ContentFrame.Background = windowBrush;
         if (IsInitialized)
         {
             foreach (var navigationItem in ShellNavigationView.MenuItems

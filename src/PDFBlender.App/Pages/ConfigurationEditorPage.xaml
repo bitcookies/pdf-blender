@@ -6,16 +6,16 @@
 >
     <Page.Resources>
         <LinearGradientBrush x:Key="EditorSaveBrush" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#EA7663" Offset="0" />
-            <GradientStop Color="#D84D31" Offset="1" />
+            <GradientStop Color="{DynamicResource AccentButtonStartColor}" Offset="0" />
+            <GradientStop Color="{DynamicResource AccentButtonEndColor}" Offset="1" />
         </LinearGradientBrush>
         <LinearGradientBrush x:Key="EditorSaveHoverBrush" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#FB536D" Offset="0" />
-            <GradientStop Color="#D23040" Offset="1" />
+            <GradientStop Color="{DynamicResource AccentButtonHoverStartColor}" Offset="0" />
+            <GradientStop Color="{DynamicResource AccentButtonHoverEndColor}" Offset="1" />
         </LinearGradientBrush>
         <LinearGradientBrush x:Key="EditorSaveDisabledBrush" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#C0C0C0" Offset="0" />
-            <GradientStop Color="#B7B7B7" Offset="1" />
+            <GradientStop Color="{DynamicResource AccentButtonDisabledStartColor}" Offset="0" />
+            <GradientStop Color="{DynamicResource AccentButtonDisabledEndColor}" Offset="1" />
         </LinearGradientBrush>
         <Style x:Key="EditorSaveButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
             <Setter Property="Template">
@@ -56,7 +56,7 @@
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Background" Value="{StaticResource EditorSaveDisabledBrush}" />
-                    <Setter Property="Foreground" Value="#777777" />
+                    <Setter Property="Foreground" Value="{DynamicResource DisabledTextBrush}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -65,11 +65,8 @@
     <ScrollViewer x:Name="EditorScroller" local:ScrollBarAutoHideBehavior.Enabled="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch">
         <Grid Margin="24,20,24,24" MaxWidth="760" VerticalAlignment="Top">
             <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
-            <ui:BreadcrumbBar x:Name="BreadcrumbBar" ItemClicked="BreadcrumbBar_ItemClicked" Margin="0,0,0,12" Cursor="Hand" FontSize="13" FontWeight="Normal" Foreground="#333333">
+            <ui:BreadcrumbBar x:Name="BreadcrumbBar" ItemClicked="BreadcrumbBar_ItemClicked" Margin="0,0,0,12" Cursor="Hand" FontSize="13" FontWeight="Normal" Foreground="{DynamicResource BreadcrumbBarNormalForegroundBrush}">
                 <ui:BreadcrumbBar.Resources>
-                    <SolidColorBrush x:Key="BreadcrumbBarNormalForegroundBrush" Color="#333333" />
-                    <SolidColorBrush x:Key="BreadcrumbBarHoverForegroundBrush" Color="#909090" />
-                    <SolidColorBrush x:Key="BreadcrumbBarCurrentNormalForegroundBrush" Color="#333333" />
                     <Style TargetType="{x:Type ui:BreadcrumbBarItem}" BasedOn="{StaticResource DefaultUiBreadcrumbBarItemStyle}">
                         <Setter Property="FontSize" Value="13" />
                         <Setter Property="FontWeight" Value="Normal" />

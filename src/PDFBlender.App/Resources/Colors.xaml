@@ -53,6 +53,18 @@
     <SolidColorBrush x:Key="NotificationInfoBrush" Color="#2563A6" />
     <SolidColorBrush x:Key="NotificationWarningBrush" Color="#B75C00" />
     <SolidColorBrush x:Key="NotificationErrorBrush" Color="#C42B1C" />
+    <SolidColorBrush x:Key="BreadcrumbBarNormalForegroundBrush" Color="#333333" />
+    <SolidColorBrush x:Key="BreadcrumbBarHoverForegroundBrush" Color="#909090" />
+    <SolidColorBrush x:Key="BreadcrumbBarCurrentNormalForegroundBrush" Color="#333333" />
+    <SolidColorBrush x:Key="DisabledTextBrush" Color="#777777" />
+    <SolidColorBrush x:Key="SliderThumbBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="SliderThumbBorderBrush" Color="#E6E6E6" />
+    <Color x:Key="AccentButtonStartColor">#EA7663</Color>
+    <Color x:Key="AccentButtonEndColor">#D84D31</Color>
+    <Color x:Key="AccentButtonHoverStartColor">#FB536D</Color>
+    <Color x:Key="AccentButtonHoverEndColor">#D23040</Color>
+    <Color x:Key="AccentButtonDisabledStartColor">#C0C0C0</Color>
+    <Color x:Key="AccentButtonDisabledEndColor">#B7B7B7</Color>
     <DropShadowEffect x:Key="FlyoutShadowEffect" x:Shared="False" BlurRadius="20" ShadowDepth="8" Direction="270" Opacity="0.14" Color="#202020" />
     <QuadraticEase x:Key="EaseOut" EasingMode="EaseOut" />
     <QuadraticEase x:Key="EaseInOut" EasingMode="EaseInOut" />

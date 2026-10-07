@@ -1,12 +1,14 @@
 using Microsoft.Win32;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 
 namespace PDFBlender.App;
 
 internal static class ThemeManager
 {
     public static bool IsDark { get; private set; }
+
     public static bool SystemUsesLightTheme()
     {
         try
@@ -26,42 +28,59 @@ internal static class ThemeManager
         var resources = Application.Current.Resources;
         if (dark)
         {
-            SetBrush(resources, "WindowBackgroundBrush", "#272727");
-            SetBrush(resources, "ShellChromeBrush", "#202020");
-            SetBrush(resources, "SidebarBrush", "#202020");
-            SetBrush(resources, "TitleBarBrush", "#202020");
-            SetBrush(resources, "SurfaceBrush", "#262626");
-            SetBrush(resources, "CardBrush", "#323232");
-            SetBrush(resources, "SettingItemBrush", "#323232");
+            SetBrush(resources, "WindowBackgroundBrush", "#1F1F1F");
+            SetBrush(resources, "ShellChromeBrush", "#1F1F1F");
+            SetBrush(resources, "SidebarBrush", "#1F1F1F");
+            SetBrush(resources, "TitleBarBrush", "#1F1F1F");
+            SetBrush(resources, "SurfaceBrush", "#252525");
+            SetBrush(resources, "CardBrush", "#2D2D2D");
+            SetBrush(resources, "SettingItemBrush", "#2D2D2D");
             SetBrush(resources, "LogoTileBrush", "#3B252B");
-            SetBrush(resources, "SurfaceRaisedBrush", "#343434");
-            SetBrush(resources, "SurfaceMutedBrush", "#292929");
-            SetBrush(resources, "BorderBrush", "#353535");
+            SetBrush(resources, "SurfaceRaisedBrush", "#383838");
+            SetBrush(resources, "SurfaceMutedBrush", "#242424");
+            SetBrush(resources, "BorderBrush", "#454545");
             SetBrush(resources, "TextBrush", "#F2F2F2");
-            SetBrush(resources, "TitleTextBrush", "#D8D8D8");
+            SetBrush(resources, "TitleTextBrush", "#F2F2F2");
             SetBrush(resources, "MutedTextBrush", "#B8B8B8");
-            SetBrush(resources, "AccentBrush", "#C9021E");
-            SetBrush(resources, "AccentDarkBrush", "#E45F60");
-            SetBrush(resources, "AccentSoftBrush", "#35C9021E");
-            SetToggleSwitchPalette(resources, "#C9021E", "#A80119", "#980018", "#7A333D");
-            SetBrush(resources, "NavHoverBrush", "#18FFFFFF");
-            SetBrush(resources, "NavSelectedBrush", "#2D2D2D");
-            SetBrush(resources, "NavTextBrush", "#9A9A9A");
-            SetBrush(resources, "NavigationViewItemForeground", "#9A9A9A");
-            SetBrush(resources, "NavigationViewItemForegroundPointerOver", "#9A9A9A");
-            SetBrush(resources, "NavigationViewItemForegroundPressed", "#9A9A9A");
-            SetBrush(resources, "NavigationViewItemForegroundLeftFluent", "#C9021E");
-            SetBrush(resources, "NavigationViewItemForegroundPointerOverLeftFluent", "#9A9A9A");
+            SetBrush(resources, "AccentBrush", "#E74856");
+            SetBrush(resources, "AccentDarkBrush", "#F05A67");
+            SetBrush(resources, "AccentSoftBrush", "#35E74856");
+            SetToggleSwitchPalette(resources, "#E74856", "#F05A67", "#C83A48", "#6A3339");
+            SetBrush(resources, "NavHoverBrush", "#2D2D2D");
+            SetBrush(resources, "NavSelectedBrush", "#454545");
+            SetBrush(resources, "NavTextBrush", "#B8B8B8");
+            SetBrush(resources, "NavigationViewItemForeground", "#B8B8B8");
+            SetBrush(resources, "NavigationViewItemForegroundPointerOver", "#F2F2F2");
+            SetBrush(resources, "NavigationViewItemForegroundPressed", "#F2F2F2");
+            SetBrush(resources, "NavigationViewItemForegroundLeftFluent", "#E74856");
+            SetBrush(resources, "NavigationViewItemForegroundPointerOverLeftFluent", "#F2F2F2");
             SetBrush(resources, "NavigationViewItemBackgroundPointerOver", "#2D2D2D");
             SetBrush(resources, "NavigationViewItemBackgroundPointerOverLeftFluent", "#2D2D2D");
             SetBrush(resources, "NavigationViewItemBackgroundSelected", "#454545");
             SetBrush(resources, "NavigationViewItemBackgroundSelectedLeftFluent", "#454545");
-            SetBrush(resources, "NavigationViewItemBackgroundPressed", "#383838");
-            SetBrush(resources, "PillBrush", "#343434");
-            SetBrush(resources, "PillTextBrush", "#F0F0F0");
+            SetBrush(resources, "NavigationViewItemBackgroundPressed", "#3A3A3A");
+            SetBrush(resources, "NavigationViewContentBackground", "#1F1F1F");
+            SetBrush(resources, "NavigationViewContentGridBorderBrush", "#1F1F1F");
+            SetBrush(resources, "LeftNavigationViewSeparatorBrush", "#454545");
+            SetBrush(resources, "NavigationViewSelectionIndicatorForeground", "#E74856");
+            SetBrush(resources, "NavigationViewItemBorderBrush", "#454545");
+            SetWpfUiSurfacePalette(resources, "#1F1F1F", "#252525", "#2D2D2D", "#2D2D2D", "#383838", "#454545", "#242424", "#F2F2F2", "#B8B8B8", "#8A8A8A");
+            SetBrush(resources, "PillBrush", "#3A3A3A");
+            SetBrush(resources, "PillTextBrush", "#F2F2F2");
             SetBrush(resources, "NotificationBrush", "#2D2D2D");
             SetBrush(resources, "NotificationBorderBrush", "#454545");
-            SetBrush(resources, "NotificationMessageBrush", "#C8C8C8");
+            SetBrush(resources, "NotificationMessageBrush", "#D8D8D8");
+            SetBrush(resources, "BreadcrumbBarNormalForegroundBrush", "#F2F2F2");
+            SetBrush(resources, "BreadcrumbBarHoverForegroundBrush", "#B8B8B8");
+            SetBrush(resources, "BreadcrumbBarCurrentNormalForegroundBrush", "#F2F2F2");
+            SetBrush(resources, "DisabledTextBrush", "#8A8A8A");
+            SetBrush(resources, "SliderThumbBrush", "#F2F2F2");
+            SetBrush(resources, "SliderThumbBorderBrush", "#6A6A6A");
+            SetColor(resources, "AccentButtonStartColor", "#E74856");
+            SetColor(resources, "AccentButtonEndColor", "#D33D4D");
+            SetColor(resources, "AccentButtonHoverStartColor", "#F05A67");
+            SetColor(resources, "AccentButtonHoverEndColor", "#D93D4D");
+            SetShadow(resources, dark: true);
         }
         else
         {
@@ -77,7 +96,7 @@ internal static class ThemeManager
             SetBrush(resources, "SurfaceMutedBrush", "#F8F8F8");
             SetBrush(resources, "BorderBrush", "#E6E6E6");
             SetBrush(resources, "TextBrush", "#202020");
-            SetBrush(resources, "TitleTextBrush", "#868686");
+            SetBrush(resources, "TitleTextBrush", "#5E5E5E");
             SetBrush(resources, "MutedTextBrush", "#666666");
             SetBrush(resources, "AccentBrush", "#C9021E");
             SetBrush(resources, "AccentDarkBrush", "#E45F60");
@@ -96,18 +115,80 @@ internal static class ThemeManager
             SetBrush(resources, "NavigationViewItemBackgroundSelected", "#FFFFFF");
             SetBrush(resources, "NavigationViewItemBackgroundSelectedLeftFluent", "#FFFFFF");
             SetBrush(resources, "NavigationViewItemBackgroundPressed", "#DEDEDE");
+            SetBrush(resources, "NavigationViewContentBackground", "#F3F3F3");
+            SetBrush(resources, "NavigationViewContentGridBorderBrush", "#E6E6E6");
+            SetBrush(resources, "LeftNavigationViewSeparatorBrush", "#E6E6E6");
+            SetBrush(resources, "NavigationViewSelectionIndicatorForeground", "#C9021E");
+            SetBrush(resources, "NavigationViewItemBorderBrush", "#E6E6E6");
+            SetWpfUiSurfacePalette(resources, "#F9F9F9", "#F3F3F3", "#E6E6E6", "#FFFFFF", "#F6F6F6", "#EAEAEA", "#F8F8F8", "#202020", "#5E5E5E", "#777777");
             SetBrush(resources, "PillBrush", "#F6F6F6");
             SetBrush(resources, "PillTextBrush", "#202020");
             SetBrush(resources, "NotificationBrush", "#FCFCFC");
             SetBrush(resources, "NotificationBorderBrush", "#DADADA");
             SetBrush(resources, "NotificationMessageBrush", "#5E5E5E");
+            SetBrush(resources, "BreadcrumbBarNormalForegroundBrush", "#333333");
+            SetBrush(resources, "BreadcrumbBarHoverForegroundBrush", "#909090");
+            SetBrush(resources, "BreadcrumbBarCurrentNormalForegroundBrush", "#333333");
+            SetBrush(resources, "DisabledTextBrush", "#777777");
+            SetBrush(resources, "SliderThumbBrush", "#FFFFFF");
+            SetBrush(resources, "SliderThumbBorderBrush", "#E6E6E6");
+            SetColor(resources, "AccentButtonStartColor", "#EA7663");
+            SetColor(resources, "AccentButtonEndColor", "#D84D31");
+            SetColor(resources, "AccentButtonHoverStartColor", "#FB536D");
+            SetColor(resources, "AccentButtonHoverEndColor", "#D23040");
+            SetShadow(resources, dark: false);
         }
+
         SetBrush(resources, "AccentTextBrush", "#FFFFFF");
+        SetColor(resources, "AccentButtonDisabledStartColor", "#C0C0C0");
+        SetColor(resources, "AccentButtonDisabledEndColor", "#B7B7B7");
     }
 
     private static void SetBrush(ResourceDictionary resources, string key, string hex)
     {
         resources[key] = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex)!);
+    }
+
+    private static void SetColor(ResourceDictionary resources, string key, string hex)
+    {
+        resources[key] = (Color)ColorConverter.ConvertFromString(hex)!;
+    }
+
+    private static void SetShadow(ResourceDictionary resources, bool dark)
+    {
+        resources["FlyoutShadowEffect"] = new DropShadowEffect
+        {
+            BlurRadius = 20,
+            ShadowDepth = 8,
+            Direction = 270,
+            Opacity = dark ? 0.38 : 0.14,
+            Color = dark ? Colors.Black : Color.FromRgb(0x20, 0x20, 0x20)
+        };
+    }
+
+    private static void SetWpfUiSurfacePalette(
+        ResourceDictionary resources,
+        string baseSurface,
+        string secondarySurface,
+        string tertiarySurface,
+        string controlDefault,
+        string controlSecondary,
+        string controlTertiary,
+        string controlDisabled,
+        string primaryText,
+        string secondaryText,
+        string tertiaryText)
+    {
+        SetBrush(resources, "SolidBackgroundFillColorBaseBrush", baseSurface);
+        SetBrush(resources, "SolidBackgroundFillColorSecondaryBrush", secondarySurface);
+        SetBrush(resources, "SolidBackgroundFillColorTertiaryBrush", tertiarySurface);
+        SetBrush(resources, "ControlFillColorDefaultBrush", controlDefault);
+        SetBrush(resources, "ControlFillColorSecondaryBrush", controlSecondary);
+        SetBrush(resources, "ControlFillColorTertiaryBrush", controlTertiary);
+        SetBrush(resources, "ControlFillColorDisabledBrush", controlDisabled);
+        SetBrush(resources, "TextFillColorPrimaryBrush", primaryText);
+        SetBrush(resources, "TextFillColorSecondaryBrush", secondaryText);
+        SetBrush(resources, "TextFillColorTertiaryBrush", tertiaryText);
     }
 
     private static void SetToggleSwitchPalette(ResourceDictionary resources, string normal, string pointerOver, string pressed, string disabled)
@@ -125,5 +206,4 @@ internal static class ThemeManager
         SetBrush(resources, "ToggleSwitchKnobFillOnPressed", "#FFFFFF");
         SetBrush(resources, "ToggleSwitchKnobFillOnDisabled", "#F7F7F7");
     }
-
 }

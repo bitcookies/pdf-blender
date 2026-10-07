@@ -13,11 +13,8 @@
                               Cursor="Hand"
                               FontSize="13"
                               FontWeight="Normal"
-                              Foreground="#333333">
+                              Foreground="{DynamicResource BreadcrumbBarNormalForegroundBrush}">
                 <ui:BreadcrumbBar.Resources>
-                    <SolidColorBrush x:Key="BreadcrumbBarNormalForegroundBrush" Color="#333333" />
-                    <SolidColorBrush x:Key="BreadcrumbBarHoverForegroundBrush" Color="#909090" />
-                    <SolidColorBrush x:Key="BreadcrumbBarCurrentNormalForegroundBrush" Color="#333333" />
                     <Style TargetType="{x:Type ui:BreadcrumbBarItem}" BasedOn="{StaticResource DefaultUiBreadcrumbBarItemStyle}">
                         <Setter Property="FontSize" Value="13" />
                         <Setter Property="FontWeight" Value="Normal" />

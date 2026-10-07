@@ -7,16 +7,16 @@
       SnapsToDevicePixels="True">
     <Page.Resources>
         <LinearGradientBrush x:Key="HomeGradientBrush" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#EA7663" Offset="0" />
-            <GradientStop Color="#D84D31" Offset="1" />
+            <GradientStop Color="{DynamicResource AccentButtonStartColor}" Offset="0" />
+            <GradientStop Color="{DynamicResource AccentButtonEndColor}" Offset="1" />
         </LinearGradientBrush>
         <LinearGradientBrush x:Key="HomeGradientHoverBrush" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#FB536D" Offset="0" />
-            <GradientStop Color="#D23040" Offset="1" />
+            <GradientStop Color="{DynamicResource AccentButtonHoverStartColor}" Offset="0" />
+            <GradientStop Color="{DynamicResource AccentButtonHoverEndColor}" Offset="1" />
         </LinearGradientBrush>
         <LinearGradientBrush x:Key="HomeGradientDisabledBrush" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#C0C0C0" Offset="0" />
-            <GradientStop Color="#B7B7B7" Offset="1" />
+            <GradientStop Color="{DynamicResource AccentButtonDisabledStartColor}" Offset="0" />
+            <GradientStop Color="{DynamicResource AccentButtonDisabledEndColor}" Offset="1" />
         </LinearGradientBrush>
         <Style x:Key="HomeGradientSurfaceStyle" TargetType="Border">
             <Setter Property="Background" Value="{StaticResource HomeGradientBrush}" />

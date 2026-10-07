@@ -111,7 +111,7 @@ public partial class ConfigurationPresetPage : Page
                 FontSize = 14,
                 FontWeight = FontWeights.SemiBold,
                 TextTrimming = TextTrimming.CharacterEllipsis,
-                Foreground = (Brush)FindResource("TextFillColorPrimaryBrush"),
+                Foreground = (Brush)FindResource("TextBrush"),
                 VerticalAlignment = VerticalAlignment.Top
             };
             Grid.SetRow(name, 0);
