@@ -29,9 +29,9 @@ internal sealed class AppSession
         Preferences = AppPreferencesStore.Load();
         UiText.SetLanguage(Preferences.Language);
         var document = ConfigurationStore.Load();
-        _userConfigurations = document.UserConfigurations ?? [];
+        _userConfigurations = (document.UserConfigurations ?? []).Where(configuration => !PDFBlender.Core.Models.BuiltInConfigurations.IsReservedId(configuration.Id)).ToList();
         var metadataChanged = EnsureConfigurationMetadata();
-        var removedDevelopmentPresets = (document.UserConfigurations ?? []).Any(configuration => PDFBlender.Core.Models.BuiltInConfigurations.All.Any(preset => string.Equals(preset.Id, configuration.Id, StringComparison.OrdinalIgnoreCase)));
+        var removedDevelopmentPresets = (document.UserConfigurations ?? []).Count != _userConfigurations.Count;
         _slotIds = document.SlotIds ?? [];
         _selectedConfigurationId = document.SelectedConfigurationId;
         _slotIds = NormalizeSlots(_slotIds);
@@ -87,7 +87,8 @@ internal sealed class AppSession
         var preset = BuiltInConfigurations.FirstOrDefault(item => string.Equals(item.Id, presetId, StringComparison.OrdinalIgnoreCase));
         if (preset is null) return string.Empty;
         var id = "preset-" + Guid.NewGuid().ToString("N");
-        _userConfigurations.Add(preset with { Id = id, Name = MakeUniqueName(LocalizedPresetName(preset)), IsBuiltIn = false, IsLocked = false, ShortId = CreateShortId(), ColorKey = ConfigurationPalette.ForIndex(_userConfigurations.Count), IconKey = ConfigurationIconCatalog.ForIndex(_userConfigurations.Count) });
+        var presetIndex = PDFBlender.Core.Models.BuiltInConfigurations.All.ToList().FindIndex(item => string.Equals(item.Id, preset.Id, StringComparison.OrdinalIgnoreCase));
+        _userConfigurations.Add(preset with { Id = id, Name = MakeUniqueName(LocalizedPresetName(preset)), IsBuiltIn = false, IsLocked = false, ShortId = CreateShortId(), ColorKey = ConfigurationPalette.Normalize(preset.ColorKey ?? ConfigurationPalette.ForPresetIndex(presetIndex)), IconKey = ConfigurationIconCatalog.Normalize(preset.IconKey ?? ConfigurationIconCatalog.ForPresetIndex(presetIndex)) });
         _selectedConfigurationId = id;
         SaveAll();
         RaiseChanged(SessionChangeKind.Configurations);

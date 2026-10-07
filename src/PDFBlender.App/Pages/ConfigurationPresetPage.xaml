@@ -33,7 +33,7 @@
             </ui:BreadcrumbBar>
             <TextBlock x:Name="TitleText" Style="{StaticResource PageTitleTextStyle}" />
             <TextBlock x:Name="SubtitleText" Style="{StaticResource PageDescriptionTextStyle}" Margin="0,3,0,14" />
-            <StackPanel x:Name="PresetPanel" />
+            <UniformGrid x:Name="PresetPanel" Columns="2" />
         </StackPanel>
     </ScrollViewer>
 </Page>

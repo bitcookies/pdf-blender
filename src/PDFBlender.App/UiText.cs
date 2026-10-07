@@ -202,6 +202,11 @@ internal static class UiText
         ["presetReadingFirst"] = "Reading First",
         ["presetBalancedProtection"] = "Balanced Protection",
         ["presetCopyLayerShield"] = "Copy Layer Shield",
+        ["presetFormatOnlyDescription"] = "A clean starting point for consistent page formatting.",
+        ["presetLightMarkDescription"] = "Adds a subtle ownership mark for everyday sharing.",
+        ["presetReadingFirstDescription"] = "Keeps documents comfortable to read while adding identity.",
+        ["presetBalancedProtectionDescription"] = "Balances readability with stronger protection for sharing.",
+        ["presetCopyLayerShieldDescription"] = "Keeps pages readable while making copied text less useful.",
         ["presetVisualObstruction"] = "Visual Obstruction",
         ["presetAiResistance"] = "AI Processing Resistance",        ["heavy"] = "Heavy",
     };
@@ -397,6 +402,11 @@ internal static class UiText
         ["presetReadingFirst"] = "阅读优先",
         ["presetBalancedProtection"] = "平衡保护",
         ["presetCopyLayerShield"] = "复制层防护",
+        ["presetFormatOnlyDescription"] = "统一页面格式，适合作为干净的基础配置。",
+        ["presetLightMarkDescription"] = "添加轻量归属标识，适合日常分享。",
+        ["presetReadingFirstDescription"] = "优先保持阅读体验，同时增加文档识别信息。",
+        ["presetBalancedProtectionDescription"] = "在可读性和分享保护之间取得平衡。",
+        ["presetCopyLayerShieldDescription"] = "保持页面可读，同时降低复制内容的有效性。",
         ["presetVisualObstruction"] = "视觉阻碍",
         ["presetAiResistance"] = "AI 自动处理抗性",        ["heavy"] = "重",
     };

@@ -41,12 +41,12 @@ public sealed class BlendSettingsTests
     [Fact]
     public void BuiltInConfigurationsContainStableLocalizedPresetIds()
     {
-        Assert.Equal(8, BuiltInConfigurations.All.Count);
+        Assert.Equal(5, BuiltInConfigurations.All.Count);
         Assert.All(BuiltInConfigurations.All, configuration => Assert.True(configuration.IsBuiltIn));
         Assert.Equal("format-only", BuiltInConfigurations.All[0].Id);
-        Assert.Equal("ai-processing-resistance", BuiltInConfigurations.All[6].Id);
+        Assert.Equal("copy-layer-shield", BuiltInConfigurations.All[4].Id);
         Assert.Equal(0, BuiltInConfigurations.All[0].Intensity);
-        Assert.True(BuiltInConfigurations.All[6].Intensity >= 7);
+        Assert.True(BuiltInConfigurations.All[4].Intensity >= 7);
     }
 
     [Fact]

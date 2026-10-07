@@ -97,9 +97,19 @@ public static class BuiltInConfigurations
         new("light-mark", "Light Mark", true, new BlendSettings { NormalizeContentWidth = true, Watermark = WatermarkStyle.Text }, true),
         new("reading-first", "Reading First", true, new BlendSettings { NormalizeContentWidth = true, Watermark = WatermarkStyle.FullPage, MetadataNormalization = true, ProtectionDeclaration = true }, true),
         new("balanced-protection", "Balanced Protection", true, new BlendSettings { NormalizeContentWidth = true, Protection = ProtectionMethod.Flatten, Watermark = WatermarkStyle.Text, Noise = NoiseStrength.Low, PermissionRestriction = true }, true),
-        new("copy-layer-shield", "Copy Layer Shield", true, new BlendSettings { NormalizeContentWidth = true, Protection = ProtectionMethod.Flatten, CopyLayer = CopyLayerMode.ReplaceWithGibberish, Dpi = 180 }, true),
-        new("visual-obstruction", "Visual Obstruction", true, new BlendSettings { NormalizeContentWidth = true, Protection = ProtectionMethod.Flatten, Watermark = WatermarkStyle.FullPage, Noise = NoiseStrength.Medium, Texture = TextureStrength.Low, GeometryPerturbation = true, Dpi = 180 }, true),
-        new("ai-processing-resistance", "AI Processing Resistance", true, new BlendSettings { NormalizeContentWidth = true, Protection = ProtectionMethod.Flatten, Noise = NoiseStrength.Low, CopyLayer = CopyLayerMode.ReplaceWithGibberish, HiddenAiText = true, PermissionRestriction = true, Dpi = 180 }, true),
-        new("custom", "Custom", true, BlendSettings.Default, true)
+        new("copy-layer-shield", "Copy Layer Shield", true, new BlendSettings { NormalizeContentWidth = true, Protection = ProtectionMethod.Flatten, CopyLayer = CopyLayerMode.ReplaceWithGibberish, Dpi = 180 }, true)
     ];
+
+    public static IReadOnlySet<string> RetiredIds { get; } =
+        new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "visual-obstruction",
+            "ai-processing-resistance",
+            "custom"
+        };
+
+    public static bool IsReservedId(string? id) =>
+        id is not null &&
+        (All.Any(preset => string.Equals(preset.Id, id, StringComparison.OrdinalIgnoreCase)) ||
+         RetiredIds.Contains(id));
 }

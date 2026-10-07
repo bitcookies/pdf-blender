@@ -67,7 +67,7 @@ internal static class ConfigurationStore
     {
         var uniqueUser = (document.UserConfigurations ?? [])
             .Where(configuration => !string.IsNullOrWhiteSpace(configuration.Id))
-            .Where(configuration => !BuiltInConfigurations.All.Any(preset => string.Equals(preset.Id, configuration.Id, StringComparison.OrdinalIgnoreCase)))
+            .Where(configuration => !BuiltInConfigurations.IsReservedId(configuration.Id))
             .GroupBy(configuration => configuration.Id, StringComparer.OrdinalIgnoreCase)
             .Select(group => group.First() with
             {

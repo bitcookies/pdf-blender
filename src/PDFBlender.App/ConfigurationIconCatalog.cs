@@ -40,6 +40,13 @@ internal static class ConfigurationIconCatalog
 
     public static string ForIndex(int index) => Normalize(RegularKeys[Math.Abs(index) % RegularKeys.Count]);
 
+    public static string ForPresetIndex(int index)
+    {
+        var preferred = new[] { "DocumentSettings20", "Accessibility24", "BookOpen20", "ShieldCheckmark24", "Copy24" };
+        var name = preferred[Math.Abs(index) % preferred.Length];
+        return Normalize(RegularKeys.Contains(name, StringComparer.Ordinal) ? name : RegularKeys[Math.Abs(index) % RegularKeys.Count]);
+    }
+
     public static SymbolRegular GetSymbol(string? key) => GetDescriptor(key).Symbol;
 
     public static bool IsFilled(string? key) => GetDescriptor(key).Filled;
