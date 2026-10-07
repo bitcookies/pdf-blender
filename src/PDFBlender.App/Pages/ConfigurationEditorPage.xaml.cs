@@ -68,7 +68,6 @@ public partial class ConfigurationEditorPage : Page
         _selectedIconKey = ConfigurationIconCatalog.Normalize(_source.IconKey);
         _settings = _source.Settings ?? BlendSettings.Default;
         InitializeComponent();
-        EditorScroller.RequestBringIntoView += (_, e) => e.Handled = true;
         ConfigureBreadcrumb(listBack);
         BreadcrumbBarStyling.Attach(BreadcrumbBar);
         RefreshText();
@@ -278,9 +277,21 @@ public partial class ConfigurationEditorPage : Page
 
     private void AddFeature(string title, string hint, UiToggleSwitch toggle, IEnumerable<UIElement> details, bool requiresFlatten = false)
     {
-        var card = new UiCard { Padding = new Thickness(12), Margin = new Thickness(0, 0, 0, 8), MinHeight = 72 };
+        // WPF-UI binds ContentBorder.VerticalAlignment to the Card itself.
+        // Center would move the visible border up when content outgrows MinHeight.
+        var card = new UiCard
+        {
+            Padding = new Thickness(12),
+            Margin = new Thickness(0, 0, 0, 8),
+            Height = 72,
+            MinHeight = 72,
+            VerticalAlignment = VerticalAlignment.Top,
+            VerticalContentAlignment = VerticalAlignment.Top,
+            HorizontalContentAlignment = HorizontalAlignment.Stretch
+        };
         var root = new StackPanel();
-        var header = new DockPanel();
+        // Reserve the full collapsed surface: 72 minus padding and the 1px border.
+        var header = new DockPanel { MinHeight = 72 - 24 - 2 };
         var labels = new StackPanel();
         var titleText = new TextBlock { Text = title, FontWeight = FontWeights.SemiBold };
         var hintText = new TextBlock
@@ -298,14 +309,18 @@ public partial class ConfigurationEditorPage : Page
         header.Children.Add(labels);
         root.Children.Add(header);
 
-        var detail = new StackPanel
+        // Keep spacing inside the clipped host so it expands with the details.
+        var detailContent = new StackPanel { Margin = new Thickness(0, 8, 0, 0) };
+        foreach (var item in details)
+            detailContent.Children.Add(item);
+        var detail = new Border
         {
             Visibility = Visibility.Collapsed,
             Height = 0,
-            Margin = new Thickness(0, 8, 0, 0)
+            ClipToBounds = true,
+            VerticalAlignment = VerticalAlignment.Top,
+            Child = detailContent
         };
-        foreach (var item in details)
-            detail.Children.Add(item);
         root.Children.Add(detail);
         card.Content = root;
         FeaturePanel.Children.Add(card);
@@ -325,46 +340,50 @@ public partial class ConfigurationEditorPage : Page
             hintText.Foreground = descriptionForeground;
         }
 
-        void Expand()
+        var expansionVersion = 0;
+        void SetExpanded(bool expanded, bool animate = true)
         {
-            detail.Visibility = Visibility.Visible;
+            var version = ++expansionVersion;
+            var current = detail.Visibility == Visibility.Visible ? detail.ActualHeight : 0;
             detail.BeginAnimation(FrameworkElement.HeightProperty, null);
-            detail.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-            var target = detail.DesiredSize.Height;
-            detail.Height = 0;
-            var animation = new DoubleAnimation(0, target, TimeSpan.FromMilliseconds(180))
-            {
-                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
-                FillBehavior = FillBehavior.HoldEnd
-            };
-            animation.Completed += (_, _) =>
-            {
-                detail.BeginAnimation(FrameworkElement.HeightProperty, null);
-                detail.Height = double.NaN;
-            };
-            detail.BeginAnimation(FrameworkElement.HeightProperty, animation);
-        }
 
-        void Collapse()
-        {
-            var current = double.IsNaN(detail.Height) ? detail.ActualHeight : detail.Height;
-            if (current <= 0)
+            if (detailContent.Children.Count == 0)
+                return;
+
+            card.Height = double.NaN;
+            detail.Visibility = Visibility.Visible;
+            // Measure the natural content, not the host whose animated Height may be zero.
+            var width = root.ActualWidth > 0 ? root.ActualWidth : double.PositiveInfinity;
+            detailContent.Measure(new Size(width, double.PositiveInfinity));
+            var target = expanded ? detailContent.DesiredSize.Height : 0;
+
+            void Complete()
             {
-                detail.Visibility = Visibility.Collapsed;
-                detail.Height = 0;
+                if (version != expansionVersion)
+                    return;
+                detail.BeginAnimation(FrameworkElement.HeightProperty, null);
+                detail.Height = expanded ? double.NaN : 0;
+                detail.Visibility = expanded ? Visibility.Visible : Visibility.Collapsed;
+                card.Height = expanded ? double.NaN : 72;
+            }
+
+            if (!animate || !IsLoaded || !SystemParameters.ClientAreaAnimation ||
+                Math.Abs(current - target) < 0.1)
+            {
+                Complete();
                 return;
             }
 
-            var animation = new DoubleAnimation(current, 0, TimeSpan.FromMilliseconds(150))
+            detail.Height = current;
+            var animation = new DoubleAnimation(current, target,
+                TimeSpan.FromMilliseconds(expanded ? 180 : 150))
             {
-                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn },
-                FillBehavior = FillBehavior.HoldEnd
+                EasingFunction = new CubicEase
+                {
+                    EasingMode = expanded ? EasingMode.EaseOut : EasingMode.EaseIn
+                }
             };
-            animation.Completed += (_, _) =>
-            {
-                detail.Visibility = Visibility.Collapsed;
-                detail.Height = 0;
-            };
+            animation.Completed += (_, _) => Complete();
             detail.BeginAnimation(FrameworkElement.HeightProperty, animation);
         }
 
@@ -373,12 +392,12 @@ public partial class ConfigurationEditorPage : Page
         toggle.IsEnabledChanged += (_, _) => RefreshEnabledVisual();
         toggle.Checked += (_, _) =>
         {
-            Expand();
+            SetExpanded(true);
             UpdateSaveState();
         };
         toggle.Unchecked += (_, _) =>
         {
-            Collapse();
+            SetExpanded(false);
             UpdateSaveState();
         };
         if (requiresFlatten)
@@ -396,8 +415,7 @@ public partial class ConfigurationEditorPage : Page
             };
         }
 
-        if (toggle.IsChecked == true)
-            Dispatcher.BeginInvoke(new Action(Expand), DispatcherPriority.Loaded);
+        SetExpanded(toggle.IsChecked == true, animate: false);
     }
 
     private UIElement Labeled(string label, Control control)
