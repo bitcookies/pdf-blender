@@ -41,6 +41,8 @@ internal static class ThemeManager
             SetBrush(resources, "BorderBrush", "#454545");
             SetBrush(resources, "TextBrush", "#F2F2F2");
             SetBrush(resources, "IconPickerForegroundBrush", "#FFFFFF");
+            SetBrush(resources, "ColorChoiceActiveBorderBrush", "#F2F2F2");
+            SetBrush(resources, "ColorChoiceHoverBorderBrush", "#A6A6A6");
             SetBrush(resources, "TitleTextBrush", "#F2F2F2");
             SetBrush(resources, "MutedTextBrush", "#B8B8B8");
             SetBrush(resources, "AccentBrush", "#E74856");
@@ -104,6 +106,8 @@ internal static class ThemeManager
             SetBrush(resources, "BorderBrush", "#E6E6E6");
             SetBrush(resources, "TextBrush", "#202020");
             SetBrush(resources, "IconPickerForegroundBrush", "#202020");
+            SetBrush(resources, "ColorChoiceActiveBorderBrush", "#666666");
+            SetBrush(resources, "ColorChoiceHoverBorderBrush", "#B3B3B3");
             SetBrush(resources, "TitleTextBrush", "#5E5E5E");
             SetBrush(resources, "MutedTextBrush", "#666666");
             SetBrush(resources, "AccentBrush", "#C9021E");

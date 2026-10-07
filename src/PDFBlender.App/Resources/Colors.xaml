@@ -16,6 +16,8 @@
     <SolidColorBrush x:Key="BorderBrush" Color="#E6E6E6" />
     <SolidColorBrush x:Key="TextBrush" Color="#202020" />
     <SolidColorBrush x:Key="IconPickerForegroundBrush" Color="#202020" />
+    <SolidColorBrush x:Key="ColorChoiceActiveBorderBrush" Color="#666666" />
+    <SolidColorBrush x:Key="ColorChoiceHoverBorderBrush" Color="#B3B3B3" />
     <SolidColorBrush x:Key="TitleTextBrush" Color="#5E5E5E" />
     <SolidColorBrush x:Key="MutedTextBrush" Color="#666666" />
     <SolidColorBrush x:Key="AccentBrush" Color="#C9021E" />

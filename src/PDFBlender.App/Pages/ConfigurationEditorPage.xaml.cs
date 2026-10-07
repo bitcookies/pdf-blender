@@ -110,7 +110,7 @@ public partial class ConfigurationEditorPage : Page
                 Height = 28,
                 Margin = new Thickness(3, 2, 3, 2),
                 Background = ConfigurationPalette.GetBrush(key),
-                BorderBrush = selected ? (Brush)FindResource("TextBrush") : Brushes.Transparent,
+                BorderBrush = selected ? (Brush)FindResource("ColorChoiceActiveBorderBrush") : Brushes.Transparent,
                 BorderThickness = new Thickness(selected ? 2 : 0),
                 CornerRadius = new CornerRadius(14),
                 Cursor = Cursors.Hand,
@@ -122,13 +122,13 @@ public partial class ConfigurationEditorPage : Page
             button.MouseEnter += (_, _) =>
             {
                 button.Background = ConfigurationPalette.GetBrush(key);
-                button.BorderBrush = new SolidColorBrush(Color.FromRgb(0x8C, 0x8C, 0x8C));
+                button.BorderBrush = (Brush)FindResource(selected ? "ColorChoiceActiveBorderBrush" : "ColorChoiceHoverBorderBrush");
                 button.BorderThickness = new Thickness(2);
             };
             button.MouseLeave += (_, _) =>
             {
                 button.Background = ConfigurationPalette.GetBrush(key);
-                button.BorderBrush = selected ? (Brush)FindResource("TextBrush") : Brushes.Transparent;
+                button.BorderBrush = selected ? (Brush)FindResource("ColorChoiceActiveBorderBrush") : Brushes.Transparent;
                 button.BorderThickness = new Thickness(selected ? 2 : 0);
             };
             button.MouseLeftButtonUp += (_, e) =>
