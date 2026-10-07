@@ -39,7 +39,68 @@ public partial class MainWindow : FluentWindow
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         DpiSupport.RefreshVisuals(this);
+        ApplyTitleBarButtonPalette();
         Dispatcher.BeginInvoke(() => SelectNavigationItem("home"), DispatcherPriority.Loaded);
+    }
+
+    private void ApplyTitleBarButtonPalette()
+    {
+        ShellTitleBar.ApplyTemplate();
+
+        var normal = Application.Current.TryFindResource("TitleBarButtonsForegroundBrush") as Brush
+            ?? Brushes.White;
+        var hover = Application.Current.TryFindResource("TitleBarButtonsHoverBrush") as Brush
+            ?? Brushes.Transparent;
+
+        foreach (var name in new[]
+        {
+            "PART_MinimizeButton",
+            "PART_MaximizeButton",
+            "PART_RestoreButton",
+            "PART_CloseButton",
+            "PART_HelpButton"
+        })
+        {
+            if (ShellTitleBar.Template?.FindName(name, ShellTitleBar) is not TitleBarButton button)
+                continue;
+
+            button.ButtonsForeground = normal;
+            button.MouseOverButtonsForeground = normal;
+            button.RenderButtonsForeground = normal;
+            button.PressedForeground = normal;
+            button.Background = Brushes.Transparent;
+            button.MouseOverBackground = hover;
+            button.PressedBackground = hover;
+            button.BorderBrush = Brushes.Transparent;
+            button.MouseOverBorderBrush = Brushes.Transparent;
+            button.PressedBorderBrush = Brushes.Transparent;
+        }
+    }
+    private void MainContentSurface_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        var width = MainContentSurface.ActualWidth;
+        var height = MainContentSurface.ActualHeight;
+        if (width <= 0 || height <= 0)
+        {
+            MainContentSurface.Clip = null;
+            return;
+        }
+
+        const double radius = 12;
+        var r = Math.Min(radius, Math.Min(width, height));
+        var geometry = new PathGeometry();
+        var figure = new PathFigure
+        {
+            StartPoint = new Point(r, 0),
+            IsClosed = true
+        };
+        figure.Segments.Add(new LineSegment(new Point(width, 0), true));
+        figure.Segments.Add(new LineSegment(new Point(width, height), true));
+        figure.Segments.Add(new LineSegment(new Point(0, height), true));
+        figure.Segments.Add(new LineSegment(new Point(0, r), true));
+        figure.Segments.Add(new ArcSegment(new Point(r, 0), new Size(r, r), 90, false, SweepDirection.Clockwise, true));
+        geometry.Figures.Add(figure);
+        MainContentSurface.Clip = geometry;
     }
 
     private void MainWindow_DpiChanged(object sender, DpiChangedEventArgs e)
@@ -93,6 +154,7 @@ public partial class MainWindow : FluentWindow
         {
             navigationItem.ApplyTemplate();
             navigationItem.ClipToBounds = false;
+            ApplyNavigationItemForeground(navigationItem);
             navigationItem.MouseEnter -= NavigationItem_MouseEnter;
             navigationItem.MouseEnter += NavigationItem_MouseEnter;
             navigationItem.MouseLeave -= NavigationItem_MouseLeave;
@@ -125,6 +187,7 @@ public partial class MainWindow : FluentWindow
     {
         if (sender is Wpf.Ui.Controls.NavigationViewItem item)
         {
+            ApplyNavigationItemForeground(item);
             ApplyNavigationItemSurface(item);
             ApplyNavigationItemIcon(item);
         }
@@ -134,9 +197,35 @@ public partial class MainWindow : FluentWindow
     {
         if (sender is Wpf.Ui.Controls.NavigationViewItem item)
         {
+            ApplyNavigationItemForeground(item);
             ApplyNavigationItemSurface(item);
             ApplyNavigationItemIcon(item);
         }
+    }
+
+    private static void ApplyNavigationItemForeground(Wpf.Ui.Controls.NavigationViewItem item)
+    {
+        var key = item.IsActive
+            ? "NavigationViewItemForegroundLeftFluent"
+            : item.IsMouseOver
+                ? "NavigationViewItemForegroundPointerOver"
+                : "NavigationViewItemForeground";
+
+        if (Application.Current.TryFindResource(key) is Brush brush)
+        {
+            item.Foreground = brush;
+            item.SetValue(System.Windows.Documents.TextElement.ForegroundProperty, brush);
+            ApplyNavigationTextVisuals(item, brush);
+        }
+    }
+
+    private static void ApplyNavigationTextVisuals(DependencyObject root, Brush foreground)
+    {
+        if (root is System.Windows.Controls.TextBlock textBlock)
+            textBlock.Foreground = foreground;
+
+        for (var index = 0; index < VisualTreeHelper.GetChildrenCount(root); index++)
+            ApplyNavigationTextVisuals(VisualTreeHelper.GetChild(root, index), foreground);
     }
 
     private static void ApplyNavigationItemIcon(Wpf.Ui.Controls.NavigationViewItem item)
@@ -163,10 +252,10 @@ public partial class MainWindow : FluentWindow
         if (surface is null)
             return;
 
-        var key = item.IsActive
-            ? "NavigationViewItemBackgroundSelectedLeftFluent"
-            : item.IsMouseOver
-                ? "NavigationViewItemBackgroundPointerOverLeftFluent"
+        var key = item.IsMouseOver
+            ? "NavigationViewItemBackgroundPointerOverLeftFluent"
+            : item.IsActive
+                ? "NavigationViewItemBackgroundSelectedLeftFluent"
                 : null;
 
         surface.Background = key is null
@@ -237,12 +326,13 @@ public partial class MainWindow : FluentWindow
         Background = windowBrush;
         RootLayout.Background = windowBrush;
         ShellTitleBar.Background = shellBrush;
-        ShellSurfaceGrid.Background = sidebarBrush;
+        ShellSurfaceGrid.Background = shellBrush;
         ShellNavigationView.Background = sidebarBrush;
         MainContentSurface.Background = windowBrush;
         ContentFrame.Background = windowBrush;
         if (IsInitialized)
         {
+            ApplyTitleBarButtonPalette();
             foreach (var navigationItem in ShellNavigationView.MenuItems
                          .Cast<object>()
                          .Concat(ShellNavigationView.FooterMenuItems.Cast<object>())

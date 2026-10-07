@@ -28,7 +28,7 @@ internal static class ThemeManager
         var resources = Application.Current.Resources;
         if (dark)
         {
-            SetBrush(resources, "WindowBackgroundBrush", "#1F1F1F");
+            SetBrush(resources, "WindowBackgroundBrush", "#272727");
             SetBrush(resources, "ShellChromeBrush", "#1F1F1F");
             SetBrush(resources, "SidebarBrush", "#1F1F1F");
             SetBrush(resources, "TitleBarBrush", "#1F1F1F");
@@ -64,7 +64,7 @@ internal static class ThemeManager
             SetBrush(resources, "LeftNavigationViewSeparatorBrush", "#454545");
             SetBrush(resources, "NavigationViewSelectionIndicatorForeground", "#E74856");
             SetBrush(resources, "NavigationViewItemBorderBrush", "#454545");
-            SetWpfUiSurfacePalette(resources, "#1F1F1F", "#252525", "#2D2D2D", "#2D2D2D", "#383838", "#454545", "#242424", "#F2F2F2", "#B8B8B8", "#8A8A8A");
+            SetWpfUiSurfacePalette(resources, "#272727", "#252525", "#2D2D2D", "#2D2D2D", "#383838", "#454545", "#242424", "#F2F2F2", "#B8B8B8", "#8A8A8A");
             SetBrush(resources, "PillBrush", "#3A3A3A");
             SetBrush(resources, "PillTextBrush", "#F2F2F2");
             SetBrush(resources, "NotificationBrush", "#2D2D2D");
@@ -76,6 +76,8 @@ internal static class ThemeManager
             SetBrush(resources, "DisabledTextBrush", "#8A8A8A");
             SetBrush(resources, "SliderThumbBrush", "#F2F2F2");
             SetBrush(resources, "SliderThumbBorderBrush", "#6A6A6A");
+            SetBrush(resources, "TitleBarButtonsForegroundBrush", "#FFFFFF");
+            SetBrush(resources, "TitleBarButtonsHoverBrush", "#191919");
             SetColor(resources, "AccentButtonStartColor", "#E74856");
             SetColor(resources, "AccentButtonEndColor", "#D33D4D");
             SetColor(resources, "AccentButtonHoverStartColor", "#F05A67");
@@ -132,6 +134,8 @@ internal static class ThemeManager
             SetBrush(resources, "DisabledTextBrush", "#777777");
             SetBrush(resources, "SliderThumbBrush", "#FFFFFF");
             SetBrush(resources, "SliderThumbBorderBrush", "#E6E6E6");
+            SetBrush(resources, "TitleBarButtonsForegroundBrush", "#202020");
+            SetBrush(resources, "TitleBarButtonsHoverBrush", "#E6E6E6");
             SetColor(resources, "AccentButtonStartColor", "#EA7663");
             SetColor(resources, "AccentButtonEndColor", "#D84D31");
             SetColor(resources, "AccentButtonHoverStartColor", "#FB536D");

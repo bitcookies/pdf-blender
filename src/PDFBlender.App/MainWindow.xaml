@@ -23,12 +23,12 @@
             <RowDefinition Height="44" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <ui:TitleBar x:Name="ShellTitleBar" Grid.Row="0" Title="PDF Blender" Height="44" Padding="12,0" Background="{DynamicResource ShellChromeBrush}" Foreground="{DynamicResource TitleTextBrush}" FontFamily="{DynamicResource AppFontFamily}">
+        <ui:TitleBar x:Name="ShellTitleBar" Grid.Row="0" Title="PDF Blender" Height="44" Padding="12,0" Background="{DynamicResource ShellChromeBrush}" Foreground="{DynamicResource TitleTextBrush}" ButtonsForeground="{DynamicResource TitleBarButtonsForegroundBrush}" ButtonsBackground="Transparent" FontFamily="{DynamicResource AppFontFamily}">
             <ui:TitleBar.Icon>
                 <ui:ImageIcon Source="/PDFBlender.App;component/Assets/logo.ico" Width="16" Height="16" />
             </ui:TitleBar.Icon>
         </ui:TitleBar>
-        <Grid x:Name="ShellSurfaceGrid" Grid.Row="1" Background="{DynamicResource SidebarBrush}">
+        <Grid x:Name="ShellSurfaceGrid" Grid.Row="1" Background="{DynamicResource ShellChromeBrush}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="72" />
                 <ColumnDefinition Width="*" />
@@ -69,7 +69,7 @@
                     </ui:NavigationViewItem>
                 </ui:NavigationView.FooterMenuItems>
             </ui:NavigationView>
-            <Border x:Name="MainContentSurface" Grid.Column="1" Background="{DynamicResource WindowBackgroundBrush}" CornerRadius="12,0,0,0" ClipToBounds="True">
+            <Border x:Name="MainContentSurface" Grid.Column="1" Background="{DynamicResource WindowBackgroundBrush}" CornerRadius="12,0,0,0" ClipToBounds="True" SizeChanged="MainContentSurface_SizeChanged">
                 <Grid>
                     <Frame x:Name="ContentFrame" NavigationUIVisibility="Hidden" Margin="0" Background="{DynamicResource WindowBackgroundBrush}" />
                     <local:UiNotificationHost x:Name="AppNotificationHost" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,16,20,0" />

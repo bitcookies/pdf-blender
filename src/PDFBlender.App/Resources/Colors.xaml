@@ -4,6 +4,8 @@
     <SolidColorBrush x:Key="ShellChromeBrush" Color="#F3F3F3" />
     <SolidColorBrush x:Key="SidebarBrush" Color="#F3F3F3" />
     <SolidColorBrush x:Key="TitleBarBrush" Color="#F3F3F3" />
+    <SolidColorBrush x:Key="TitleBarButtonsForegroundBrush" Color="#202020" />
+    <SolidColorBrush x:Key="TitleBarButtonsHoverBrush" Color="#E6E6E6" />
     <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF" />
     <SolidColorBrush x:Key="CardBrush" Color="#FDFDFD" />
     <SolidColorBrush x:Key="SettingItemBrush" Color="#FDFDFD" />
