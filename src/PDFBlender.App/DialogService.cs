@@ -118,6 +118,10 @@ internal sealed class DialogService
         var matches = Array.Empty<ConfigurationIconDescriptor>();
         var loadedCount = 0;
         var isLoading = false;
+        var searchTimer = new System.Windows.Threading.DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(90)
+        };
 
         static string BaseName(ConfigurationIconDescriptor descriptor)
         {
@@ -178,13 +182,30 @@ internal sealed class DialogService
             AddNextBatch();
         }
 
+        searchTimer.Tick += (_, _) =>
+        {
+            searchTimer.Stop();
+            Refresh();
+        };
         scroll.ScrollChanged += (_, _) =>
         {
             if (scroll.VerticalOffset + scroll.ViewportHeight >= scroll.ExtentHeight - 72)
                 AddNextBatch();
         };
-        query.TextChanged += (_, _) => Refresh();
-        popup.Closed += (_, _) => { if (!completed) { completed = true; resultSource.TrySetResult(null); } };
+        query.TextChanged += (_, _) =>
+        {
+            searchTimer.Stop();
+            searchTimer.Start();
+        };
+        popup.Closed += (_, _) =>
+        {
+            searchTimer.Stop();
+            if (!completed)
+            {
+                completed = true;
+                resultSource.TrySetResult(null);
+            }
+        };
         query.PreviewKeyDown += (_, e) => { if (e.Key == Key.Escape) { e.Handled = true; Close(null); } };
         Refresh();
         popup.IsOpen = true;

@@ -7,6 +7,11 @@ internal readonly record struct UiMotionProfile(TimeSpan EnterOpacity, TimeSpan 
 
 internal static class UiMotionPolicy
 {
+    public static TimeSpan ScrollBarHideDelay => TimeSpan.FromMilliseconds(700);
+    public static TimeSpan ScrollBarFadeDuration => Resolve().EnterOpacity <= TimeSpan.Zero
+        ? TimeSpan.Zero
+        : TimeSpan.FromMilliseconds(300);
+
     public static UiMotionProfile Resolve()
     {
         var tier = RenderCapability.Tier >> 16;

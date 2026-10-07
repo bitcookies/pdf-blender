@@ -1,6 +1,6 @@
 # PDF Blender Interface Specification
 
-Status: v0.7.0 configuration workflow
+Status: v0.9.0 lightweight maintenance baseline
 
 ## Visual Direction
 
@@ -59,7 +59,7 @@ The WPF process is Per-Monitor V2 DPI aware. Windows scaling from 100% through 3
 
 The Configuration page shows five fixed 72 px Home blend slots followed by a separator and a five-column compact configuration grid. Empty slots center the Add icon above the level-specific drop label. Occupied slots use one solid rounded border and show the configuration icon, name, short ID, intensity label, and remove action.
 
-Configuration cards are fixed at approximately 104 px high. The icon, content, metadata, and three-dot action area use stable grid columns. The menu uses WPF-UI MenuItem entries and an explicit PlacementTarget so it opens below the clicked button.
+Configuration cards are fixed at 72 px high. The icon, content, metadata, and three-dot action area use stable grid columns. The menu uses WPF-UI MenuItem entries and an explicit PlacementTarget so it opens below the clicked button.
 
 New configuration, preset selection, and editing are nested pages under BreadcrumbBar. The creation flow has no ContentDialog. A locked configuration disables edit and delete while leaving unlock available. Configuration persistence schema 6 adds IconKey and migrates older files.
 

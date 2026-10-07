@@ -1,6 +1,6 @@
 # PDF Blender Product Specification
 
-Status: v0.7.0 configuration workflow baseline
+Status: v0.9.0 lightweight maintenance baseline
 Product: PDF Blender  
 Slogan: `DO NOT PLAGIARIZE MY PDF.`
 
@@ -12,7 +12,7 @@ PDF Blender creates a new, ordinarily readable PDF from a source PDF while raisi
 
 - Windows desktop application, C# / .NET 10, WPF, Fluent-inspired UI.
 - Microsoft Store is the sole release channel; release packaging is MSIX. Development builds may include a portable package.
-- Current version: `0.7.0`; package version: `0.7.0.0`.
+- Current version: `0.9.0`; package version: `0.9.0.0`.
 - Microsoft Store handles updates. No custom update service is in scope.
 - Preserve the reserved Store identity: Package Identity Name `57335Bitcookies.PDFBlender`; Publisher `CN=53636128-C1AF-456C-8B82-AC0D583B730C`; Publisher display name `Bitcookies`; Store ID `9P65BNNQRGVZ`. Do not change it or hard-code a Store URL before publication.
 
@@ -92,7 +92,7 @@ Cloud processing, accounts, DRM, guaranteed copy prevention, custom update check
 
 ## v0.7.0 Configuration Presets
 
-Configuration is organized as cards. The page shows five Home blend slots first, a separator, then one merged `Blend configurations` section. On first use the application seeds three editable configurations named with the localized `Preset`/`预设` prefix. Users can create custom configurations or add a copy of a built-in preset from the New configuration flow. Copied presets receive a unique suffix when the name already exists. Users can rename, edit, lock, unlock, and delete any configuration. A locked configuration cannot be edited or deleted.
+Configuration is organized as cards. The page shows five Home blend slots first, a separator, then one merged `Blend configurations` section. On first use the application starts with no configurations. Users create custom configurations or add localized presets explicitly. Users can create custom configurations or add a copy of a built-in preset from the New configuration flow. Copied presets receive a unique suffix when the name already exists. Users can rename, edit, lock, unlock, and delete any configuration. A locked configuration cannot be edited or deleted.
 
 Each configuration owns its enabled features and feature-specific values. Only enabled features expand their detail controls. The implemented feature set is Normalize Content Width, Flatten, Watermark, and conservative Pixel Noise. Deferred protection and prompt-injection ideas remain absent from the working controls.
 

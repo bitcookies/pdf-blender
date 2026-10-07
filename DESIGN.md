@@ -1,6 +1,6 @@
 # PDF Blender Design Overview
 
-Status: v0.7.0 configuration workflow
+Status: v0.9.0 lightweight maintenance baseline
 Detailed requirements: `SPEC.md`  
 Architecture boundaries: `ARCHITECTURE.md`  
 Interface and localization: `INTERFACE.md`
@@ -67,7 +67,7 @@ The sole release channel is Microsoft Store, packaged as MSIX with the reserved 
 
 The Configuration page is ordered as five fixed Home blend slots, a separator, and one merged "Blend configurations" section. Empty slots show a centered Add icon above a level-specific drop label inside one solid rounded border. Occupied slots show the configuration icon, name, short ID, intensity label, and remove action.
 
-The configuration list uses five compact columns with fixed 104 px cards. Each card has a left WPF-UI icon, stable name/summary/metadata rows, and an anchored three-dot menu. Dragging preserves the existing slot replacement behavior and uses a short opacity/scale animation.
+The configuration list uses five compact columns with fixed 72 px cards. Each card has a left WPF-UI icon, stable name/summary/metadata rows, and an anchored three-dot menu. Dragging preserves the existing slot replacement behavior and uses a short opacity/scale animation.
 
 Feature rows use progressive disclosure in the nested editor page. A disabled feature remains compact; enabling it reveals only its own details. A locked configuration cannot be edited or deleted.
 
@@ -75,6 +75,6 @@ Feature rows use progressive disclosure in the nested editor page. A disabled fe
 
 The Configuration page starts with five fixed 72 px Home blend slots. Empty slots show a centered Add icon on the first line and a centered level-specific drop label on the second line. Occupied slots show the selected configuration icon, name, short ID, intensity label, and remove action inside one solid rounded border.
 
-The configuration list uses five compact columns with fixed 104 px card height. Each card has a WPF-UI icon on the left, name and enabled-feature summary in the center, short ID and qualitative intensity on the bottom row, and an anchored three-dot menu in the top-right.
+The configuration list uses five compact columns with fixed 72 px card height. Each card has a WPF-UI icon on the left, name and enabled-feature summary in the center, short ID and qualitative intensity on the bottom row, and an anchored three-dot menu in the top-right.
 
 Configuration metadata includes ShortId, ColorKey, and IconKey. Schema 6 loads schemas 1-5 and fills missing metadata. Creation, preset selection, and editing use nested pages with BreadcrumbBar; delete confirmation remains a ContentDialog.

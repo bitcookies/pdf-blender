@@ -26,12 +26,14 @@ public partial class ConfigurationPage : Page
     private UiCard? _dragCandidate;
     private bool _dragInProgress;
     private bool _listTransitionPending;
+    private int _transitionGeneration;
 
     internal ConfigurationPage(AppSession session, DialogService dialogs)
     {
         _session = session;
         _dialogs = dialogs;
         InitializeComponent();
+        Unloaded += ConfigurationPage_Unloaded;
         RefreshFromSession();
     }
 
@@ -464,12 +466,21 @@ public partial class ConfigurationPage : Page
         ShowList();
     }
 
+    private void ConfigurationPage_Unloaded(object sender, RoutedEventArgs e)
+    {
+        _transitionGeneration++;
+        _listTransitionPending = false;
+        CancelTransition(ListScroller);
+        CancelTransition(ChildContent);
+    }
+
     private void ShowChild(Page page)
     {
         if (_listTransitionPending)
             return;
 
         _listTransitionPending = true;
+        var transition = ++_transitionGeneration;
         ListScroller.Visibility = Visibility.Collapsed;
         ListScroller.IsHitTestVisible = false;
         ChildContent.Visibility = Visibility.Visible;
@@ -489,6 +500,8 @@ public partial class ConfigurationPage : Page
             motion.EnterSlide,
             () =>
             {
+                if (transition != _transitionGeneration)
+                    return;
                 ChildContent.IsHitTestVisible = true;
                 _listTransitionPending = false;
             });
@@ -508,6 +521,7 @@ public partial class ConfigurationPage : Page
             return;
 
         _listTransitionPending = true;
+        var transition = ++_transitionGeneration;
         ListScroller.Visibility = Visibility.Visible;
         ListScroller.IsHitTestVisible = false;
         ChildContent.IsHitTestVisible = false;
@@ -532,11 +546,17 @@ public partial class ConfigurationPage : Page
             0,
             1,
             motion.EnterSlide,
-            CompleteListTransition);
+            () =>
+            {
+                if (transition == _transitionGeneration)
+                    CompleteListTransition();
+            });
     }
 
     private void CompleteListTransition()
     {
+        if (_transitionGeneration <= 0)
+            return;
         ListScroller.Opacity = 1;
         ListScroller.IsHitTestVisible = true;
         ChildContent.Visibility = Visibility.Collapsed;
@@ -550,6 +570,13 @@ public partial class ConfigurationPage : Page
             ChildContent.Content = null;
             _listTransitionPending = false;
         }), DispatcherPriority.ApplicationIdle);
+    }
+
+    private static void CancelTransition(FrameworkElement element)
+    {
+        if (element.RenderTransform is TranslateTransform transform)
+            transform.BeginAnimation(TranslateTransform.XProperty, null);
+        element.BeginAnimation(UIElement.OpacityProperty, null);
     }
 
     private static void SetTransitionState(FrameworkElement element, double x, double opacity)

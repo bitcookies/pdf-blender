@@ -1,6 +1,6 @@
 # PDF Blender Architecture
 
-Status: v0.7.0 configuration workflow baseline
+Status: v0.9.0 lightweight maintenance baseline
 
 ## Design Goals
 
@@ -52,7 +52,7 @@ Keep startup work minimal: load theme/language and lightweight preferences first
 
 ## Persistence and Privacy
 
-Store non-secret configurations in the roaming AppData folder named PDF Blender with schema versioning. Preferences and configurations are stored separately. The first run seeds three editable configurations named with the localized `Preset`/`预设` prefix. The legacy `RestorePresets` preference remains readable for compatibility but is not exposed as a toggle or command. The MVP has no secret-key subsystem. Do not persist temporary page images after an operation, send document data over the network, or include document content in diagnostics. Configuration saves use temporary files followed by replacement and normalize unknown IDs, duplicate slots, and the five-slot limit.
+Store non-secret configurations in the roaming AppData folder named PDF Blender with schema versioning. Preferences and configurations are stored separately. The first run starts with an empty configuration list. Users create custom configurations or add localized presets explicitly. The legacy `RestorePresets` preference remains readable for compatibility but is not exposed as a toggle or command. The MVP has no secret-key subsystem. Do not persist temporary page images after an operation, send document data over the network, or include document content in diagnostics. Configuration saves use temporary files followed by replacement and normalize unknown IDs, duplicate slots, and the five-slot limit.
 
 ## Packaging and Build
 
