@@ -135,7 +135,7 @@ public partial class ConfigurationPage : Page
         var card = CreateCardSurface(
             configuration,
             new Thickness(3, 0, 3, 6),
-            (Brush)FindResource("CardBrush"), useColorBorder: true);
+            (Brush)FindResource("CardBrush"), useColorBorder: false);
         card.ToolTip = used ? UiText.Get("configurationInUse") : UiText.Get("dragToSlots");
         card.Opacity = used ? 0.52 : 1;
         card.Content = CreateConfigurationContent(configuration, isSlot: false, used);
@@ -178,14 +178,24 @@ public partial class ConfigurationPage : Page
         var icon = new Wpf.Ui.Controls.SymbolIcon
         {
             Symbol = ConfigurationIconCatalog.GetSymbol(configuration.IconKey),
-            FontSize = 18,
-            Foreground = ConfigurationPalette.GetBrush(configuration.ColorKey),
-            HorizontalAlignment = HorizontalAlignment.Left,
-            VerticalAlignment = VerticalAlignment.Top
+            FontSize = 16,
+            Foreground = Brushes.White,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
         };
-        Grid.SetColumn(icon, 0);
-        Grid.SetRow(icon, 0);
-        root.Children.Add(icon);
+        var iconCircle = new Border
+        {
+            Width = 28,
+            Height = 28,
+            CornerRadius = new CornerRadius(14),
+            Background = ConfigurationPalette.GetBrush(configuration.ColorKey),
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top,
+            Child = icon
+        };
+        Grid.SetColumn(iconCircle, 0);
+        Grid.SetRow(iconCircle, 0);
+        root.Children.Add(iconCircle);
 
         var action = MakeStatusAction(configuration, isSlot, used, foreground);
         Grid.SetColumn(action, 1);
@@ -204,9 +214,9 @@ public partial class ConfigurationPage : Page
         var name = new TextBlock
         {
             Text = configuration.Name,
-            FontSize = 10,
+            FontSize = 12,
             Foreground = foreground,
-            FontWeight = FontWeights.SemiBold,
+            FontWeight = FontWeights.Normal,
             TextTrimming = TextTrimming.CharacterEllipsis,
             MaxWidth = 110,
             VerticalAlignment = VerticalAlignment.Center
@@ -309,7 +319,9 @@ public partial class ConfigurationPage : Page
                 e.Handled = true;
             };
         }
-        var actionBorderBrush = configuration.IsLocked || isSlot ? ConfigurationPalette.GetBrush(configuration.ColorKey) : (Brush)FindResource("BorderBrush");
+        var actionBorderBrush = configuration.IsLocked && !isSlot
+            ? new SolidColorBrush(Color.FromRgb(0x6F, 0x6F, 0x6F))
+            : (Brush)FindResource("BorderBrush");
 
         // Match the Home PDF remove control with a separate circular surface.
         return new Border
@@ -340,6 +352,12 @@ public partial class ConfigurationPage : Page
             IsEnabled = !configuration.IsLocked
         };
         edit.Click += (_, _) => Dispatcher.BeginInvoke(new Action(() => OpenEditor(configuration, false)), DispatcherPriority.ContextIdle);
+        var copy = new UiMenuItem
+        {
+            Header = UiText.Get("copy"),
+            Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.Copy16 }
+        };
+        copy.Click += (_, _) => _session.CopyConfiguration(configuration.Id);
         var lockItem = new UiMenuItem
         {
             Header = configuration.IsLocked ? UiText.Get("unlock") : UiText.Get("lock"),
@@ -369,6 +387,7 @@ public partial class ConfigurationPage : Page
             if (confirmed) _session.DeleteConfiguration(configuration.Id);
         };
         menu.Items.Add(edit);
+        menu.Items.Add(copy);
         menu.Items.Add(lockItem);
         menu.Items.Add(new Separator());
         menu.Items.Add(delete);
@@ -596,7 +615,7 @@ public partial class ConfigurationPage : Page
         var custom = new UiMenuItem
         {
             Header = UiText.Get("newCustomConfiguration"),
-            Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.BookAdd24 },
+            Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.TextBoxSettings24 },
             Focusable = false,
             IsTabStop = false,
             FocusVisualStyle = null
@@ -605,7 +624,7 @@ public partial class ConfigurationPage : Page
         var preset = new UiMenuItem
         {
             Header = UiText.Get("newPresetConfiguration"),
-            Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.BoxMultiple24 },
+            Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.WindowSettings20 },
             Focusable = false,
             IsTabStop = false,
             FocusVisualStyle = null

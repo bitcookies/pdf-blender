@@ -95,6 +95,27 @@ internal sealed class AppSession
         return id;
     }
 
+    public string CopyConfiguration(string id)
+    {
+        var source = GetConfiguration(id);
+        if (source is null) return string.Empty;
+
+        var copyId = "custom-" + Guid.NewGuid().ToString("N");
+        var copy = source with
+        {
+            Id = copyId,
+            Name = MakeUniqueName(source.Name),
+            IsBuiltIn = false,
+            IsLocked = false,
+            ShortId = CreateShortId()
+        };
+        _userConfigurations.Add(copy);
+        _selectedConfigurationId = copyId;
+        SaveAll();
+        RaiseChanged(SessionChangeKind.Configurations);
+        return copyId;
+    }
+
     public bool RenameConfiguration(string id, string name)
     {
         var index = _userConfigurations.FindIndex(configuration => string.Equals(configuration.Id, id, StringComparison.OrdinalIgnoreCase));
