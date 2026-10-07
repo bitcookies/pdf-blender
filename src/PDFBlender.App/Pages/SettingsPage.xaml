@@ -180,12 +180,12 @@
                 </Border>
             </StackPanel>
             <TextBlock x:Name="AboutHeader" Style="{StaticResource SectionTitleTextStyle}" Margin="0,20,0,8" />
-            <Border Padding="0" Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="14" ClipToBounds="True">
+            <Border Padding="0" Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="10" ClipToBounds="True">
                 <StackPanel>
                     <ui:Button x:Name="AboutSummaryButton" Style="{StaticResource AboutSummaryButtonStyle}" Padding="12,8" MinHeight="76"
                                Margin="1,1,1,0"
                                HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch"
-                               CornerRadius="13" Cursor="Hand" Click="AboutSummaryButton_Click"
+                               CornerRadius="9" Cursor="Hand" Click="AboutSummaryButton_Click"
                                AutomationProperties.Name="About">
                         <Grid Margin="0,0,20,0">
                             <Grid.ColumnDefinitions>

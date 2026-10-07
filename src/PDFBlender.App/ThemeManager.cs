@@ -154,8 +154,8 @@ internal static class ThemeManager
         }
 
         SetBrush(resources, "AccentTextBrush", "#FFFFFF");
-        SetColor(resources, "AccentButtonDisabledStartColor", "#C0C0C0");
-        SetColor(resources, "AccentButtonDisabledEndColor", "#B7B7B7");
+        SetColor(resources, "AccentButtonDisabledStartColor", dark ? "#3A3A3A" : "#C0C0C0");
+        SetColor(resources, "AccentButtonDisabledEndColor", dark ? "#303030" : "#B7B7B7");
     }
 
     private static void SetBrush(ResourceDictionary resources, string key, string hex)
