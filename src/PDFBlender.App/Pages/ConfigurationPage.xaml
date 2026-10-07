@@ -18,7 +18,7 @@
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock x:Name="ConfigurationsHeader" Style="{StaticResource SectionTitleTextStyle}" Margin="0" />
                     </StackPanel>
-                    <ui:Button x:Name="AddButton" HorizontalAlignment="Right" VerticalAlignment="Center" Appearance="Secondary" Padding="12,6" Click="AddButton_Click" Cursor="Hand">
+                    <ui:Button x:Name="AddButton" Width="140" HorizontalAlignment="Right" VerticalAlignment="Center" Appearance="Secondary" Padding="12,6" Click="AddButton_Click" Cursor="Hand">
                         <StackPanel Orientation="Horizontal">
                             <ui:SymbolIcon Symbol="Add24" Margin="0,0,6,0" />
                             <TextBlock x:Name="AddButtonText" />

@@ -299,7 +299,7 @@ public partial class MainWindow : FluentWindow
     {
         UiText.SetLanguage(_session.Preferences.Language);
         HomeNavigationItem.Content = UiText.Get("home");
-        ConfigurationNavigationItem.Content = UiText.Get("configuration");
+        ConfigurationNavigationItem.Content = UiText.Get("configurationNavigation");
         SettingsNavigationItem.Content = UiText.Get("settings");
         ShellTitleBar.Title = "PDF Blender";
     }

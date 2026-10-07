@@ -147,7 +147,7 @@ public partial class ConfigurationPresetPage : Page
                 VerticalAlignment = VerticalAlignment.Top,
                 Child = new TextBlock
                 {
-                    Text = UiText.Get(ConfigurationIntensity.LabelKey(preset.Intensity)),
+                    Text = UiText.GetIntensityLevel(preset.Intensity),
                     FontSize = 10,
                     TextTrimming = TextTrimming.CharacterEllipsis,
                     Foreground = color,

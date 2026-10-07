@@ -76,7 +76,7 @@ internal static class ThemeManager
             SetBrush(resources, "BreadcrumbBarCurrentNormalForegroundBrush", "#F2F2F2");
             SetBrush(resources, "DisabledTextBrush", "#8A8A8A");
             SetBrush(resources, "EditorSaveDisabledTextBrush", "#B8B8B8");
-            SetBrush(resources, "SliderThumbBrush", "#F2F2F2");
+            SetBrush(resources, "SliderThumbBrush", "#1F1F1F");
             SetBrush(resources, "SliderThumbBorderBrush", "#6A6A6A");
             SetBrush(resources, "TitleBarButtonsForegroundBrush", "#FFFFFF");
             SetBrush(resources, "TitleBarButtonsHoverBrush", "#191919");

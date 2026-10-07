@@ -632,7 +632,7 @@ public partial class ConfigurationPage : Page
 
     private void AddButton_Click(object sender, RoutedEventArgs e)
     {
-        const double menuWidth = 120;
+        var menuWidth = AddButton.ActualWidth;
         var menu = new ContextMenu
         {
             PlacementTarget = AddButton,
@@ -647,7 +647,7 @@ public partial class ConfigurationPage : Page
         };
         var custom = new UiMenuItem
         {
-            Header = UiText.Get("newCustomConfiguration"),
+            Header = UiText.Get("customConfigMenu"),
             Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.TextBoxSettings24 },
             Focusable = false,
             IsTabStop = false,
@@ -656,7 +656,7 @@ public partial class ConfigurationPage : Page
         custom.Click += (_, _) => Dispatcher.BeginInvoke(new Action(() => OpenEditor(null, true)), DispatcherPriority.ContextIdle);
         var preset = new UiMenuItem
         {
-            Header = UiText.Get("newPresetConfiguration"),
+            Header = UiText.Get("presetConfigMenu"),
             Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.WindowSettings20 },
             Focusable = false,
             IsTabStop = false,

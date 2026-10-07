@@ -95,7 +95,7 @@ public partial class ConfigurationEditorPage : Page
         ColorText.Text = UiText.Get("selectColor");
         IconText.Text = UiText.Get("selectIcon");
         CancelButton.Content = UiText.Get("cancel");
-        SaveButton.Content = new TextBlock { Text = UiText.Get("save") };
+        SaveButton.Content = new TextBlock { Text = UiText.Get("save"), VerticalAlignment = VerticalAlignment.Center, TextAlignment = TextAlignment.Center };
     }
 
     private void BuildColorChoices()

@@ -72,7 +72,7 @@ public partial class BlendLevelRail : UserControl
         for (var index = 0; index < SlotCount; index++)
         {
             var level = index < _levels.Count ? _levels[index] : new BlendLevelItem($"{index + 1}", string.Empty, false);
-            var availableBrush = (Brush)FindResource(level.IsAvailable ? "MutedTextBrush" : "BorderBrush");
+            var availableBrush = level.IsAvailable ? GetUnselectedAvailableBrush() : (Brush)FindResource("BorderBrush");
             NumbersPanel.Children.Add(new TextBlock
             {
                 Text = $"{index + 1}",
@@ -91,7 +91,7 @@ public partial class BlendLevelRail : UserControl
                 ? (Brush)FindResource("BorderBrush")
                 : isSelected
                     ? ConfigurationPalette.GetBrush(level.ColorKey)
-                    : new SolidColorBrush(Color.FromRgb(0x66, 0x66, 0x66));
+                    : GetUnselectedAvailableBrush();
             var iconBorder = new Border
             {
                 Width = 18,
@@ -452,7 +452,7 @@ public partial class BlendLevelRail : UserControl
             var stateBrush = available
                 ? highlighted
                     ? configurationBrush
-                    : new SolidColorBrush(Color.FromRgb(0x66, 0x66, 0x66))
+                    : GetUnselectedAvailableBrush()
                 : (Brush)FindResource("BorderBrush");
             if (label is not null)
             {
@@ -470,12 +470,21 @@ public partial class BlendLevelRail : UserControl
         UpdateTickBrushes(index);
     }
 
+    private Brush GetUnselectedAvailableBrush() => ThemeManager.IsDark
+        ? new SolidColorBrush(Color.FromRgb(0x66, 0x66, 0x66))
+        : new SolidColorBrush(Color.FromRgb(0xB3, 0xB3, 0xB3));
+
     private void UpdateTickBrushes(int selectedIndex)
     {
         for (var index = 0; index < SlotCount; index++)
         {
-            var available = _levels.ElementAtOrDefault(index)?.IsAvailable == true;
-            var brush = (Brush)FindResource(index == selectedIndex && available ? "AccentBrush" : available ? "MutedTextBrush" : "BorderBrush");
+            var level = _levels.ElementAtOrDefault(index);
+            var available = level?.IsAvailable == true;
+            var brush = available
+                ? index == selectedIndex
+                    ? ConfigurationPalette.GetBrush(level?.ColorKey)
+                    : GetUnselectedAvailableBrush()
+                : (Brush)FindResource("BorderBrush");
             if (index < UpperTickPanel.Children.Count && UpperTickPanel.Children[index] is Rectangle upper) upper.Fill = brush;
             if (index < LowerTickPanel.Children.Count && LowerTickPanel.Children[index] is Rectangle lower) lower.Fill = brush;
             if (index < NumbersPanel.Children.Count && NumbersPanel.Children[index] is TextBlock number) number.Foreground = brush;

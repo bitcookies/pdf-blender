@@ -15,7 +15,8 @@ internal static class UiText
     {
         ["appName"] = "PDF Blender",
         ["home"] = "Home",
-        ["configuration"] = "Configuration",
+        ["configurationNavigation"] = "Configs",
+        ["configuration"] = "Configurations",
         ["about"] = "About",
         ["homeSlogan"] = "DO NOT PLAGIARIZE MY PDF !",
         ["dropTitle"] = "Drag a PDF file into the blender",
@@ -85,27 +86,29 @@ internal static class UiText
         ["configurationSubtitle"] = "Customize the blend settings used by each level.",
         ["blendSlots"] = "Blend slots",
         ["blendSlotsHint"] = "Drag configurations into the levels used on Home.",
-        ["newConfiguration"] = "New configuration",
-        ["addConfiguration"] = "New configuration",
-        ["newCustomConfiguration"] = "Custom configuration",
-        ["newPresetConfiguration"] = "Preset configuration",
+        ["newConfiguration"] = "New config",
+        ["addConfiguration"] = "New config",
+        ["customConfigMenu"] = "Custom config",
+        ["presetConfigMenu"] = "Preset config",
+        ["newCustomConfiguration"] = "Custom config",
+        ["newPresetConfiguration"] = "Preset config",
         ["newConfigurationHint"] = "Choose how you want to create the next blend configuration.",
         ["customConfigurationDescription"] = "Start with an empty configuration and choose its features.",
         ["presetConfigurationDescription"] = "Copy a built-in preset and add it to your configurations.",
         ["choosePreset"] = "Choose a preset",
-        ["customConfiguration"] = "Custom configuration",
+        ["customConfiguration"] = "Custom config",
         ["add"] = "Add",
         ["continue"] = "Continue",
         ["more"] = "More actions",
         ["emptyBlendSlots"] = "No blend slots selected. Drag a card here or open a configuration.",
         ["dragToSlots"] = "Drag this card to the Blend slots area.",
-        ["intensity"] = "Intensity",
+        ["intensity"] = "Lv",
         ["intensityNone"] = "None",
         ["intensityLight"] = "Light",
         ["intensityModerate"] = "Moderate",
         ["intensityStrong"] = "Strong",
         ["intensityVeryStrong"] = "Very strong",
-        ["slotDropHint"] = "Drop configuration into level {0}",
+        ["slotDropHint"] = "Drop config into slot {0}",
         ["selectColor"] = "Color",
         ["selectIcon"] = "Icon",
         ["selectIconTitle"] = "Select icon",
@@ -216,6 +219,7 @@ internal static class UiText
     {
         ["appName"] = "PDF Blender",
         ["home"] = "主页",
+        ["configurationNavigation"] = "配置",
         ["configuration"] = "配置",
         ["about"] = "关于",
         ["homeSlogan"] = "别抄我的 PDF ！",
@@ -288,6 +292,8 @@ internal static class UiText
         ["blendSlotsHint"] = "将配置拖入需要使用的挡位。",
         ["newConfiguration"] = "新建配置",
         ["addConfiguration"] = "新建配置",
+        ["customConfigMenu"] = "自定义配置",
+        ["presetConfigMenu"] = "预设配置",
         ["newCustomConfiguration"] = "自定义配置",
         ["newPresetConfiguration"] = "预设配置",
         ["newConfigurationHint"] = "选择要创建的搅拌配置类型。",
@@ -414,6 +420,10 @@ internal static class UiText
     };
 
     public static IReadOnlyDictionary<string, string> Current { get; private set; } = English;
+
+    public static string GetIntensityLevel(int level) => ReferenceEquals(Current, Chinese)
+        ? Get(PDFBlender.Core.Models.ConfigurationIntensity.LabelKey(level))
+        : "Lv " + level;
 
     public static void SetLanguage(UiLanguage language)
     {
