@@ -264,6 +264,9 @@ public partial class HomePage : Page
             ToolTip = UiText.Get("removePdf"),
             Content = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.Dismiss16, FontSize = 11 }
         };
+        removeButton.SetResourceReference(Control.ForegroundProperty, "TextBrush");
+        if (removeButton.Content is Wpf.Ui.Controls.SymbolIcon removeIcon)
+            removeIcon.SetResourceReference(Wpf.Ui.Controls.IconElement.ForegroundProperty, "TextBrush");
         AutomationProperties.SetName(removeButton, UiText.Get("removePdf"));
         removeButton.Click += (_, _) => RemoveInputPath(path);
         var removeSurface = new Border
