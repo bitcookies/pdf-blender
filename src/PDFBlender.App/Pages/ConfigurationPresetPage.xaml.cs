@@ -26,10 +26,10 @@ public partial class ConfigurationPresetPage : Page
         _listBack = listBack;
         InitializeComponent();
         BreadcrumbBarStyling.Attach(BreadcrumbBar);
-        Refresh();
+        RefreshFromSession();
     }
 
-    private void Refresh()
+    public void RefreshFromSession()
     {
         BreadcrumbBar.Items.Clear();
         BreadcrumbBar.Items.Add(UiText.Get("configuration"));

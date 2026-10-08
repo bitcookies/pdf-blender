@@ -430,9 +430,17 @@ internal static class UiText
         Current = language switch
         {
             UiLanguage.SimplifiedChinese => Chinese,
-            UiLanguage.System when CultureInfo.CurrentUICulture.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase) => Chinese,
+            UiLanguage.System when IsSystemChinese() => Chinese,
             _ => English
         };
+    }
+
+    private static bool IsSystemChinese()
+    {
+        var current = CultureInfo.CurrentUICulture.Name;
+        var installed = CultureInfo.InstalledUICulture.Name;
+        return current.StartsWith("zh", StringComparison.OrdinalIgnoreCase)
+            || installed.StartsWith("zh", StringComparison.OrdinalIgnoreCase);
     }
 
     public static string Get(string key) => Current.TryGetValue(key, out var value) ? value : key;

@@ -55,6 +55,15 @@ public partial class ConfigurationPage : Page
         }
     }
 
+    public void RefreshThemeAndLanguage()
+    {
+        RefreshFromSession();
+        if (ChildContent.Content is ConfigurationEditorPage editor)
+            editor.RefreshFromSession();
+        else if (ChildContent.Content is ConfigurationPresetPage presets)
+            presets.RefreshFromSession();
+    }
+
     private void BuildSlots()
     {
         SlotsPanel.Children.Clear();

@@ -7,7 +7,76 @@ namespace PDFBlender.App;
 
 internal static class ThemeManager
 {
+    private static bool _monitoring;
+    private static bool? _lastSystemDark;
+
     public static bool IsDark { get; private set; }
+
+    public static event EventHandler? SystemThemeChanged;
+    public static event EventHandler? SystemPreferencesChanged;
+
+    public static void StartSystemMonitoring()
+    {
+        if (_monitoring)
+            return;
+
+        _monitoring = true;
+        _lastSystemDark = !SystemUsesLightTheme();
+        SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
+        SystemEvents.DisplaySettingsChanged += SystemEvents_DisplaySettingsChanged;
+    }
+
+    public static void StopSystemMonitoring()
+    {
+        if (!_monitoring)
+            return;
+
+        SystemEvents.UserPreferenceChanged -= SystemEvents_UserPreferenceChanged;
+        SystemEvents.DisplaySettingsChanged -= SystemEvents_DisplaySettingsChanged;
+        _monitoring = false;
+        _lastSystemDark = null;
+    }
+
+    private static void SystemEvents_UserPreferenceChanged(object? sender, UserPreferenceChangedEventArgs e)
+    {
+        PublishSystemPreferencesChanged();
+        PublishSystemThemeIfChanged();
+    }
+
+    private static void SystemEvents_DisplaySettingsChanged(object? sender, EventArgs e)
+    {
+        PublishSystemPreferencesChanged();
+        PublishSystemThemeIfChanged();
+    }
+
+    private static void PublishSystemPreferencesChanged()
+    {
+        var dispatcher = Application.Current?.Dispatcher;
+        if (dispatcher is null)
+            return;
+
+        if (dispatcher.CheckAccess())
+            SystemPreferencesChanged?.Invoke(null, EventArgs.Empty);
+        else
+            dispatcher.BeginInvoke(new Action(() => SystemPreferencesChanged?.Invoke(null, EventArgs.Empty)));
+    }
+
+    private static void PublishSystemThemeIfChanged()
+    {
+        var isDark = !SystemUsesLightTheme();
+        if (_lastSystemDark == isDark)
+            return;
+
+        _lastSystemDark = isDark;
+        var dispatcher = Application.Current?.Dispatcher;
+        if (dispatcher is null)
+            return;
+
+        if (dispatcher.CheckAccess())
+            SystemThemeChanged?.Invoke(null, EventArgs.Empty);
+        else
+            dispatcher.BeginInvoke(new Action(() => SystemThemeChanged?.Invoke(null, EventArgs.Empty)));
+    }
 
     public static bool SystemUsesLightTheme()
     {

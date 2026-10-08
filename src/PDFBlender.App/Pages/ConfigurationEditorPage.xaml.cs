@@ -78,6 +78,16 @@ public partial class ConfigurationEditorPage : Page
         UpdateSaveState();
     }
 
+    public void RefreshFromSession()
+    {
+        var name = NameBox.Text;
+        UiText.SetLanguage(_session.Preferences.Language);
+        RefreshText();
+        NameBox.Text = name;
+        BuildColorChoices();
+        UpdateIconPreview();
+    }
+
     private void ConfigureBreadcrumb(Action listBack)
     {
         BreadcrumbBar.Items.Clear();
@@ -301,14 +311,15 @@ public partial class ConfigurationEditorPage : Page
         var header = new DockPanel { MinHeight = 72 - 24 - 2 };
         var labels = new StackPanel();
         var titleText = new TextBlock { Text = title, FontWeight = FontWeights.SemiBold };
+        titleText.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
         var hintText = new TextBlock
         {
             Text = hint,
-            Foreground = (Brush)FindResource("MutedTextBrush"),
             FontSize = 11,
             TextWrapping = TextWrapping.Wrap,
             Margin = new Thickness(0, 3, 10, 0)
         };
+        hintText.SetResourceReference(TextBlock.ForegroundProperty, "MutedTextBrush");
         labels.Children.Add(titleText);
         labels.Children.Add(hintText);
         DockPanel.SetDock(toggle, Dock.Right);
@@ -332,8 +343,7 @@ public partial class ConfigurationEditorPage : Page
         card.Content = root;
         FeaturePanel.Children.Add(card);
 
-        var disabledBrush = new SolidColorBrush(Color.FromRgb(0xA6, 0xA6, 0xA6));
-        disabledBrush.Freeze();
+        var disabledBrush = (Brush)FindResource("DisabledTextBrush");
 
         void RefreshEnabledVisual()
         {

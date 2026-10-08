@@ -27,13 +27,39 @@ public partial class MainWindow : FluentWindow
         AddHandler(Keyboard.PreviewGotKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnKeyboardFocus), true);
         _dialogs = new DialogService(RootDialogHost);
         _notifications = new UiNotificationService(AppNotificationHost, _session);
+        ThemeManager.StartSystemMonitoring();
+        ThemeManager.SystemThemeChanged += ThemeManager_SystemThemeChanged;
+        ThemeManager.SystemPreferencesChanged += ThemeManager_SystemPreferencesChanged;
         ApplicationThemeManager.Apply(this);
         ApplyTheme();
         ApplyLanguage();
         NavigateTo("home");
         _session.Changed += Session_Changed;
         Loaded += MainWindow_Loaded;
+        Closed += MainWindow_Closed;
 
+    }
+
+    private void MainWindow_Closed(object? sender, EventArgs e)
+    {
+        ThemeManager.SystemThemeChanged -= ThemeManager_SystemThemeChanged;
+        ThemeManager.SystemPreferencesChanged -= ThemeManager_SystemPreferencesChanged;
+        ThemeManager.StopSystemMonitoring();
+    }
+
+    private void ThemeManager_SystemThemeChanged(object? sender, EventArgs e)
+    {
+        if (_session.Preferences.Theme != ThemePreference.System)
+            return;
+
+        ApplyTheme();
+        RefreshPages();
+    }
+
+    private void ThemeManager_SystemPreferencesChanged(object? sender, EventArgs e)
+    {
+        if (_session.Preferences.Language == UiLanguage.System)
+            RefreshPages();
     }
 
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -289,9 +315,14 @@ public partial class MainWindow : FluentWindow
     private void Session_Changed(object? sender, EventArgs e)
     {
         ApplyTheme();
+        RefreshPages();
+    }
+
+    private void RefreshPages()
+    {
         ApplyLanguage();
         _homePage?.RefreshFromSession();
-        _configurationPage?.RefreshFromSession();
+        _configurationPage?.RefreshThemeAndLanguage();
         _settingsPage?.RefreshFromSession();
     }
 

@@ -95,6 +95,12 @@ internal sealed class DialogService
                 Child = new StackPanel { Children = { query, scroll } }
             }
         };
+        if (border.Child is Border pickerSurface)
+        {
+            pickerSurface.SetResourceReference(Border.BackgroundProperty, "SurfaceBrush");
+            pickerSurface.SetResourceReference(Border.BorderBrushProperty, "BorderBrush");
+        }
+
         var popup = new Popup
         {
             PlacementTarget = placementTarget,
@@ -140,13 +146,11 @@ internal sealed class DialogService
                 foreach (var descriptor in matches.Skip(loadedCount).Take(batchSize))
                 {
                     var selected = string.Equals(descriptor.Key, currentKey, StringComparison.OrdinalIgnoreCase);
-                    var iconBrush = (Brush)Application.Current.FindResource("IconPickerForegroundBrush");
                     var icon = new SymbolIcon
                     {
                         Symbol = descriptor.Symbol,
                         Filled = descriptor.Filled,
                         FontSize = 13,
-                        Foreground = iconBrush
                     };
                     icon.SetResourceReference(IconElement.ForegroundProperty, "IconPickerForegroundBrush");
 
@@ -158,8 +162,6 @@ internal sealed class DialogService
                         Padding = new Thickness(0),
                         CornerRadius = new CornerRadius(6),
                         Appearance = ControlAppearance.Secondary,
-                        Foreground = iconBrush,
-                        BorderBrush = selected ? (Brush)Application.Current.FindResource("AccentBrush") : (Brush)Application.Current.FindResource("BorderBrush"),
                         BorderThickness = new Thickness(selected ? 2 : 1),
                         ToolTip = descriptor.Name,
                         Cursor = Cursors.Hand,
@@ -167,6 +169,7 @@ internal sealed class DialogService
                     };
                     button.SetResourceReference(Control.ForegroundProperty, "IconPickerForegroundBrush");
                     button.SetResourceReference(IconElement.ForegroundProperty, "IconPickerForegroundBrush");
+                    button.SetResourceReference(Control.BorderBrushProperty, selected ? "AccentBrush" : "BorderBrush");
                     button.Click += (_, _) => Close(descriptor.Key);
                     grid.Children.Add(button);
                 }
