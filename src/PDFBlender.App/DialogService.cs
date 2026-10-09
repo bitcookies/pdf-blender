@@ -23,29 +23,42 @@ internal sealed class DialogService
         var dialog = new ContentDialog
         {
             Title = title,
-            Content = new TextBlock { Text = message, TextWrapping = TextWrapping.Wrap },
+            Content = new TextBlock { Text = message, TextWrapping = TextWrapping.Wrap, MinWidth = 240 },
             PrimaryButtonText = primaryText,
             CloseButtonText = closeText,
             PrimaryButtonAppearance = ControlAppearance.Danger,
             CloseButtonAppearance = ControlAppearance.Secondary,
             PrimaryButtonIcon = new SymbolIcon(icon),
-            DialogWidth = 330,
             DialogMaxWidth = 620,
+            DialogMargin = new Thickness(24),
             DefaultButton = ContentDialogButton.Primary
         };
+
+        dialog.SetResourceReference(Control.BackgroundProperty, "ContentDialogBackground");
+        dialog.SetResourceReference(Control.ForegroundProperty, "ContentDialogForeground");
+        dialog.SetResourceReference(Control.BorderBrushProperty, "ContentDialogBorderBrush");
+        if (dialog.Content is TextBlock messageText)
+            messageText.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
         dialog.Loaded += (_, _) =>
         {
             dialog.Dispatcher.BeginInvoke(
                 System.Windows.Threading.DispatcherPriority.Loaded,
                 new Action(() =>
                 {
-                    var primary = FindVisualChild<Wpf.Ui.Controls.Button>(dialog);
+                    var primary = dialog.Template.FindName("PrimaryButton", dialog) as Wpf.Ui.Controls.Button;
                     if (primary is not null)
                     {
-                        var textBrush = (Brush)Application.Current.FindResource("AccentTextBrush");
-                        primary.Foreground = textBrush;
-                        primary.Cursor = Cursors.Hand;
-                        SetForegroundRecursive(primary, textBrush);
+                        primary.SetResourceReference(Control.ForegroundProperty, "AccentTextBrush");
+                        SetForegroundRecursive(primary, (Brush)Application.Current.FindResource("AccentTextBrush"));
+                    }
+                    if (dialog.Template.FindName("CloseButton", dialog) is Wpf.Ui.Controls.Button close)
+                    {
+                        close.Cursor = Cursors.Hand;
+                        close.SetResourceReference(Control.BackgroundProperty, "SurfaceRaisedBrush");
+                        close.SetResourceReference(Control.BorderBrushProperty, "BorderBrush");
+                        close.SetResourceReference(Control.ForegroundProperty, "TextBrush");
+                        close.SetResourceReference(Wpf.Ui.Controls.Button.MouseOverBackgroundProperty, "SurfaceMutedBrush");
+                        close.SetResourceReference(Wpf.Ui.Controls.Button.PressedForegroundProperty, "TextBrush");
                     }
                 }));
         };
@@ -245,16 +258,5 @@ internal sealed class DialogService
         {
             SetForegroundRecursive(VisualTreeHelper.GetChild(parent, i), brush);
         }
-    }
-    private static T? FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
-    {
-        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
-        {
-            var child = VisualTreeHelper.GetChild(parent, i);
-            if (child is T match) return match;
-            var nested = FindVisualChild<T>(child);
-            if (nested is not null) return nested;
-        }
-        return null;
     }
 }

@@ -9,6 +9,7 @@
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="Foreground" Value="{DynamicResource NavigationViewItemForeground}" />
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
         <!-- The fluent template adds its own left indicator inset. Compensate with a larger right inset. -->
         <Setter Property="Width" Value="60" />
         <Setter Property="Margin" Value="0,2,0,2" />

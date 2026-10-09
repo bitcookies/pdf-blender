@@ -227,6 +227,11 @@ internal static class ThemeManager
         }
 
         SetBrush(resources, "AccentTextBrush", "#FFFFFF");
+        SetBrush(resources, "ContentDialogBackground", dark ? "#272727" : "#F3F3F3");
+        SetBrush(resources, "ContentDialogTopOverlay", dark ? "#323232" : "#FFFFFF");
+        SetBrush(resources, "ContentDialogForeground", dark ? "#F2F2F2" : "#202020");
+        SetBrush(resources, "ContentDialogBorderBrush", dark ? "#454545" : "#E6E6E6");
+        SetBrush(resources, "ContentDialogSeparatorBorderBrush", dark ? "#454545" : "#E6E6E6");
         SetColor(resources, "AccentButtonDisabledStartColor", dark ? "#3A3A3A" : "#C0C0C0");
         SetColor(resources, "AccentButtonDisabledEndColor", dark ? "#303030" : "#B7B7B7");
     }

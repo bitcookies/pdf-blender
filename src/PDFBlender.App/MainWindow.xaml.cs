@@ -30,7 +30,6 @@ public partial class MainWindow : FluentWindow
         ThemeManager.StartSystemMonitoring();
         ThemeManager.SystemThemeChanged += ThemeManager_SystemThemeChanged;
         ThemeManager.SystemPreferencesChanged += ThemeManager_SystemPreferencesChanged;
-        ApplicationThemeManager.Apply(this);
         ApplyTheme();
         ApplyLanguage();
         NavigateTo("home");
