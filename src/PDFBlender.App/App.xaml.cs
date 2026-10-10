@@ -12,13 +12,14 @@ public partial class App : Application
     private const string SingleInstanceMutexName = "PDFBlender.SingleInstance.CurrentUser";
     private readonly SingleInstanceGuard _singleInstance = new(SingleInstanceMutexName);
 
-    protected override void OnStartup(StartupEventArgs e)
+    protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
 
         var preferences = AppPreferencesStore.Load();
         if (!preferences.AllowMultipleInstances && !_singleInstance.TryAcquire())
         {
+            await SingleInstanceGuard.ActivateExistingWindowAsync();
             Shutdown();
             return;
         }
