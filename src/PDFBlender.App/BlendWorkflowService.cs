@@ -21,6 +21,7 @@ internal sealed class BlendWorkflowService
     public async Task<IReadOnlyList<BlendResult>> BlendAsync(
         IReadOnlyList<string> inputPaths,
         BlendSettings settings,
+        string configurationName,
         IProgress<BlendBatchProgress>? progress = null,
         CancellationToken cancellationToken = default)
     {
@@ -30,9 +31,7 @@ internal sealed class BlendWorkflowService
         {
             cancellationToken.ThrowIfCancellationRequested();
             var inputPath = inputPaths[index];
-            var outputPath = Path.Combine(
-                Path.GetDirectoryName(inputPath) ?? string.Empty,
-                $"{Path.GetFileNameWithoutExtension(inputPath)}_blended.pdf");
+            var outputPath = BlendOutputPath.Create(inputPath, configurationName);
             var completedFiles = index;
             var pageProgress = new Progress<BlendProgress>(value =>
                 progress?.Report(new BlendBatchProgress(completedFiles, inputPaths.Count, value)));

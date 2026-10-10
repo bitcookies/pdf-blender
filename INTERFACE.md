@@ -21,7 +21,7 @@ The first screen is the working tool, not a marketing page. The compact 820×600
 3. The discrete Blend level rail and a Configuration shortcut.
 4. A clear primary `Blend PDF` action.
 
-The main workflow is `Drop/Browse -> choose Blend level -> Blend PDF`. The application accepts one or more PDF files per batch and ignores duplicate paths. Reject unsupported file types clearly and do not start processing before a valid PDF is selected. The output is written beside the input as `<source>_blended.pdf`, with `(2)` etc when needed; the destination is not exposed as a home control. Theme and language controls are absent from the home screen and available in Settings.
+The main workflow is `Drop/Browse -> choose Blend level -> Blend PDF`. The application accepts one or more PDF files per batch and ignores duplicate paths. Reject unsupported file types clearly and do not start processing before a valid PDF is selected. The output is written beside the input as `<source>_<configuration name>.pdf`, with `(2)` etc when needed; the destination is not exposed as a home control. Theme and language controls are absent from the home screen and available in Settings.
 
 The shell is a single WPF-UI `FluentWindow` with a fixed 44 px title bar, a WPF-UI `NavigationView` in `LeftFluent` mode fixed at 74 px, and a content `Frame`. Pane expansion is disabled. Home and Configuration appear in the main navigation group; Settings appears in the footer group. The title bar and navigation rail share one shell surface (`#F3F3F3` light / `#202020` dark); the content surface uses `#F9F9F9` light / `#272727` dark, with a 12 px top-left radius. Cards use `#FDFDFD` light / `#323232` dark. Home, Configuration, and Settings share one `AppSession`; language refresh preserves the current selection. Settings also contains the collapsible About section with version, links, license, feedback, and developer information.
 
@@ -41,7 +41,7 @@ Preferences and configurations are stored under the roaming AppData folder named
 - Flatten: explicit toggle, independent DPI (default 300) and Compact/Standard/High/Lossless quality. No exposed image format selector.
 - Watermark: enable toggle, multiline text, angle and Text/Full page type. Opacity/spacing are conservative internal choices.
 - Raster: noise and texture strength, geometry and microtext toggles, all gated by Flatten.
-- Output is automatic: the original remains untouched and the generated file uses the `_blended.pdf` suffix in the source directory.
+- Output is automatic: the original remains untouched and the generated file uses the `_<configuration name>.pdf` suffix in the source directory.
 
 Configurations are selectable alternative settings snapshots. Editing updates that configuration; no multi-slot processing chain is implied.
 

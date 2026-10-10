@@ -10,7 +10,7 @@ namespace PDFBlender.App;
 
 public enum UiNotificationKind { Info, Success, Warning, Error, Progress }
 
-public sealed class UiNotificationService
+public sealed class UiNotificationService : IDisposable
 {
     private readonly UiNotificationHost _host;
     private readonly AppSession _session;
@@ -39,8 +39,9 @@ public sealed class UiNotificationService
                 _host.Show(id, kind, title, message, autoDismiss);
             if (_session.Preferences.BannerNotificationsEnabled && kind != UiNotificationKind.Progress && _session.Preferences.ToastSoundEnabled)
                 PlayToastSound();
-            if (_session.Preferences.WindowsNotificationsEnabled)
-                ShowWindowsNotification(title, message);
+            if (_session.Preferences.WindowsNotificationsEnabled
+                && kind is UiNotificationKind.Success or UiNotificationKind.Error)
+                ShowWindowsNotification(kind, title, message);
         });
         return id;
     }
@@ -62,27 +63,41 @@ public sealed class UiNotificationService
         catch (IOException) { }
     }
 
-    private void ShowWindowsNotification(string title, string message)
+    private void ShowWindowsNotification(UiNotificationKind kind, string title, string message)
     {
         try
         {
             if (_windowsNotifier is null)
             {
-                var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "logo.ico");
+                var resource = System.Windows.Application.GetResourceStream(
+                    new Uri("pack://application:,,,/PDFBlender.App;component/Assets/logo.ico"));
+                using var stream = resource?.Stream;
+                using var embeddedIcon = stream is not null ? new DrawingIcon(stream) : null;
                 _windowsNotifier = new FormsNotifyIcon
                 {
-                    Icon = File.Exists(iconPath) ? new DrawingIcon(iconPath) : DrawingSystemIcons.Application,
+                    Icon = (DrawingIcon)(embeddedIcon ?? DrawingSystemIcons.Application).Clone(),
                     Text = "PDF Blender",
                     Visible = false
                 };
             }
 
             _windowsNotifier.Visible = true;
-            _windowsNotifier.ShowBalloonTip(5000, title, message, FormsToolTipIcon.Info);
+            _windowsNotifier.ShowBalloonTip(5000, title, message,
+                kind == UiNotificationKind.Error ? FormsToolTipIcon.Error : FormsToolTipIcon.None);
             _windowsNotifierHideTimer.Stop();
             _windowsNotifierHideTimer.Start();
         }
         catch (Exception) { }
+    }
+
+    public void Dispose()
+    {
+        _windowsNotifierHideTimer.Stop();
+        var icon = _windowsNotifier?.Icon;
+        _windowsNotifier?.Dispose();
+        _windowsNotifier = null;
+        icon?.Dispose();
+        _toastPlayer.Close();
     }
 
     private static void Dispatch(Action action)

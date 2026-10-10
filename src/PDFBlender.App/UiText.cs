@@ -129,11 +129,6 @@ internal static class UiText
         ["emptyBlendSlots"] = "No blend slots selected. Drag a card here or open a configuration.",
         ["dragToSlots"] = "Drag this card to the Blend slots area.",
         ["intensity"] = "Lv",
-        ["intensityNone"] = "None",
-        ["intensityLight"] = "Light",
-        ["intensityModerate"] = "Moderate",
-        ["intensityStrong"] = "Strong",
-        ["intensityVeryStrong"] = "Very strong",
         ["slotDropHint"] = "Drop config into slot {0}",
         ["selectColor"] = "Color",
         ["selectIcon"] = "Icon",
@@ -359,11 +354,6 @@ internal static class UiText
         ["emptyBlendSlots"] = "还没有选择搅拌挡位。将卡片拖到这里，或打开配置。",
         ["dragToSlots"] = "将此卡片拖到搅拌挡位区域。",
         ["intensity"] = "强度",
-        ["intensityNone"] = "无影响",
-        ["intensityLight"] = "轻度",
-        ["intensityModerate"] = "中度",
-        ["intensityStrong"] = "重度",
-        ["intensityVeryStrong"] = "极强",
         ["slotDropHint"] = "拖入配置到挡位 {0}",
         ["selectColor"] = "配置颜色",
         ["selectIcon"] = "配置图标",
@@ -473,9 +463,7 @@ internal static class UiText
 
     public static IReadOnlyDictionary<string, string> Current { get; private set; } = English;
 
-    public static string GetIntensityLevel(int level) => ReferenceEquals(Current, Chinese)
-        ? Get(PDFBlender.Core.Models.ConfigurationIntensity.LabelKey(level))
-        : "Lv " + level;
+    public static string GetIntensityLevel(int level) => $"{Get("intensity")} {level}";
 
     public static void SetLanguage(UiLanguage language)
     {

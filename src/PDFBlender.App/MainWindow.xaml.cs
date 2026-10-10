@@ -44,6 +44,7 @@ public partial class MainWindow : FluentWindow
         ThemeManager.SystemThemeChanged -= ThemeManager_SystemThemeChanged;
         ThemeManager.SystemPreferencesChanged -= ThemeManager_SystemPreferencesChanged;
         ThemeManager.StopSystemMonitoring();
+        _notifications.Dispose();
     }
 
     private void ThemeManager_SystemThemeChanged(object? sender, EventArgs e)

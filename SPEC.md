@@ -56,7 +56,7 @@ Title, Author, Subject and Keywords survive raster rebuilding. Normalization set
 ## Validation and Output Safety
 Validate active finite dimensions (10-2000 mm), DPI (72-600), supported enums, watermark text/angle and prompt constraints in Core and editor. Raster prerequisites and mutually exclusive layout are enforced in both. GAN remains disabled/experimental and enabling it is rejected.
 
-Batch processing is asynchronous and cancellable; earlier successful files survive a later failure. Output is beside source as `<source>_blended.pdf`, then `(2)`, `(3)` etc. Input and existing output are never overwritten, including concurrent commit races. Same-directory temporary output is committed only on success; failure/cancellation removes it. Signed PDFs reject modifications. Damaged/password/font/page-memory/path problems have localized errors without content logging.
+Batch processing is asynchronous and cancellable; earlier successful files survive a later failure. Output is beside source as `<source>_<configuration name>.pdf`, then `(2)`, `(3)` etc. Input and existing output are never overwritten, including concurrent commit races. Same-directory temporary output is committed only on success; failure/cancellation removes it. Signed PDFs reject modifications. Damaged/password/font/page-memory/path problems have localized errors without content logging.
 
 ## Verification
 See `docs/pdf-v010-verification.md` for structural, extraction, pixel and render checks. Synthetic fixtures cover Chinese/English, formulas, tables/charts, transparent images, native/raster objects, portrait/landscape/multiple pages and cropped rotations. External viewer and MSIX compatibility must not be claimed without checks.

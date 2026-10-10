@@ -7,6 +7,7 @@ using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Shape = System.Windows.Shapes.Shape;
 
 namespace PDFBlender.App.Pages;
 
@@ -76,17 +77,17 @@ public partial class HomePage : Page
         DropTarget_DragOver(sender, e);
         if (e.Effects != DragDropEffects.None)
         {
-            DropCard.BorderBrush = (Brush)FindResource("AccentBrush");
-            DropCard.Background = (Brush)FindResource("AccentSoftBrush");
-            DropDash.Stroke = (Brush)FindResource("AccentBrush");
+            DropCard.SetResourceReference(Control.BorderBrushProperty, "AccentBrush");
+            DropCard.SetResourceReference(Control.BackgroundProperty, "AccentSoftBrush");
+            DropDash.SetResourceReference(Shape.StrokeProperty, "AccentBrush");
         }
     }
 
     private void DropCard_DragLeave(object sender, DragEventArgs e)
     {
-        DropCard.BorderBrush = (Brush)FindResource("BorderBrush");
-        DropCard.Background = (Brush)FindResource("CardBrush");
-        DropDash.Stroke = (Brush)FindResource("BorderBrush");
+        DropCard.SetResourceReference(Control.BorderBrushProperty, "BorderBrush");
+        DropCard.SetResourceReference(Control.BackgroundProperty, "CardBrush");
+        DropDash.SetResourceReference(Shape.StrokeProperty, "BorderBrush");
     }
 
     private void DropTarget_DragOver(object sender, DragEventArgs e)
@@ -117,6 +118,8 @@ public partial class HomePage : Page
         if (_session.SlotConfigurations.All(configuration => configuration is null)) { SetStatusText(UiText.Get("noBlendSlots")); return; }
         if (_processingCts is not null) return;
         var inputPaths = _session.InputPaths.ToArray();
+        var configuration = _session.SlotConfigurations.ElementAtOrDefault(_session.SelectedBlendLevel);
+        if (configuration is null) { SetStatusText(UiText.Get("noBlendSlots")); return; }
         _processingCts = new CancellationTokenSource();
         SetProcessingState(true);
         var progressNotification = _notifications.Show(UiNotificationKind.Progress, UiText.Get("blend"), UiText.Get("processing"), autoDismiss: false);
@@ -129,7 +132,7 @@ public partial class HomePage : Page
         });
         try
         {
-            var results = await _workflow.BlendAsync(inputPaths, _session.Settings, progress, _processingCts.Token);
+            var results = await _workflow.BlendAsync(inputPaths, configuration.Settings, configuration.Name, progress, _processingCts.Token);
             var outputNames = results.Select(result => Path.GetFileName(result.OutputPath)).ToArray();
             SetStatusText(UiText.Get("completed"));
             _notifications.Dismiss(progressNotification);
@@ -230,10 +233,10 @@ public partial class HomePage : Page
         };
         var loadingOverlay = new Border
         {
-            Background = (Brush)FindResource("SurfaceRaisedBrush"),
             Opacity = 0.92,
             Child = new Wpf.Ui.Controls.ProgressRing()
         };
+        loadingOverlay.SetResourceReference(Border.BackgroundProperty, "SurfaceRaisedBrush");
         if (loadingOverlay.Child is Wpf.Ui.Controls.ProgressRing ring)
         {
             ring.IsIndeterminate = true;
@@ -274,7 +277,6 @@ public partial class HomePage : Page
             Width = 21,
             Height = 21,
             CornerRadius = new CornerRadius(11),
-            Background = (Brush)FindResource("CardBrush"),
             BorderBrush = new SolidColorBrush(Color.FromRgb(0xE6, 0xE6, 0xE6)),
             BorderThickness = new Thickness(1),
             HorizontalAlignment = HorizontalAlignment.Right,
@@ -282,20 +284,21 @@ public partial class HomePage : Page
             Margin = new Thickness(0, 0, 3, 0),
             Child = removeButton
         };
+        removeSurface.SetResourceReference(Border.BackgroundProperty, "CardBrush");
         Panel.SetZIndex(removeSurface, 10);
         var card = new Border
         {
             Width = 88,
             Height = 141,
             Padding = new Thickness(6),
-            Background = (Brush)FindResource("SurfaceRaisedBrush"),
-            BorderBrush = (Brush)FindResource("BorderBrush"),
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(8),
             ClipToBounds = false,
             Child = grid,
             ToolTip = path
         };
+        card.SetResourceReference(Border.BackgroundProperty, "SurfaceRaisedBrush");
+        card.SetResourceReference(Border.BorderBrushProperty, "BorderBrush");
         var container = new Grid
         {
             Width = 99,
@@ -360,8 +363,8 @@ public partial class HomePage : Page
     {
         StatusText.Text = text;
         var emptySlots = _session.SlotConfigurations.All(configuration => configuration is null);
-        StatusText.Foreground = (Brush)FindResource(emptySlots ? "MutedTextBrush" : "PillTextBrush");
-        StatusDot.Fill = (Brush)FindResource(emptySlots ? "MutedTextBrush" : "AccentBrush");
+        StatusText.SetResourceReference(TextBlock.ForegroundProperty, emptySlots ? "MutedTextBrush" : "PillTextBrush");
+        StatusDot.SetResourceReference(Shape.FillProperty, emptySlots ? "MutedTextBrush" : "AccentBrush");
     }
     private void SetProcessingState(bool processing)
     {
@@ -378,7 +381,7 @@ public partial class HomePage : Page
         if (!processing) ProcessingProgress.Value = 0;
     }
 
-    private IReadOnlyList<BlendLevelItem> BuildLevelItems() => _session.SlotConfigurations.Select((configuration, index) => configuration is null ? new BlendLevelItem($"{index + 1}", string.Empty, false) : new BlendLevelItem(configuration.Name, $"{UiText.Get("intensity")} {configuration.Intensity}", true, configuration.IconKey, configuration.ColorKey)).ToList();
+    private IReadOnlyList<BlendLevelItem> BuildLevelItems() => _session.SlotConfigurations.Select((configuration, index) => configuration is null ? new BlendLevelItem($"{index + 1}", string.Empty, false) : new BlendLevelItem(configuration.Name, UiText.GetIntensityLevel(configuration.Intensity), true, configuration.IconKey, configuration.ColorKey)).ToList();
 
     private static bool HasPdfDrop(DragEventArgs e) => e.Data.GetDataPresent(DataFormats.FileDrop) && e.Data.GetData(DataFormats.FileDrop) is string[] files && files.Any(path => string.Equals(Path.GetExtension(path), ".pdf", StringComparison.OrdinalIgnoreCase));
 }
