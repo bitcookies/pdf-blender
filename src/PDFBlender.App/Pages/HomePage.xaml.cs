@@ -145,7 +145,7 @@ public partial class HomePage : Page
         {
             SetStatusText(UiText.Get("processingError"));
             _notifications.Dismiss(progressNotification);
-            _notifications.Show(UiNotificationKind.Error, UiText.Get("processingError"), exception.Message, autoDismiss: false);
+            _notifications.Show(UiNotificationKind.Error, UiText.Get("processingError"), UiText.Get(exception is PdfProcessingException pdfError ? pdfError.ErrorKey : exception is IOException or UnauthorizedAccessException ? "pdfPath" : "pdfFailed"), autoDismiss: false);
         }
         finally
         {

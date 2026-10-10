@@ -1,21 +1,9 @@
 namespace PDFBlender.Core.Models;
 
-public enum BlendMode
-{
-    Stir,
-    Blend,
-    Pulse,
-    Crush,
-    Overblend,
-    Custom
-}
-
 public enum ProtectionMethod
 {
     None,
-    Flatten,
-    TextScrambling,
-    PermissionRestriction
+    Flatten
 }
 
 public enum NoiseStrength
@@ -60,17 +48,10 @@ public enum TextureStrength
     Medium
 }
 
-public enum PageImageFormat
-{
-    WebP,
-    Jpeg,
-    Png
-}
-
 public enum ImageQuality
 {
-    Low,
-    Medium,
+    Compact,
+    Standard,
     High,
-    Maximum
+    Lossless
 }

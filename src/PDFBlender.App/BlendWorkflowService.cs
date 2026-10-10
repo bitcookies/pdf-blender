@@ -33,8 +33,9 @@ internal sealed class BlendWorkflowService
             var outputPath = Path.Combine(
                 Path.GetDirectoryName(inputPath) ?? string.Empty,
                 $"{Path.GetFileNameWithoutExtension(inputPath)}_blended.pdf");
+            var completedFiles = index;
             var pageProgress = new Progress<BlendProgress>(value =>
-                progress?.Report(new BlendBatchProgress(index, inputPaths.Count, value)));
+                progress?.Report(new BlendBatchProgress(completedFiles, inputPaths.Count, value)));
             results.Add(await _processor.ProcessAsync(
                 new BlendRequest(inputPath, outputPath, settings),
                 pageProgress,

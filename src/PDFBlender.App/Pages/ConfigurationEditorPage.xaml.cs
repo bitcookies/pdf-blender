@@ -38,7 +38,6 @@ public partial class ConfigurationEditorPage : Page
     private readonly UiToggleSwitch _permissions = new();
     private readonly ComboBox _contentWidthPreset = new();
     private readonly ComboBox _pageSizePreset = new();
-    private readonly ComboBox _imageFormat = new();
     private readonly ComboBox _imageQuality = new();
     private readonly ComboBox _watermarkAngle = new();
     private readonly ComboBox _copyLayerMode = new();
@@ -196,23 +195,25 @@ public partial class ConfigurationEditorPage : Page
         _microText.IsChecked = _settings.MicroTextPattern;
         _copyLayer.IsChecked = _settings.CopyLayer != CopyLayerMode.Preserve;
         _hiddenAi.IsChecked = _settings.HiddenAiText;
-        _promptInjection.IsChecked = !string.IsNullOrWhiteSpace(_settings.PromptInjectionText);
+        _promptInjection.IsChecked = _settings.PromptInjection;
         _promptInjectionText.Text = _settings.PromptInjectionText;
-        _gan.IsChecked = _settings.GanAdversarialPerturbation;
+        _gan.IsChecked = false;
+        _promptInjectionText.AcceptsReturn = true;
+        _promptInjectionText.TextWrapping = TextWrapping.Wrap;
+        _promptInjectionText.Height = 74;
+        _promptInjectionText.MaxLength = 4000;
         _metadata.IsChecked = _settings.MetadataNormalization || _settings.ProtectionDeclaration;
         _permissions.IsChecked = _settings.PermissionRestriction;
 
         _contentWidthPreset.ItemsSource = new[] { PageSizePreset.A5, PageSizePreset.A4, PageSizePreset.A3, PageSizePreset.Letter, PageSizePreset.Legal, PageSizePreset.Custom };
         _contentWidthPreset.SelectedItem = _settings.ContentWidthPreset == PageSizePreset.Original ? PageSizePreset.A4 : _settings.ContentWidthPreset;
         _width.Text = _settings.TargetWidthMillimeters.ToString("0.##", CultureInfo.InvariantCulture);
-        _dpi.ItemsSource = new[] { 120, 150, 180, 200, 300 };
+        _dpi.ItemsSource = new[] { 72, 150, 200, 300, 450, 600 };
         _dpi.SelectedItem = _settings.Dpi;
         _pageSizePreset.ItemsSource = new[] { PageSizePreset.A5, PageSizePreset.A4, PageSizePreset.A3, PageSizePreset.A2, PageSizePreset.Letter, PageSizePreset.Legal };
         _pageSizePreset.SelectedItem = _settings.PageSize == PageSizePreset.Original ? PageSizePreset.A4 : _settings.PageSize;
-        _imageFormat.ItemsSource = new[] { PageImageFormat.WebP, PageImageFormat.Jpeg, PageImageFormat.Png };
-        _imageFormat.SelectedItem = _settings.ImageFormat;
-        _imageQuality.ItemsSource = new[] { ImageQuality.Low, ImageQuality.Medium, ImageQuality.High, ImageQuality.Maximum };
-        _imageQuality.SelectedItem = _settings.ImageQuality;
+        _imageQuality.ItemsSource = new[] { UiText.Get("qualityCompact"), UiText.Get("qualityStandard"), UiText.Get("qualityHigh"), UiText.Get("qualityLossless") };
+        _imageQuality.SelectedIndex = (int)_settings.ImageQuality;
         _watermarkType.ItemsSource = new[] { UiText.Get("text"), UiText.Get("fullPage") };
         _watermarkType.SelectedIndex = Math.Max(0, (int)_settings.Watermark - 1);
         _watermarkAngle.ItemsSource = new[] { -45d, 0d, 45d, 90d };
@@ -233,7 +234,7 @@ public partial class ConfigurationEditorPage : Page
         AddFeature(UiText.Get("normalizePageSize"), UiText.Get("normalizePageSizeHint"), _pageSize, [Labeled(UiText.Get("pageSize"), _pageSizePreset)]);
 
         AddSection(UiText.Get("flattening"));
-        AddFeature(UiText.Get("flatten"), UiText.Get("protectionHint"), _flatten, [Labeled(UiText.Get("dpi"), _dpi), Labeled(UiText.Get("imageFormat"), _imageFormat), Labeled(UiText.Get("imageQuality"), _imageQuality)]);
+        AddFeature(UiText.Get("flatten"), UiText.Get("protectionHint"), _flatten, [Labeled(UiText.Get("dpi"), _dpi), Labeled(UiText.Get("imageQuality"), _imageQuality)]);
 
         AddSection(UiText.Get("watermarkGroup"));
         AddFeature(UiText.Get("watermark"), UiText.Get("watermarkTypeHint"), _watermark, [Labeled(UiText.Get("watermarkType"), _watermarkType), Labeled(UiText.Get("watermarkAngle"), _watermarkAngle), Labeled(UiText.Get("watermarkText"), _watermarkText)]);
@@ -252,11 +253,11 @@ public partial class ConfigurationEditorPage : Page
         AddFeature(UiText.Get("promptInjection"), UiText.Get("promptInjectionHint"), _promptInjection, [Labeled(UiText.Get("promptText"), _promptInjectionText)]);
 
         AddSection(UiText.Get("ganGroup"));
-        AddFeature(UiText.Get("ganPerturbation"), UiText.Get("ganPerturbationHint"), _gan, [], true);
+        AddFeature(UiText.Get("ganPerturbation"), UiText.Get("ganPerturbationHint"), _gan, []);
 
         AddSection(UiText.Get("copyrightProtection"));
         AddFeature(UiText.Get("metadata"), UiText.Get("metadataHint"), _metadata, []);
-        AddFeature(UiText.Get("permissionRestriction"), UiText.Get("permissionHint"), _permissions, [], true);
+        AddFeature(UiText.Get("permissionRestriction"), UiText.Get("permissionHint"), _permissions, []);
 
         _normalize.Checked += (_, _) => { _pageSize.IsChecked = false; UpdateSaveState(); };
         _pageSize.Checked += (_, _) => { _normalize.IsChecked = false; UpdateSaveState(); };
@@ -404,7 +405,7 @@ public partial class ConfigurationEditorPage : Page
             detail.BeginAnimation(FrameworkElement.HeightProperty, animation);
         }
 
-        toggle.IsEnabled = !requiresFlatten || _flatten.IsChecked == true;
+        toggle.IsEnabled = toggle != _gan && (!requiresFlatten || _flatten.IsChecked == true);
         RefreshEnabledVisual();
         toggle.IsEnabledChanged += (_, _) => RefreshEnabledVisual();
         toggle.Checked += (_, _) =>
@@ -471,15 +472,19 @@ public partial class ConfigurationEditorPage : Page
             ErrorText.Text = UiText.Get("configurationNameRequired");
             return;
         }
-        var width = double.TryParse(_width.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var value) ? value : 210;
+        var width = double.TryParse(_width.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var value) ? value : double.NaN;
+        if (_normalize.IsChecked != true && !double.IsFinite(width)) width = 210;
         var settings = _settings with
         {
             NormalizeContentWidth = _normalize.IsChecked == true,
             TargetWidthMillimeters = width,
+            ContentWidthPreset = _contentWidthPreset.SelectedItem is PageSizePreset widthPreset ? widthPreset : PageSizePreset.A4,
             NormalizePageSize = _pageSize.IsChecked == true,
             PageSize = _pageSizePreset.SelectedItem is PageSizePreset pageSize ? pageSize : PageSizePreset.Original,
             Protection = _flatten.IsChecked == true ? ProtectionMethod.Flatten : ProtectionMethod.None,
-            Dpi = _dpi.SelectedItem is int dpi ? dpi : 150,
+            Dpi = _dpi.SelectedItem is int dpi ? dpi : 300,
+            ImageQuality = (ImageQuality)Math.Clamp(_imageQuality.SelectedIndex, 0, 3),
+            WatermarkAngle = _watermarkAngle.SelectedItem is double angle ? angle : -45,
             Watermark = _watermark.IsChecked == true ? (_watermarkType.SelectedIndex == 1 ? WatermarkStyle.FullPage : WatermarkStyle.Text) : WatermarkStyle.None,
             WatermarkText = _watermarkText.Text ?? string.Empty,
             Noise = _noise.IsChecked == true ? (NoiseStrength)Math.Clamp(_noiseLevel.SelectedIndex + 1, 1, 3) : NoiseStrength.Off,
@@ -488,6 +493,9 @@ public partial class ConfigurationEditorPage : Page
             MicroTextPattern = _microText.IsChecked == true,
             CopyLayer = _copyLayer.IsChecked == true ? (CopyLayerMode)Math.Clamp(_copyLayerMode.SelectedIndex + 1, 1, 3) : CopyLayerMode.Preserve,
             HiddenAiText = _hiddenAi.IsChecked == true,
+            PromptInjection = _promptInjection.IsChecked == true,
+            PromptInjectionText = _promptInjectionText.Text ?? string.Empty,
+            GanAdversarialPerturbation = false,
             MetadataNormalization = _metadata.IsChecked == true,
             ProtectionDeclaration = _metadata.IsChecked == true,
             PermissionRestriction = _permissions.IsChecked == true
@@ -495,7 +503,7 @@ public partial class ConfigurationEditorPage : Page
         var errors = SettingsValidator.Validate(settings);
         if (errors.Count > 0)
         {
-            ErrorText.Text = string.Join("\n", errors);
+            ErrorText.Text = string.Join("\n", errors.Select(UiText.Get));
             return;
         }
         _save(_source, _isNew, NameBox.Text.Trim(), settings, _selectedColorKey, _selectedIconKey);

@@ -1,6 +1,6 @@
 # PDF Blender Interface Specification
 
-Status: v0.9.0 lightweight maintenance baseline
+Status: v0.10.0 PDF core controls; existing GUI preserved
 
 ## Visual Direction
 
@@ -21,7 +21,7 @@ The first screen is the working tool, not a marketing page. The compact 820×600
 3. The discrete Blend level rail and a Configuration shortcut.
 4. A clear primary `Blend PDF` action.
 
-The main workflow is `Drop/Browse -> choose Blend level -> Blend PDF`. v0.7.0 accepts one or more PDF files per batch and ignores duplicate paths. Reject unsupported file types clearly and do not start processing before a valid PDF is selected. The output is written beside the input as `<source>_blended.pdf`; the destination is not exposed as a home control. Theme and language controls are absent from the home screen and available in Settings.
+The main workflow is `Drop/Browse -> choose Blend level -> Blend PDF`. The application accepts one or more PDF files per batch and ignores duplicate paths. Reject unsupported file types clearly and do not start processing before a valid PDF is selected. The output is written beside the input as `<source>_blended.pdf`, with `(2)` etc when needed; the destination is not exposed as a home control. Theme and language controls are absent from the home screen and available in Settings.
 
 The shell is a single WPF-UI `FluentWindow` with a fixed 44 px title bar, a WPF-UI `NavigationView` in `LeftFluent` mode fixed at 74 px, and a content `Frame`. Pane expansion is disabled. Home and Configuration appear in the main navigation group; Settings appears in the footer group. The title bar and navigation rail share one shell surface (`#F3F3F3` light / `#202020` dark); the content surface uses `#F9F9F9` light / `#272727` dark, with a 12 px top-left radius. Cards use `#FDFDFD` light / `#323232` dark. Home, Configuration, and Settings share one `AppSession`; language refresh preserves the current selection. Settings also contains the collapsible About section with version, links, license, feedback, and developer information.
 
@@ -38,16 +38,16 @@ The shell uses WPF-UI `NavigationView` item selection with a scoped project temp
 Preferences and configurations are stored under the roaming AppData folder named PDF Blender. Theme, language, selected slot, and the multiple-instance policy restore across restarts; the policy defaults to single-instance. When disabled, startup acquires a per-user named mutex. Preset recovery is handled by adding a fresh copy from the New configuration flow and is not exposed as a Settings command. A malformed file is ignored and replaced by safe defaults.
 
 - Format: Normalize Content Width toggle and configurable target width in millimeters. Clarify that it scales content proportionally rather than converting pages to A4 or equal heights.
-- Protection: mutually exclusive method selector. The current MVP enables Flatten; future methods must be visibly unavailable or absent.
-- Watermark: enable toggle; text, opacity, size, rotation, placement, and repeated-page spacing as applicable.
-- Image: pixel-noise toggle and bounded strength selector.
+- Flatten: explicit toggle, independent DPI (default 300) and Compact/Standard/High/Lossless quality. No exposed image format selector.
+- Watermark: enable toggle, multiline text, angle and Text/Full page type. Opacity/spacing are conservative internal choices.
+- Raster: noise and texture strength, geometry and microtext toggles, all gated by Flatten.
 - Output is automatic: the original remains untouched and the generated file uses the `_blended.pdf` suffix in the source directory.
 
-Configurations and Blend Modes are selectors, not decorative badges. Changing an individual setting marks the selected level as modified/custom.
+Configurations are selectable alternative settings snapshots. Editing updates that configuration; no multi-slot processing chain is implied.
 
 ## Processing States
 
-Represent empty, file selected, validating, processing, cancelling, completed, and error states. During work, show a page-based progress description when available, a progress indicator, and a Cancel command. Disable conflicting commands while processing. Completion offers an obvious way to open the output or its folder. Errors use plain language with optional technical details, never a raw stack trace in the primary message.
+Represent empty, file selected, validating, processing, cancelling, completed, and error states. During work, show a page-based progress description when available, a progress indicator, and a Cancel command. Disable conflicting commands while processing. Completion displays the actual generated filenames. Errors use plain language with optional technical details, never a raw stack trace in the primary message.
 
 ## Accessibility and Responsiveness
 
@@ -55,14 +55,21 @@ Support keyboard access for import, selectors, settings, and the primary action.
 
 The WPF process is Per-Monitor V2 DPI aware. Windows scaling from 100% through 300%, including moving a window between monitors with different scales, must preserve device-independent layout dimensions and trigger a visual re-measure. Images use high-quality bitmap scaling and must not be replaced with low-resolution runtime copies.
 
-## v0.7.0 Configuration Cards
+## Configuration Cards
 
-The Configuration page shows five fixed 72 px Home blend slots followed by a separator and a five-column compact configuration grid. Empty slots center the Add icon above the level-specific drop label. Occupied slots use one solid rounded border and show the configuration icon, name, short ID, intensity label, and remove action.
+The Configuration page shows five fixed 72 px Home blend slots followed by a separator and a five-column compact configuration grid. Empty slots center the Add icon above the level-specific drop label. Occupied slots use one solid rounded border and show the configuration icon, name, short ID and take-off action.
 
 Configuration cards are fixed at 72 px high. The icon, content, metadata, and three-dot action area use stable grid columns. The menu uses WPF-UI MenuItem entries and an explicit PlacementTarget so it opens below the clicked button.
 
-New configuration, preset selection, and editing are nested pages under BreadcrumbBar. The creation flow has no ContentDialog. A locked configuration disables edit and delete while leaving unlock available. Configuration persistence schema 6 adds IconKey and migrates older files.
+New configuration, preset selection, and editing are nested pages under BreadcrumbBar. The creation flow has no ContentDialog. A locked configuration disables edit and delete while leaving unlock available. Configuration persistence schema 9 resets unpublished older development files without changing preferences.
 
 ## Configuration Page Revision
 
-Empty slots render the Add icon and the level-specific drop label inside the tile. Configuration cards use WPF-UI icons, five fixed columns, stable grid alignment, and a menu whose PlacementTarget is the three-dot button. Schema 6 adds IconKey and migrates older configuration files.
+Empty slots render the Add icon and the level-specific drop label inside the tile. Configuration cards use WPF-UI icons, five fixed columns, stable grid alignment, and a menu whose PlacementTarget is the three-dot button. Schema 9 stores stable ShortId, ColorKey and IconKey.
+
+## v0.10 PDF Feature Controls
+All switches default off; name and at least one feature are required for a new custom config. Width and paper normalization are mutually exclusive. Width offers presets and Custom mm; page size fits centered into standard paper. Save/reopen retains preset, mm, DPI, quality, angle/text and every feature toggle.
+
+Keep existing section/card layout and animations. Copy-layer modes require Flatten and warn about copying/search/accessibility. Permissions operate without Flatten and warn about bypassability. Hidden notice and custom prompt are separate opt-in features, with multiline bounded text. GAN stays visibly disabled/experimental.
+
+Localized model and processing errors explain invalid dependencies, malformed/password-protected/signed files, missing fonts, oversized pages, memory and filesystem errors. Never show extracted text or raw stack traces. Quality Lossless means PNG encoding, not vector preservation.

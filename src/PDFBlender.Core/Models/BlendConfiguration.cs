@@ -43,7 +43,7 @@ public static class BlendFeatureCatalog
         BlendFeature.UnicodeScramble => settings.CopyLayer == CopyLayerMode.UnicodeScramble,
         BlendFeature.TextLayoutPerturbation => settings.CopyLayer == CopyLayerMode.TextLayoutPerturbation,
         BlendFeature.GibberishCopyLayer => settings.CopyLayer == CopyLayerMode.ReplaceWithGibberish,
-        BlendFeature.HiddenAiText => settings.HiddenAiText, BlendFeature.PromptInjection => !string.IsNullOrWhiteSpace(settings.PromptInjectionText), BlendFeature.GanAdversarialPerturbation => settings.GanAdversarialPerturbation, BlendFeature.MetadataNormalization => settings.MetadataNormalization || settings.ProtectionDeclaration,
+        BlendFeature.HiddenAiText => settings.HiddenAiText, BlendFeature.PromptInjection => settings.PromptInjection, BlendFeature.GanAdversarialPerturbation => settings.GanAdversarialPerturbation, BlendFeature.MetadataNormalization => settings.MetadataNormalization || settings.ProtectionDeclaration,
         BlendFeature.PermissionRestriction => settings.PermissionRestriction,
         _ => false
     };
@@ -65,7 +65,7 @@ public static class BlendFeatureCatalog
         BlendFeature.UnicodeScramble when settings.CopyLayer == CopyLayerMode.UnicodeScramble => 4,
         BlendFeature.TextLayoutPerturbation when settings.CopyLayer == CopyLayerMode.TextLayoutPerturbation => 5,
         BlendFeature.GibberishCopyLayer when settings.CopyLayer == CopyLayerMode.ReplaceWithGibberish => 7,
-        BlendFeature.HiddenAiText when settings.HiddenAiText => 7, BlendFeature.PromptInjection when !string.IsNullOrWhiteSpace(settings.PromptInjectionText) => 7, BlendFeature.GanAdversarialPerturbation when settings.GanAdversarialPerturbation => 8, BlendFeature.PermissionRestriction when settings.PermissionRestriction => 1,
+        BlendFeature.HiddenAiText when settings.HiddenAiText => 7, BlendFeature.PromptInjection when settings.PromptInjection => 7, BlendFeature.GanAdversarialPerturbation when settings.GanAdversarialPerturbation => 8, BlendFeature.PermissionRestriction when settings.PermissionRestriction => 1,
         _ => 0
     };
 }
@@ -93,11 +93,11 @@ public static class BuiltInConfigurations
 {
     public static IReadOnlyList<BlendConfiguration> All { get; } =
     [
-        new("format-only", "Format Only", true, new BlendSettings { NormalizeContentWidth = true, NormalizePageSize = true, PageSize = PageSizePreset.A4 }, true),
+        new("format-only", "Format Only", true, new BlendSettings { NormalizeContentWidth = true }, true),
         new("light-mark", "Light Mark", true, new BlendSettings { NormalizeContentWidth = true, Watermark = WatermarkStyle.Text }, true),
         new("reading-first", "Reading First", true, new BlendSettings { NormalizeContentWidth = true, Watermark = WatermarkStyle.FullPage, MetadataNormalization = true, ProtectionDeclaration = true }, true),
         new("balanced-protection", "Balanced Protection", true, new BlendSettings { NormalizeContentWidth = true, Protection = ProtectionMethod.Flatten, Watermark = WatermarkStyle.Text, Noise = NoiseStrength.Low, PermissionRestriction = true }, true),
-        new("copy-layer-shield", "Copy Layer Shield", true, new BlendSettings { NormalizeContentWidth = true, Protection = ProtectionMethod.Flatten, CopyLayer = CopyLayerMode.ReplaceWithGibberish, Dpi = 180 }, true)
+        new("copy-layer-shield", "Copy Layer Shield", true, new BlendSettings { NormalizeContentWidth = true, Protection = ProtectionMethod.Flatten, CopyLayer = CopyLayerMode.ReplaceWithGibberish, ImageQuality = ImageQuality.High }, true)
     ];
 
     public static IReadOnlySet<string> RetiredIds { get; } =

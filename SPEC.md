@@ -1,105 +1,65 @@
 # PDF Blender Product Specification
 
-Status: v0.9.0 lightweight maintenance baseline
-Product: PDF Blender  
+Status: v0.10.0 PDF core implementation
+Product: PDF Blender
 Slogan: `DO NOT PLAGIARIZE MY PDF.`
 
 ## Purpose
-
-PDF Blender creates a new, ordinarily readable PDF from a source PDF while raising the cost of direct text copying, image extraction, OCR reuse, and simple automated reuse. It does not encrypt documents, restrict who can read them, or promise copy protection. Human readability always outranks machine resistance.
+PDF Blender creates publicly readable PDFs while raising the cost of extraction and reuse. Human readability and visual fidelity take priority. It is not DRM or guaranteed copying/OCR/AI resistance. Processing is local and document contents are never uploaded or logged.
 
 ## Platform and Identity
+- Windows, C# / .NET 10, WPF and WPF-UI 4.3.0.
+- Current version `0.10.0`; executable/package version `0.10.0.0`.
+- Reserved Store identity: Package Identity Name `57335Bitcookies.PDFBlender`; Publisher `CN=53636128-C1AF-456C-8B82-AC0D583B730C`; Publisher display name `Bitcookies`; Store ID `9P65BNNQRGVZ`.
+- Store owns update delivery. Do not hard-code an unpublished Store URL or build an updater.
+- Development portable publishing uses `pwsh ./build.ps1 1 -Force`. MSIX packaging is not yet configured; `build.ps1 2` reports the missing packaging project.
 
-- Windows desktop application, C# / .NET 10, WPF, Fluent-inspired UI.
-- Microsoft Store is the sole release channel; release packaging is MSIX. Development builds may include a portable package.
-- Current version: `0.9.0`; package version: `0.9.0.0`.
-- Microsoft Store handles updates. No custom update service is in scope.
-- Preserve the reserved Store identity: Package Identity Name `57335Bitcookies.PDFBlender`; Publisher `CN=53636128-C1AF-456C-8B82-AC0D583B730C`; Publisher display name `Bitcookies`; Store ID `9P65BNNQRGVZ`. Do not change it or hard-code a Store URL before publication.
+## Configuration and Workflow
+The first run has no configurations and five empty slots. Users explicitly create a custom config or copy a localized preset; duplicate names receive `(2)` etc. Name and at least one enabled feature are required for new custom configs. Features default off. Configurations can be edited, copied, locked/unlocked and deleted. Lock blocks edit/delete. ShortId, ColorKey and IconKey are stable metadata.
 
-## v0.7.0 Scope
+The five slots are alternative configurations. Selecting one runs its settings for the batch; slots are not sequential pipeline stages. Empty slots remain disabled. Existing Home, Settings and configuration layouts remain unchanged in v0.10.
 
-This release refines the WPF shell, reusable visual resources, page layouts, and lightweight motion. It does not add PDF protection algorithms, change output semantics, or add network services.
+Schema 9 intentionally clears older unpublished development configurations and slots. Preferences are separate and survive this reset.
 
-- Compact single-window home layout at `820×600`, with a `760×540` minimum and a compact icon-and-label navigation rail.
-- Settings-only software controls, supporting System/Light/Dark and System/English/简体中文, and an Allow multiple instances toggle disabled by default.
-- A snapped, keyboard-accessible Blend level rail showing the validated `STIR`, `BLEND`, and `PULSE` presets.
-- Local preferences and configuration cards at the roaming AppData folder named PDF Blender, with safe defaults for malformed values.
-- Logo-derived multi-size `logo.ico` used by the WPF window and executable.
-- Shared color, typography, surface, button, and input resource dictionaries layered over WPF-UI theme/control dictionaries.
-- Compact logo-led home header, bordered PDF drop surface, setting rows, and theme-aware notification cards.
-- Page transitions adapt to Windows client-area animation and the active WPF render tier.
+## Stable PDF Functions
+### Native layout
+Width normalization proportionally scales content to a chosen width in mm, retaining different page heights. Page size normalization fits content centered into A5/A4/A3/A2/Letter/Legal, selecting portrait or landscape from the source. These modes are exclusive and never implicitly flatten. Rotation and CropBox/MediaBox are handled. Simple URI links and markup coordinates transform with content. Widgets, appearance-bearing annotations, internal destinations and nonstandard UserUnit transformations fail explicitly when safe geometry cannot be guaranteed.
 
-The processing scope below remains the v0.1.0 MVP behavior carried forward unchanged.
+### Explicit image flattening
+Only Flatten replaces page objects with images. Default 300 DPI; selectable 72/150/200/300/450/600. Quality is Compact (JPEG 65), Standard (JPEG 85), High (JPEG 95) or Lossless (PNG). Encoding lossless does not preserve vectors. No image-format selector or WebP option exists. Rendering and output each have a 40-million-pixel page cap. Pages process sequentially with cancellation checks between operations.
 
-The first usable release accepts one or more input PDFs per operation and includes:
+### Watermarks and raster effects
+Watermarks accept multiline custom text, selectable angle, a single central mark or faint full-page repetition. They work in native and raster paths. Pixel noise, texture, bounded one-pixel geometry shifts and microtext require Flatten. Conservative amplitudes preserve human reading; these are no guarantee of OCR resistance.
 
-- Browse and drag/drop import, input summary, and automatic output name `<source>_blended.pdf` beside the source without overwriting it.
-- Local PDF rendering and reconstruction, with progress, cancellation, understandable errors, and temporary-file cleanup.
-- Optional Normalize Content Width, Flatten, raster quality/DPI, text watermark, repeated full-page watermark, and conservative pixel noise.
-- Basic persistent Configurations and Blend Mode presets that can be manually overridden per level.
-- Light, dark, and system themes; Simplified Chinese and English, with system-language selection.
-- A fast startup path: defer PDF engine initialization and other expensive work until needed; do not block the first window on nonessential work.
-- Build/test and portable-package workflows, plus Store-compatible MSIX packaging. `build.ps1` will return distinct documented numeric result codes.
+### Copy layers
+Without Flatten, original selectable text is preserved. Flatten with CopyLayer Preserve means no restored copy layer. Explicit copy modes require Flatten and original extractable letters:
+- Unicode scramble creates randomized Greek character replacements at original geometry.
+- Text layout perturbation preserves characters/positions but randomizes text-object order.
+- Gibberish creates fresh randomized Cyrillic character replacements at original geometry; original text, fonts, attachments and original page objects are not copied.
+Mixed image/text pages are accepted; an entirely text-free document requested with a copy layer fails. Copy/search/accessibility may degrade and are disclosed in feature hints.
 
-### Normalize Content Width
+### Hidden machine text
+Built-in bilingual passive machine-processing notice and optional custom text are independently off by default. Custom text must be nonempty and at most 4000 characters. Pure invisible text rendering mode 3 with Artifact marking is prepended to page one. No scripts/actions/links are inserted. Extractors may expose or reorder it; no AI obedience or universal priority is promised.
 
-Normalize the visual content width to a configurable target while preserving each page's aspect ratio. For example, `1000 x 210` becomes `210 x 44.1`, and `210 x 297` remains `210 x 297`. This is not A4 conversion: do not crop, stretch, force equal heights, or change page dimensions unless the selected output representation requires it. The UI must explain the distinction between content width and physical page size.
+### Metadata and advisory permissions
+Title, Author, Subject and Keywords survive raster rebuilding. Normalization sets Creator/Producer/modification date; declaration appends to Subject. Reader-dependent permission restrictions are independent of Flatten. Standard PDF permission encryption uses an empty opening password and random internal owner password; reading, printing and accessibility remain allowed, copying/modification restricted. Owner passwords are not exposed, stored or logged. Restrictions are bypassable, not an access/security boundary.
 
-### Flatten and Quality
+## Optional Presets
+| ID | English | Chinese | Enabled combination |
+|---|---|---|---|
+| format-only | Format Only | 仅格式整理 | A4 width |
+| light-mark | Light Mark | 轻度标识 | A4 width + text watermark |
+| reading-first | Reading First | 阅读优先 | A4 width + faint repeat watermark + metadata/declaration |
+| balanced-protection | Balanced Protection | 平衡保护 | A4 width + 300 DPI Standard flatten + low noise + watermark + permissions |
+| copy-layer-shield | Copy Layer Shield | 复制层防护 | A4 width + 300 DPI High flatten + gibberish, copying unrestricted |
 
-Flatten renders pages to raster content and rebuilds the PDF so the original text and image objects are not preserved in their original independently extractable form. Quality controls must be validated on representative documents. No DPI or setting may be described as a guarantee of protection.
+## Validation and Output Safety
+Validate active finite dimensions (10-2000 mm), DPI (72-600), supported enums, watermark text/angle and prompt constraints in Core and editor. Raster prerequisites and mutually exclusive layout are enforced in both. GAN remains disabled/experimental and enabling it is rejected.
 
-### Watermarks and Noise
+Batch processing is asynchronous and cancellable; earlier successful files survive a later failure. Output is beside source as `<source>_blended.pdf`, then `(2)`, `(3)` etc. Input and existing output are never overwritten, including concurrent commit races. Same-directory temporary output is committed only on success; failure/cancellation removes it. Signed PDFs reject modifications. Damaged/password/font/page-memory/path problems have localized errors without content logging.
 
-Support an ordinary text watermark and a repeated full-page pattern with configurable text, size, opacity, rotation, position/spacing. Pixel noise is conservative and defaults to a very low strength. Quality degradation must remain bounded; disable or lower an effect when it harms legibility or figures.
+## Verification
+See `docs/pdf-v010-verification.md` for structural, extraction, pixel and render checks. Synthetic fixtures cover Chinese/English, formulas, tables/charts, transparent images, native/raster objects, portrait/landscape/multiple pages and cropped rotations. External viewer and MSIX compatibility must not be claimed without checks.
 
-## Blend Modes
-
-Blend Modes are editable configuration presets. Changing a setting marks the selection `Custom` or `<MODE> · Modified`.
-
-| Mode | Current intent |
-| --- | --- |
-| `STIR` | Light touch: normalize width; no flatten; watermark off by default. |
-| `BLEND` | Recommended: normalize, flatten at 150 DPI, text watermark, low noise. |
-| `PULSE` | Stronger: normalize, flatten at 120 DPI, full-page watermark, medium noise. |
-| `CRUSH` | Future preset; do not ship until quality limits and behavior are validated. |
-| `OVERBLEND` | Experimental/future preset; never permit unbounded degradation. |
-
-Modes express processing presets, not security levels. The user can turn individual functions on or off and adjust supported settings.
-
-## Configuration and Settings
-
-Configuration contains Format, Protection, Watermark, and Image controls for the selected level. Settings contains appearance, language, notification, and storage/runtime controls. The home screen exposes only import, Blend Mode, Configuration shortcut, and the primary Blend action.
-
-Primary protection methods are mutually exclusive: None, Flatten, Text Scrambling, or PDF Permission Restriction. v0.1.0 implements Flatten only. Watermarks and image processing can compose with the selected primary method.
-
-## Deferred Features
-
-Do not block v0.1.0 on Text Scrambling, PDF permission restrictions, keyed/dynamic watermarks, key management, identity records, reusable templates, batch processing, color/grain/edge/frequency perturbation, or AI-readable notices and prompt-injection text. Any future AI-directed text is only a notice; never claim arbitrary AI systems must obey it.
-
-## Privacy, Reliability, and Acceptance
-
-- Process files locally. Do not add document-content telemetry.
-- Never log PDF content, extracted text, private document data, or secrets.
-- Handle damaged and password-protected PDFs, unsupported features, oversized pages, memory pressure, invalid output paths, render failures, and cancellation with clear messages.
-- Never overwrite the source by default.
-- Validate rendering and output using real documents containing Chinese and English, formulas, tables, charts, vectors, raster images, transparent PNGs, varied fonts, portrait/landscape pages, and multiple pages.
-- Width normalization must preserve aspect ratio without cropping/stretching or forcing A4/equal heights. Flatten must remain visually readable and open in normal readers. Watermarks must be configurable and non-destructive. Configurations must persist across restarts.
-
-## Explicitly Out of Scope
-
-Cloud processing, accounts, DRM, guaranteed copy prevention, custom update checks, and advanced experimental protection features are not part of the initial release.
-
-## v0.7.0 Configuration Presets
-
-Configuration is organized as cards. The page shows five Home blend slots first, a separator, then one merged `Blend configurations` section. On first use the application starts with no configurations. Users create custom configurations or add localized presets explicitly. Users can create custom configurations or add a copy of a built-in preset from the New configuration flow. Copied presets receive a unique suffix when the name already exists. Users can rename, edit, lock, unlock, and delete any configuration. A locked configuration cannot be edited or deleted.
-
-Each configuration owns its enabled features and feature-specific values. Only enabled features expand their detail controls. The implemented feature set is Normalize Content Width, Flatten, Watermark, and conservative Pixel Noise. Deferred protection and prompt-injection ideas remain absent from the working controls.
-
-Configuration intensity is the strongest enabled feature weight on a 0-9 scale. Width normalization is 0; text watermark is 3; full-page watermark is 5; flatten and high noise are 6; medium noise is 4; low noise is 2. Home has five ordered slot positions, preserves empty positions, and displays only occupied positions as selectable levels; empty positions are visibly disabled.
-
-Configuration and preferences are stored under the roaming AppData folder named PDF Blender. The application does not read the removed local PDFBlender folder.
-
-## v0.7.0 Configuration UI Revision
-
-The configuration page uses five compact slot tiles and a five-column configuration card grid. Slot instructions are rendered inside empty tiles rather than as a separate paragraph. New and edit flows are nested pages with BreadcrumbBar; creation is not a dialog. Configuration schema 6 persists ShortId, ColorKey, and IconKey, with migration from schemas 1-5.
+## Deferred
+GAN, adversarial neural models, unverified font substitutions, custom crypto/key management, structural corruption, cloud services and guaranteed extraction prevention remain outside stable v0.10.

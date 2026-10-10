@@ -28,13 +28,13 @@ public sealed class BlendSettingsTests
             Noise = NoiseStrength.Low
         });
 
-        Assert.Contains(errors, error => error.Contains("flattening", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(errors, error => error == "validationFlattenRequired");
     }
 
     [Fact]
     public void ValidatorRejectsUnsafeDpiAndWidth()
     {
-        var errors = SettingsValidator.Validate(new BlendSettings { Dpi = 20, TargetWidthMillimeters = 1 });
+        var errors = SettingsValidator.Validate(new BlendSettings { Protection = ProtectionMethod.Flatten, NormalizeContentWidth = true, Dpi = 20, TargetWidthMillimeters = 1 });
         Assert.Equal(2, errors.Count);
     }
 
@@ -42,7 +42,7 @@ public sealed class BlendSettingsTests
     public void BuiltInConfigurationsContainStableLocalizedPresetIds()
     {
         Assert.Equal(5, BuiltInConfigurations.All.Count);
-        Assert.All(BuiltInConfigurations.All, configuration => Assert.True(configuration.IsBuiltIn));
+        Assert.All(BuiltInConfigurations.All, configuration => { Assert.True(configuration.IsBuiltIn); Assert.Empty(SettingsValidator.Validate(configuration.Settings)); });
         Assert.Equal("format-only", BuiltInConfigurations.All[0].Id);
         Assert.Equal("copy-layer-shield", BuiltInConfigurations.All[4].Id);
         Assert.Equal(0, BuiltInConfigurations.All[0].Intensity);
@@ -61,5 +61,37 @@ public sealed class BlendSettingsTests
             Noise = NoiseStrength.Low
         };
         Assert.Equal(4, ConfigurationIntensity.For(fullPageWatermarkAndLowNoise));
+    }
+
+    [Fact]
+    public void DisabledParametersDoNotBlockProcessingAndPermissionsDoNotRequireFlattening()
+    {
+        Assert.Empty(SettingsValidator.Validate(new BlendSettings { Dpi = 0, TargetWidthMillimeters = double.NaN }));
+        Assert.Empty(SettingsValidator.Validate(new BlendSettings { PermissionRestriction = true }));
+        Assert.Contains("validationGanUnsupported", SettingsValidator.Validate(new BlendSettings { GanAdversarialPerturbation = true }));
+        Assert.Contains("validationWidth", SettingsValidator.Validate(new BlendSettings { NormalizeContentWidth = true, TargetWidthMillimeters = double.NaN }));
+        Assert.Contains("validationPrompt", SettingsValidator.Validate(new BlendSettings { PromptInjection = true }));
+        Assert.Contains("validationAngle", SettingsValidator.Validate(new BlendSettings { Watermark = WatermarkStyle.Text, WatermarkAngle = double.PositiveInfinity }));
+    }
+
+    [Fact]
+    public void ActiveParameterSnapshotRoundTripsWithoutLosingSelections()
+    {
+        var settings = new BlendSettings
+        {
+            NormalizeContentWidth = true, ContentWidthPreset = PageSizePreset.Custom, TargetWidthMillimeters = 190.5,
+            Protection = ProtectionMethod.Flatten, Dpi = 450, ImageQuality = ImageQuality.Lossless,
+            Watermark = WatermarkStyle.FullPage, WatermarkAngle = 45, WatermarkText = "中文 Watermark",
+            Noise = NoiseStrength.Medium, Texture = TextureStrength.Low, GeometryPerturbation = true,
+            MicroTextPattern = true, CopyLayer = CopyLayerMode.UnicodeScramble, HiddenAiText = true,
+            PromptInjection = true, PromptInjectionText = "Synthetic prompt", MetadataNormalization = true,
+            ProtectionDeclaration = true, PermissionRestriction = true
+        };
+        Assert.Empty(SettingsValidator.Validate(settings));
+        var json = System.Text.Json.JsonSerializer.Serialize(settings);
+        Assert.Equal(settings, System.Text.Json.JsonSerializer.Deserialize<BlendSettings>(json));
+        Assert.False(BlendSettings.Default.PromptInjection);
+        Assert.Equal(300, BlendSettings.Default.Dpi);
+        Assert.Equal(ImageQuality.Standard, BlendSettings.Default.ImageQuality);
     }
 }
