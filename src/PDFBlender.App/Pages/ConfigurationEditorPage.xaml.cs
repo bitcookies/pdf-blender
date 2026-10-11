@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using TextBlock = System.Windows.Controls.TextBlock;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -43,6 +44,18 @@ public partial class ConfigurationEditorPage : Page
     private readonly ComboBox _copyLayerMode = new();
     private readonly ComboBox _textureLevel = new();
     private readonly UiTextBox _promptInjectionText = new();
+    private readonly UiTextBox _copyLayerCustomText = new();
+    private readonly UiTextBox _metadataAuthor = new();
+    private readonly UiTextBox _metadataOrganization = new();
+    private readonly UiTextBox _metadataCopyright = new();
+    private readonly UiButton _promptTemplates = new();
+    private readonly HashSet<string> _selectedPromptTemplateIds = new(StringComparer.OrdinalIgnoreCase);
+    private readonly List<CheckBox> _promptTemplateChecks = [];
+    private readonly CheckBox _allowPrinting = new();
+    private readonly CheckBox _allowCopying = new();
+    private readonly CheckBox _allowModification = new();
+    private readonly CheckBox _allowAnnotations = new();
+    private readonly CheckBox _allowForms = new();
     private readonly UiToggleSwitch _promptInjection = new();
     private readonly UiToggleSwitch _gan = new();
     private readonly UiTextBox _width = new();
@@ -204,6 +217,19 @@ public partial class ConfigurationEditorPage : Page
         _promptInjectionText.TextWrapping = TextWrapping.Wrap;
         _promptInjectionText.Height = 74;
         _promptInjectionText.MaxLength = 4000;
+        _copyLayerCustomText.Text = _settings.CopyLayerCustomText;
+        _copyLayerCustomText.AcceptsReturn = true;
+        _copyLayerCustomText.TextWrapping = TextWrapping.Wrap;
+        _copyLayerCustomText.MaxLength = 4000;
+        _metadataAuthor.Text = _settings.MetadataAuthorName;
+        _metadataOrganization.Text = _settings.MetadataOrganization;
+        _metadataCopyright.Text = _settings.MetadataCopyright;
+        _allowPrinting.IsChecked = _settings.PermissionAllowPrinting;
+        _allowCopying.IsChecked = _settings.PermissionAllowCopying;
+        _allowModification.IsChecked = _settings.PermissionAllowModification;
+        _allowAnnotations.IsChecked = _settings.PermissionAllowAnnotations;
+        _allowForms.IsChecked = _settings.PermissionAllowFormFilling;
+        ConfigurePromptTemplatePicker();
         _metadata.IsChecked = _settings.MetadataNormalization || _settings.ProtectionDeclaration;
         _permissions.IsChecked = _settings.PermissionRestriction;
 
@@ -218,7 +244,7 @@ public partial class ConfigurationEditorPage : Page
         _pageHeight.Text = _settings.PageHeightMillimeters.ToString("0.##", CultureInfo.InvariantCulture);
         _imageQuality.ItemsSource = new[] { UiText.Get("qualityCompact"), UiText.Get("qualityStandard"), UiText.Get("qualityHigh"), UiText.Get("qualityLossless") };
         _imageQuality.SelectedIndex = (int)_settings.ImageQuality;
-        _watermarkType.ItemsSource = new[] { UiText.Get("text"), UiText.Get("fullPage") };
+        _watermarkType.ItemsSource = new[] { UiText.Get("singleWatermark"), UiText.Get("repeatedWatermark") };
         _watermarkType.SelectedIndex = Math.Max(0, (int)_settings.Watermark - 1);
         _watermarkAngle.ItemsSource = new[] { -45d, 0d, 45d, 90d };
         _watermarkAngle.SelectedItem = _settings.WatermarkAngle;
@@ -228,13 +254,13 @@ public partial class ConfigurationEditorPage : Page
         _watermarkText.Height = 74;
         _noiseLevel.ItemsSource = new[] { UiText.Get("low"), UiText.Get("medium"), UiText.Get("high") };
         _noiseLevel.SelectedIndex = Math.Max(0, (int)_settings.Noise - 1);
-        _textureLevel.ItemsSource = new[] { UiText.Get("low"), UiText.Get("medium") };
+        _textureLevel.ItemsSource = new[] { UiText.Get("low"), UiText.Get("medium"), UiText.Get("high") };
         _textureLevel.SelectedIndex = Math.Max(0, (int)_settings.Texture - 1);
-        _copyLayerMode.ItemsSource = new[] { UiText.Get("unicodeScramble"), UiText.Get("textLayoutPerturbation"), UiText.Get("gibberishCopyLayer") };
-        _copyLayerMode.SelectedIndex = Math.Clamp((int)_settings.CopyLayer - 1, 0, 2);
+        _copyLayerMode.ItemsSource = new[] { UiText.Get("unicodeScramble"), UiText.Get("textLayoutPerturbation"), UiText.Get("gibberishCopyLayer"), UiText.Get("customWarning") };
+        _copyLayerMode.SelectedIndex = Math.Clamp((int)_settings.CopyLayer - 1, 0, 3);
 
         AddSection(UiText.Get("pageFormat"));
-        AddFeature(UiText.Get("normalizeWidth"), UiText.Get("normalizeHint"), _normalize, [Labeled(UiText.Get("targetWidthPreset"), _contentWidthPreset), Labeled(UiText.Get("targetWidth"), _width)]);
+        AddFeature(UiText.Get("normalizeWidth"), UiText.Get("normalizeHint"), _normalize, [Labeled(UiText.Get("targetWidthPreset"), _contentWidthPreset), Labeled(UiText.Get("pageWidth"), _width)]);
         AddFeature(UiText.Get("normalizePageSize"), UiText.Get("normalizePageSizeHint"), _pageSize, [
             Labeled(UiText.Get("pageSize"), _pageSizePreset),
             Labeled(UiText.Get("pageWidth"), _pageWidth),
@@ -254,27 +280,91 @@ public partial class ConfigurationEditorPage : Page
         AddFeature(UiText.Get("microTextPattern"), UiText.Get("microTextPatternHint"), _microText, [], true);
 
         AddSection(UiText.Get("copyGroup"));
-        AddFeature(UiText.Get("copyLayer"), UiText.Get("copyLayerHint"), _copyLayer, [Labeled(UiText.Get("copyLayerMode"), _copyLayerMode)], true);
+        AddFeature(UiText.Get("copyLayer"), UiText.Get("copyLayerHint"), _copyLayer, [Labeled(UiText.Get("copyLayerMode"), _copyLayerMode), Labeled(UiText.Get("customWarning"), _copyLayerCustomText)], true);
 
         AddSection(UiText.Get("promptInjectionGroup"));
-        AddFeature(UiText.Get("hiddenAiText"), UiText.Get("hiddenAiTextHint"), _hiddenAi, []);
+        AddFeature(UiText.Get("hiddenAiText"), UiText.Get("hiddenAiTextHint"), _hiddenAi, [Labeled(UiText.Get("promptTemplates"), _promptTemplates)]);
         AddFeature(UiText.Get("promptInjection"), UiText.Get("promptInjectionHint"), _promptInjection, [Labeled(UiText.Get("promptText"), _promptInjectionText)]);
 
         AddSection(UiText.Get("ganGroup"));
         AddFeature(UiText.Get("ganPerturbation"), UiText.Get("ganPerturbationHint"), _gan, []);
 
         AddSection(UiText.Get("copyrightProtection"));
-        AddFeature(UiText.Get("metadata"), UiText.Get("metadataHint"), _metadata, []);
-        AddFeature(UiText.Get("permissionRestriction"), UiText.Get("permissionHint"), _permissions, []);
+        AddFeature(UiText.Get("metadata"), UiText.Get("metadataHint"), _metadata, [Labeled(UiText.Get("author"), _metadataAuthor), Labeled(UiText.Get("organization"), _metadataOrganization), Labeled(UiText.Get("copyright"), _metadataCopyright)]);
+        AddFeature(UiText.Get("permissionRestriction"), UiText.Get("permissionHint"), _permissions, [CreatePermissionOptions()]);
+        UpdateCopyLayerDetailsVisibility();
 
         _normalize.Checked += (_, _) => { _pageSize.IsChecked = false; UpdateSaveState(); };
         _pageSize.Checked += (_, _) => { _normalize.IsChecked = false; UpdateSaveState(); };
         _contentWidthPreset.SelectionChanged += (_, _) => UpdateWidthFromPreset();
         _pageSizePreset.SelectionChanged += (_, _) => UpdatePageSizeFromPreset();
+        _copyLayerMode.SelectionChanged += (_, _) => { UpdateCopyLayerDetailsVisibility(); UpdateSaveState(); };
+
+        _copyLayerCustomText.TextChanged += (_, _) => UpdateSaveState();
         UpdateWidthFromPreset();
         UpdatePageSizeFromPreset();
     }
 
+    private void ConfigurePromptTemplatePicker()
+    {
+        _selectedPromptTemplateIds.Clear();
+        _selectedPromptTemplateIds.UnionWith(_settings.PromptTemplateIds ?? Array.Empty<string>());
+        _promptTemplates.Content = UiText.Get("promptTemplates");
+        _promptTemplates.HorizontalContentAlignment = HorizontalAlignment.Left;
+        _promptTemplates.Height = 38;
+        _promptTemplates.Appearance = ControlAppearance.Secondary;
+        var popup = new Popup
+        {
+            PlacementTarget = _promptTemplates,
+            Placement = PlacementMode.Bottom,
+            StaysOpen = false,
+            AllowsTransparency = true,
+            Child = new Border
+            {
+                Background = (Brush)FindResource("CardBrush"),
+                BorderBrush = (Brush)FindResource("BorderBrush"),
+                BorderThickness = new Thickness(1),
+                Padding = new Thickness(8),
+                Child = new StackPanel { Width = 280 }
+            }
+        };
+        var choices = (StackPanel)((Border)popup.Child).Child;
+        _promptTemplateChecks.Clear();
+        for (var i = 0; i < PromptTemplateCatalog.Ids.Count; i++)
+        {
+            var check = new CheckBox
+            {
+                Content = UiText.Get(new[] { "promptTemplatePriority", "promptTemplateRedirection", "promptTemplateRefusal", "promptTemplateClassical" }[i]),
+                Tag = PromptTemplateCatalog.Ids[i],
+                IsChecked = _selectedPromptTemplateIds.Contains(PromptTemplateCatalog.Ids[i]),
+                Margin = new Thickness(2, 4, 2, 4)
+            };
+            check.Checked += PromptTemplateCheckChanged;
+            check.Unchecked += PromptTemplateCheckChanged;
+            _promptTemplateChecks.Add(check);
+            choices.Children.Add(check);
+        }
+        _promptTemplates.Click += (_, _) => popup.IsOpen = true;
+        UpdatePromptTemplateButtonText();
+    }
+
+    private void PromptTemplateCheckChanged(object sender, RoutedEventArgs e)
+    {
+        if (sender is CheckBox check && check.Tag is string id)
+        {
+            if (check.IsChecked == true) _selectedPromptTemplateIds.Add(id);
+            else _selectedPromptTemplateIds.Remove(id);
+            UpdatePromptTemplateButtonText();
+            UpdateSaveState();
+        }
+    }
+
+    private void UpdatePromptTemplateButtonText()
+    {
+        _promptTemplates.Content = _selectedPromptTemplateIds.Count == 0
+            ? UiText.Get("promptTemplates")
+            : $"{UiText.Get("promptTemplates")} ({_selectedPromptTemplateIds.Count})";
+    }
     private void AddSection(string title)
     {
         FeaturePanel.Children.Add(new TextBlock
@@ -290,6 +380,7 @@ public partial class ConfigurationEditorPage : Page
         if (_contentWidthPreset.SelectedItem is not PageSizePreset preset)
             return;
         _width.Visibility = preset == PageSizePreset.Custom ? Visibility.Visible : Visibility.Collapsed;
+        SetControlRowVisibility(_width, _width.Visibility);
         if (preset == PageSizePreset.Custom)
             return;
         _width.Text = WidthForPreset(preset).ToString("0.##", CultureInfo.InvariantCulture);
@@ -301,7 +392,9 @@ public partial class ConfigurationEditorPage : Page
             return;
         var custom = preset == PageSizePreset.Custom;
         _pageWidth.Visibility = custom ? Visibility.Visible : Visibility.Collapsed;
+        SetControlRowVisibility(_pageWidth, _pageWidth.Visibility);
         _pageHeight.Visibility = custom ? Visibility.Visible : Visibility.Collapsed;
+        SetControlRowVisibility(_pageHeight, _pageHeight.Visibility);
         if (custom)
             return;
         var (width, height) = DimensionsForPreset(preset);
@@ -402,7 +495,7 @@ public partial class ConfigurationEditorPage : Page
         root.Children.Add(header);
 
         // Keep spacing inside the clipped host so it expands with the details.
-        var detailContent = new StackPanel { Margin = new Thickness(0, 8, 0, 0) };
+        var detailContent = new StackPanel { Margin = new Thickness(0, 8, 96, 0) };
         foreach (var item in details)
             detailContent.Children.Add(item);
         var detail = new Border
@@ -509,20 +602,158 @@ public partial class ConfigurationEditorPage : Page
         SetExpanded(toggle.IsChecked == true, animate: false);
     }
 
+    private void UpdateCopyLayerDetailsVisibility()
+    {
+        SetControlRowVisibility(_copyLayerCustomText, _copyLayerMode.SelectedIndex == 3 ? Visibility.Visible : Visibility.Collapsed);
+    }
     private UIElement Labeled(string label, Control control)
     {
-        var panel = new DockPanel { Margin = new Thickness(0, 3, 0, 3) };
-        panel.Children.Add(new TextBlock { Text = label, Width = 150, VerticalAlignment = VerticalAlignment.Center });
-        control.Width = 190;
-        DockPanel.SetDock(control, Dock.Right);
-        panel.Children.Add(control);
+        var panel = new Grid { Margin = new Thickness(0, 3, 0, 3) };
+        panel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        panel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        panel.Children.Add(new TextBlock
+        {
+            Text = label,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(0, 0, 12, 0)
+        });
+
+        if (control is UiTextBox textBox && textBox.AcceptsReturn)
+        {
+            var editor = new Grid
+            {
+                Height = 74,
+                MinHeight = 64,
+                MaxHeight = 180,
+                HorizontalAlignment = HorizontalAlignment.Stretch
+            };
+            textBox.Width = double.NaN;
+            textBox.Height = double.NaN;
+            textBox.HorizontalAlignment = HorizontalAlignment.Stretch;
+            textBox.VerticalContentAlignment = VerticalAlignment.Top;
+            editor.Children.Add(textBox);
+            var grip = new Thumb
+            {
+                Width = 14,
+                Height = 14,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                Cursor = Cursors.SizeNS,
+                Background = Brushes.Transparent,
+                Opacity = .7,
+                ToolTip = UiText.Get("resizeText")
+            };
+            grip.DragDelta += (_, e) =>
+            {
+                editor.Height = Math.Clamp(editor.Height + e.VerticalChange, editor.MinHeight, editor.MaxHeight);
+            };
+            editor.Children.Add(grip);
+            Grid.SetColumn(editor, 1);
+            panel.Children.Add(editor);
+        }
+        else
+        {
+            control.Width = 190;
+            control.HorizontalAlignment = HorizontalAlignment.Left;
+            control.VerticalAlignment = VerticalAlignment.Center;
+            Grid.SetColumn(control, 1);
+            panel.Children.Add(control);
+        }
+
         return panel;
     }
-
+    private UIElement CreatePermissionOptions()
+    {
+        var grid = new Grid { Margin = new Thickness(0, 3, 0, 3) };
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        var options = new[]
+        {
+            (_allowPrinting, "allowPrinting"),
+            (_allowCopying, "allowCopying"),
+            (_allowModification, "allowModification"),
+            (_allowAnnotations, "allowAnnotations"),
+            (_allowForms, "allowForms")
+        };
+        for (var i = 0; i < options.Length; i++)
+        {
+            var (checkBox, textKey) = options[i];
+            var row = i / 2;
+            while (grid.RowDefinitions.Count <= row)
+                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            checkBox.Content = UiText.Get(textKey);
+            checkBox.Width = double.NaN;
+            checkBox.MinHeight = 32;
+            checkBox.Margin = new Thickness(0, 2, 16, 2);
+            checkBox.HorizontalAlignment = HorizontalAlignment.Left;
+            checkBox.VerticalAlignment = VerticalAlignment.Center;
+            Grid.SetRow(checkBox, row);
+            Grid.SetColumn(checkBox, i % 2);
+            grid.Children.Add(checkBox);
+        }
+        return grid;
+    }
+    private void SetControlRowVisibility(FrameworkElement control, Visibility visibility)
+    {
+        DependencyObject? current = control;
+        DockPanel? row = null;
+        while (current is not null)
+        {
+            if (current is DockPanel found)
+            {
+                row = found;
+                break;
+            }
+            current = current is FrameworkElement element ? element.Parent : null;
+        }
+        if (row is null) return;
+        var show = visibility == Visibility.Visible;
+        if (!IsLoaded || !SystemParameters.ClientAreaAnimation)
+        {
+            row.BeginAnimation(FrameworkElement.HeightProperty, null);
+            row.Visibility = visibility;
+            row.Height = show ? double.NaN : 0;
+            return;
+        }
+        if (show)
+        {
+            row.Visibility = Visibility.Visible;
+            row.Height = double.NaN;
+            row.Measure(new Size(Math.Max(1, FeaturePanel.ActualWidth), double.PositiveInfinity));
+            var target = row.DesiredSize.Height;
+            row.Height = 0;
+            var animation = new DoubleAnimation(0, target, TimeSpan.FromMilliseconds(160))
+            {
+                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+            };
+            animation.Completed += (_, _) => row.Height = double.NaN;
+            row.BeginAnimation(FrameworkElement.HeightProperty, animation);
+        }
+        else
+        {
+            var currentHeight = row.ActualHeight;
+            if (currentHeight <= 0)
+            {
+                row.Visibility = Visibility.Collapsed;
+                row.Height = 0;
+                return;
+            }
+            var animation = new DoubleAnimation(currentHeight, 0, TimeSpan.FromMilliseconds(140))
+            {
+                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
+            };
+            animation.Completed += (_, _) =>
+            {
+                row.Visibility = Visibility.Collapsed;
+                row.Height = 0;
+            };
+            row.BeginAnimation(FrameworkElement.HeightProperty, animation);
+        }
+    }
     private void UpdateSaveState() {
         var hasName = !string.IsNullOrWhiteSpace(NameBox.Text);
         var hasFeature = _normalize.IsChecked == true || _pageSize.IsChecked == true || _flatten.IsChecked == true || _watermark.IsChecked == true || _noise.IsChecked == true || _texture.IsChecked == true || _geometry.IsChecked == true || _microText.IsChecked == true || _copyLayer.IsChecked == true || _hiddenAi.IsChecked == true || _promptInjection.IsChecked == true || _gan.IsChecked == true || _metadata.IsChecked == true || _permissions.IsChecked == true;
-        SaveButton.IsEnabled = hasName && (!_isNew || hasFeature);
+        SaveButton.IsEnabled = hasName && (!_isNew || hasFeature) && (_copyLayer.IsChecked != true || _copyLayerMode.SelectedIndex != 3 || !string.IsNullOrWhiteSpace(_copyLayerCustomText.Text)) && (_hiddenAi.IsChecked != true || _selectedPromptTemplateIds.Count > 0);
         var saveTextResource = SaveButton.IsEnabled ? "AccentTextBrush" : "EditorSaveDisabledTextBrush";
 
         if (SaveButton.Content is TextBlock saveText)
@@ -567,16 +798,26 @@ public partial class ConfigurationEditorPage : Page
             Dpi = _dpi.SelectedItem is int dpi ? dpi : 300,
             ImageQuality = (ImageQuality)Math.Clamp(_imageQuality.SelectedIndex, 0, 3),
             WatermarkAngle = _watermarkAngle.SelectedItem is double angle ? angle : -45,
-            Watermark = _watermark.IsChecked == true ? (_watermarkType.SelectedIndex == 1 ? WatermarkStyle.FullPage : WatermarkStyle.Text) : WatermarkStyle.None,
+            Watermark = _watermark.IsChecked == true ? (_watermarkType.SelectedIndex == 1 ? WatermarkStyle.Repeated : WatermarkStyle.Single) : WatermarkStyle.None,
             WatermarkText = _watermarkText.Text ?? string.Empty,
             Noise = _noise.IsChecked == true ? (NoiseStrength)Math.Clamp(_noiseLevel.SelectedIndex + 1, 1, 3) : NoiseStrength.Off,
-            Texture = _texture.IsChecked == true ? (TextureStrength)Math.Clamp(_textureLevel.SelectedIndex + 1, 1, 2) : TextureStrength.Off,
+            Texture = _texture.IsChecked == true ? (TextureStrength)Math.Clamp(_textureLevel.SelectedIndex + 1, 1, 3) : TextureStrength.Off,
             GeometryPerturbation = _geometry.IsChecked == true,
             MicroTextPattern = _microText.IsChecked == true,
-            CopyLayer = _copyLayer.IsChecked == true ? (CopyLayerMode)Math.Clamp(_copyLayerMode.SelectedIndex + 1, 1, 3) : CopyLayerMode.Preserve,
+            CopyLayer = _copyLayer.IsChecked == true ? (CopyLayerMode)Math.Clamp(_copyLayerMode.SelectedIndex + 1, 1, 4) : CopyLayerMode.Preserve,
+            CopyLayerCustomText = _copyLayerCustomText.Text ?? string.Empty,
             HiddenAiText = _hiddenAi.IsChecked == true,
+            PromptTemplateIds = _selectedPromptTemplateIds.ToArray(),
             PromptInjection = _promptInjection.IsChecked == true,
             PromptInjectionText = _promptInjectionText.Text ?? string.Empty,
+            MetadataAuthorName = _metadataAuthor.Text ?? string.Empty,
+            MetadataOrganization = _metadataOrganization.Text ?? string.Empty,
+            MetadataCopyright = _metadataCopyright.Text ?? string.Empty,
+            PermissionAllowPrinting = _allowPrinting.IsChecked == true,
+            PermissionAllowCopying = _allowCopying.IsChecked == true,
+            PermissionAllowModification = _allowModification.IsChecked == true,
+            PermissionAllowAnnotations = _allowAnnotations.IsChecked == true,
+            PermissionAllowFormFilling = _allowForms.IsChecked == true,
             GanAdversarialPerturbation = false,
             MetadataNormalization = _metadata.IsChecked == true,
             ProtectionDeclaration = _metadata.IsChecked == true,

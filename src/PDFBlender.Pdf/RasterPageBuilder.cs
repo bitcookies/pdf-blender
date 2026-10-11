@@ -54,7 +54,7 @@ internal static class RasterPageBuilder
                 var i = y * bitmap.Width + x;
                 var delta = amplitude == 0 ? 0 : random.Next(-amplitude, amplitude + 1);
                 if (settings.Texture != TextureStrength.Off)
-                    delta += (int)Math.Round(Math.Sin(x * .11) * Math.Sin(y * .09) * (settings.Texture == TextureStrength.Medium ? 3 : 1.5));
+                    delta += (int)Math.Round(Math.Sin(x * .11) * Math.Sin(y * .09) * (settings.Texture switch { TextureStrength.Low => 1.5, TextureStrength.Medium => 3, TextureStrength.High => 5, _ => 0 }));
                 var p = pixels[i];
                 pixels[i] = new SKColor((byte)Math.Clamp(p.Red + delta, 0, 255), (byte)Math.Clamp(p.Green + delta, 0, 255), (byte)Math.Clamp(p.Blue + delta, 0, 255));
             }

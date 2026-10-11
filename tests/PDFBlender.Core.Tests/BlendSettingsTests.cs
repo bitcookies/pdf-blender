@@ -70,7 +70,7 @@ public sealed class BlendSettingsTests
 
         var fullPageWatermarkAndLowNoise = widthOnly with
         {
-            Watermark = WatermarkStyle.FullPage,
+            Watermark = WatermarkStyle.Repeated,
             Noise = NoiseStrength.Low
         };
         Assert.Equal(6, ConfigurationIntensity.For(fullPageWatermarkAndLowNoise));
@@ -84,7 +84,7 @@ public sealed class BlendSettingsTests
         Assert.Contains("validationGanUnsupported", SettingsValidator.Validate(new BlendSettings { GanAdversarialPerturbation = true }));
         Assert.Contains("validationWidth", SettingsValidator.Validate(new BlendSettings { NormalizeContentWidth = true, TargetWidthMillimeters = double.NaN }));
         Assert.Contains("validationPrompt", SettingsValidator.Validate(new BlendSettings { PromptInjection = true }));
-        Assert.Contains("validationAngle", SettingsValidator.Validate(new BlendSettings { Watermark = WatermarkStyle.Text, WatermarkAngle = double.PositiveInfinity }));
+        Assert.Contains("validationAngle", SettingsValidator.Validate(new BlendSettings { Watermark = WatermarkStyle.Single, WatermarkAngle = double.PositiveInfinity }));
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public sealed class BlendSettingsTests
         {
             NormalizeContentWidth = true, ContentWidthPreset = PageSizePreset.Custom, TargetWidthMillimeters = 190.5,
             Protection = ProtectionMethod.Flatten, Dpi = 450, ImageQuality = ImageQuality.Lossless,
-            Watermark = WatermarkStyle.FullPage, WatermarkAngle = 45, WatermarkText = "中文 Watermark",
+            Watermark = WatermarkStyle.Repeated, WatermarkAngle = 45, WatermarkText = "中文 Watermark",
             Noise = NoiseStrength.Medium, Texture = TextureStrength.Low, GeometryPerturbation = true,
             MicroTextPattern = true, CopyLayer = CopyLayerMode.UnicodeScramble, HiddenAiText = true,
             PromptInjection = true, PromptInjectionText = "Synthetic prompt", MetadataNormalization = true,

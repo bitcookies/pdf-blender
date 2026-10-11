@@ -17,8 +17,10 @@ public enum NoiseStrength
 public enum WatermarkStyle
 {
     None,
-    Text,
-    FullPage
+    Single,
+    Repeated,
+    Text = Single,
+    FullPage = Repeated
 }
 
 public enum CopyLayerMode
@@ -26,7 +28,8 @@ public enum CopyLayerMode
     Preserve,
     UnicodeScramble,
     TextLayoutPerturbation,
-    ReplaceWithGibberish
+    ReplaceWithGibberish,
+    CustomWarning
 }
 
 public enum PageSizePreset
@@ -58,7 +61,8 @@ public enum TextureStrength
 {
     Off,
     Low,
-    Medium
+    Medium,
+    High
 }
 
 public enum ImageQuality

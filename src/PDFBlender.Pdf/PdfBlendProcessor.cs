@@ -47,9 +47,7 @@ public sealed class PdfBlendProcessor : IBlendProcessor
         int pageCount;
         try { pageCount = Conversion.GetPageCount(bytes, null); }
         catch (Exception ex) when (ex is not OperationCanceledException and not OutOfMemoryException)
-        {
-            throw new PdfProcessingException(ex.Message.Contains("password", StringComparison.OrdinalIgnoreCase) ? "pdfPassword" : "pdfInvalid", ex);
-        }
+        { throw new PdfProcessingException(ex.Message.Contains("password", StringComparison.OrdinalIgnoreCase) ? "pdfPassword" : "pdfInvalid", ex); }
         if (pageCount <= 0) throw new PdfProcessingException("pdfInvalid");
         var hasChanges = BlendFeatureCatalog.All.Any(feature => BlendFeatureCatalog.IsEnabled(settings, feature));
         if (!hasChanges)
@@ -62,17 +60,13 @@ public sealed class PdfBlendProcessor : IBlendProcessor
         }
         using (var inspection = PdfReader.Open(input, PdfDocumentOpenMode.Import))
         {
-            if (inspection.Internals.GetAllObjects().OfType<PdfDictionary>().Any(dictionary =>
-                dictionary.Elements.GetName("/Type") == "/Sig" || dictionary.Elements.ContainsKey("/ByteRange")))
+            if (inspection.Internals.GetAllObjects().OfType<PdfDictionary>().Any(dictionary => dictionary.Elements.GetName("/Type") == "/Sig" || dictionary.Elements.ContainsKey("/ByteRange")))
                 throw new PdfProcessingException("pdfSigned");
         }
-        if (settings.Protection == ProtectionMethod.Flatten)
-            BuildRaster(bytes, input, temporary, pageCount, settings, progress, token);
-        else
-            BuildNative(input, temporary, settings, pageCount, progress, token);
+        if (settings.Protection == ProtectionMethod.Flatten) BuildRaster(bytes, input, temporary, pageCount, settings, progress, token);
+        else BuildNative(input, temporary, settings, pageCount, progress, token);
         token.ThrowIfCancellationRequested();
-        var committed = Commit(temporary, final);
-        return new BlendResult(committed, pageCount);
+        return new BlendResult(Commit(temporary, final), pageCount);
     }
 
     private static void BuildNative(string input, string output, BlendSettings settings, int pageCount, IProgress<BlendProgress>? progress, CancellationToken token)
@@ -123,8 +117,7 @@ public sealed class PdfBlendProcessor : IBlendProcessor
             if (settings.CopyLayer != CopyLayerMode.Preserve)
             {
                 var letters = pig!.GetPage(i + 1);
-                var count = PdfOverlays.CopyLayer(page, letters, layout, settings.CopyLayer, token);
-                totalLetters += count;
+                totalLetters += PdfOverlays.CopyLayer(page, letters, layout, settings.CopyLayer, settings.CopyLayerCustomText, token);
             }
             progress?.Report(new BlendProgress(i + 1, pageCount, "Raster"));
         }
@@ -149,12 +142,19 @@ public sealed class PdfBlendProcessor : IBlendProcessor
     {
         if (settings.MetadataNormalization)
         {
-            document.Info.Creator = "PDF Blender";
+            document.Info.Creator = string.IsNullOrWhiteSpace(settings.MetadataOrganization) ? "PDF Blender" : settings.MetadataOrganization;
             document.Info.Elements.SetString("/Producer", "PDF Blender 0.10.0.0");
             document.Info.ModificationDate = DateTime.UtcNow;
+            if (!string.IsNullOrWhiteSpace(settings.MetadataAuthorName)) document.Info.Author = settings.MetadataAuthorName;
         }
         if (settings.ProtectionDeclaration)
-            document.Info.Subject = string.IsNullOrWhiteSpace(document.Info.Subject) ? "PDF Blender protection output" : document.Info.Subject + " | PDF Blender protection output";
+        {
+            var owner = string.IsNullOrWhiteSpace(settings.MetadataAuthorName) ? settings.MetadataOrganization : settings.MetadataAuthorName;
+            var hasCustomDeclaration = !string.IsNullOrWhiteSpace(owner) || !string.IsNullOrWhiteSpace(settings.MetadataCopyright);
+            if (string.IsNullOrWhiteSpace(owner)) owner = "PDF Blender";
+            var declaration = hasCustomDeclaration ? $"Copyright © {DateTime.UtcNow.Year} {owner}. {settings.MetadataCopyright}".TrimEnd() : "PDF Blender protection output";
+            document.Info.Subject = string.IsNullOrWhiteSpace(document.Info.Subject) ? declaration : document.Info.Subject + " | " + declaration;
+        }
     }
 
     private static void ApplyPermissions(PdfDocument document, BlendSettings settings)
@@ -163,13 +163,12 @@ public sealed class PdfBlendProcessor : IBlendProcessor
         var security = document.SecuritySettings;
         security.UserPassword = string.Empty;
         security.OwnerPassword = Convert.ToBase64String(RandomNumberGenerator.GetBytes(24));
-        security.PermitPrint = true;
-        security.PermitFullQualityPrint = true;
-        // Accessibility extraction remains permitted by PDFsharp's default permission bit 10.
-        security.PermitExtractContent = false;
-        security.PermitModifyDocument = false;
-        security.PermitAnnotations = false;
-        security.PermitFormsFill = false;
+        security.PermitPrint = settings.PermissionAllowPrinting;
+        security.PermitFullQualityPrint = settings.PermissionAllowPrinting;
+        security.PermitExtractContent = settings.PermissionAllowCopying;
+        security.PermitModifyDocument = settings.PermissionAllowModification;
+        security.PermitAnnotations = settings.PermissionAllowAnnotations;
+        security.PermitFormsFill = settings.PermissionAllowFormFilling;
         security.PermitAssembleDocument = false;
     }
 
