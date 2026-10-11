@@ -15,6 +15,8 @@ public partial class SettingsPage : Page
     private readonly DialogService _dialogs;
     private readonly UiNotificationService _notifications;
     private bool _initializing;
+    private bool _aboutExpanded;
+    private int _aboutExpansionVersion;
 
     internal SettingsPage(AppSession session, DialogService dialogs, UiNotificationService notifications)
     {
@@ -146,17 +148,60 @@ public partial class SettingsPage : Page
 
     private void AboutSummaryButton_Click(object sender, RoutedEventArgs e)
     {
-        var expanded = AboutDetails.Visibility == Visibility.Visible;
-        AboutDetails.Visibility = expanded ? Visibility.Collapsed : Visibility.Visible;
+        _aboutExpanded = !_aboutExpanded;
+        var expanded = _aboutExpanded;
+        var version = ++_aboutExpansionVersion;
+        var currentHeight = AboutDetails.Visibility == Visibility.Visible ? AboutDetails.ActualHeight : 0;
+        AboutDetails.BeginAnimation(FrameworkElement.HeightProperty, null);
+        AboutDetails.Visibility = Visibility.Visible;
+
+        // Measure the child independently of the host's previous animated height.
+        var width = Math.Max(1, AboutSummaryButton.ActualWidth);
+        AboutDetails.Child.Measure(new Size(width, double.PositiveInfinity));
+        var targetHeight = expanded ? AboutDetails.Child.DesiredSize.Height : 0;
+        var duration = SystemParameters.ClientAreaAnimation
+            ? TimeSpan.FromMilliseconds(Math.Min(expanded ? 180 : 150, UiMotionPolicy.Resolve().EnterOpacity.TotalMilliseconds))
+            : TimeSpan.Zero;
+
+        void Complete()
+        {
+            if (version != _aboutExpansionVersion)
+                return;
+            AboutDetails.BeginAnimation(FrameworkElement.HeightProperty, null);
+            AboutDetails.Height = expanded ? double.NaN : 0;
+            AboutDetails.Visibility = expanded ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        if (duration == TimeSpan.Zero || Math.Abs(currentHeight - targetHeight) < 0.1)
+        {
+            Complete();
+        }
+        else
+        {
+            AboutDetails.Height = currentHeight;
+            var animation = new DoubleAnimation(currentHeight, targetHeight, duration)
+            {
+                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+            };
+            animation.Completed += (_, _) => Complete();
+            AboutDetails.BeginAnimation(FrameworkElement.HeightProperty, animation);
+        }
+
         if (AboutExpandIcon.RenderTransform is RotateTransform rotate)
         {
-            var animation = new DoubleAnimation
+            var currentAngle = rotate.Angle;
+            var targetAngle = expanded ? 180 : 0;
+            rotate.BeginAnimation(RotateTransform.AngleProperty, null);
+            rotate.Angle = targetAngle;
+            if (duration > TimeSpan.Zero)
             {
-                To = expanded ? 0 : 180,
-                Duration = TimeSpan.FromMilliseconds(180),
-                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-            };
-            rotate.BeginAnimation(RotateTransform.AngleProperty, animation);
+                var animation = new DoubleAnimation(currentAngle, targetAngle, duration)
+                {
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
+                    FillBehavior = FillBehavior.Stop
+                };
+                rotate.BeginAnimation(RotateTransform.AngleProperty, animation);
+            }
         }
     }
 

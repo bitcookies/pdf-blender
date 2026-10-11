@@ -207,7 +207,7 @@
                             </ui:SymbolIcon>
                         </Grid>
                     </ui:Button>
-                    <Border x:Name="AboutDetails" Margin="1,0,1,1" Visibility="Collapsed">
+                    <Border x:Name="AboutDetails" Margin="1,0,1,1" Visibility="Collapsed" Height="0" ClipToBounds="True" VerticalAlignment="Top">
                         <StackPanel>
                             <Grid MinHeight="46" Margin="16,0">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
