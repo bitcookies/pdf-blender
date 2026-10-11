@@ -176,7 +176,7 @@ public partial class ConfigurationPresetPage : Page
         };
         var addText = new TextBlock
         {
-            Text = UiText.Get("add"),
+            Text = UiText.Get(definition.IsExperimental ? "experimentalPresetButton" : "add"),
             VerticalAlignment = VerticalAlignment.Center
         };
         var add = new UiButton
