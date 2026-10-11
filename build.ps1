@@ -26,7 +26,12 @@ function Show-Menu {
 }
 
 function Confirm-ReplaceOutput([string]$Path) {
-    if ($Force -or -not (Test-Path -LiteralPath $Path)) {
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return $true
+    }
+
+    if ($Force) {
+        Remove-Item -LiteralPath $Path -Recurse -Force
         return $true
     }
 
@@ -123,20 +128,43 @@ switch ($Mode) {
         }
 
         $targetPlatformVersion = ((Get-Content -LiteralPath $packagingProject | Select-String -Pattern '<TargetPlatformVersion>([^<]+)</TargetPlatformVersion>').Matches.Groups[1].Value)
+        $sdkRegistryPaths = @(
+            'HKLM:\SOFTWARE\Microsoft\Windows Kits\Installed Roots',
+            'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots'
+        )
         $windowsKitCandidates = @(
-            (Join-Path ${env:ProgramFiles(x86)} 'Windows Kits\10'),
+            $env:WindowsSdkDir
+            foreach ($registryPath in $sdkRegistryPaths) {
+                (Get-ItemProperty -LiteralPath $registryPath -ErrorAction SilentlyContinue).KitsRoot10
+            }
+            (Join-Path ${env:ProgramFiles(x86)} 'Windows Kits\10')
             (Join-Path $env:ProgramFiles 'Windows Kits\10')
-        ) | Where-Object { $_ }
+        ) | Where-Object { $_ } | Select-Object -Unique
         $windowsKitRoot = $windowsKitCandidates |
-            Where-Object { Test-Path (Join-Path $_ "Platforms\UAP\$targetPlatformVersion\UAP.props") } |
+            Where-Object { Test-Path (Join-Path $_ "DesignTime\CommonConfiguration\Neutral\UAP\$targetPlatformVersion\UAP.props") } |
             Select-Object -First 1
         if (-not $windowsKitRoot) {
             Write-Host "MSIX packaging requires the Windows SDK UAP platform $targetPlatformVersion (UAP.props). Install the matching Windows 10/11 SDK, then retry." -ForegroundColor Yellow
             exit 40
         }
 
-        & $msbuild $packagingProject '/p:Configuration=Release' "/p:VSToolsPath=$vsToolsPath" "/p:OutDir=$installerOutput\"
+        # Keep each platform's intermediate output separate; a shared OutDir can reuse the wrong AppxManifest.xml.
+        & $msbuild $packagingProject '/restore' '/verbosity:minimal' '/p:GenerateAppxPackageOnBuild=true' '/p:Configuration=Release' "/p:VSToolsPath=$vsToolsPath"
         if ($LASTEXITCODE -ne 0) { exit 40 }
+
+        # Keep the three architecture packages together for manual installation and Store inspection.
+        # The WAP project owns its per-platform intermediate directories; do not redirect them with OutDir.
+        $packageOutput = Join-Path $installerOutput 'PDFBlender.Package'
+        New-Item -ItemType Directory -Path $packageOutput -Force | Out-Null
+        foreach ($platform in @('x86', 'x64', 'ARM64')) {
+            $platformPackageDirectory = Join-Path $root "packaging/bin/$platform/Release"
+            $platformPackages = Get-ChildItem -LiteralPath $platformPackageDirectory -Filter '*.msix' -File -ErrorAction SilentlyContinue
+            if (-not $platformPackages) {
+                Write-Host "MSIX package for $platform was not found in $platformPackageDirectory." -ForegroundColor Yellow
+                exit 40
+            }
+            Copy-Item -LiteralPath $platformPackages.FullName -Destination $packageOutput -Force
+        }
         Write-Host "MSIX installer written to $installerOutput" -ForegroundColor Green
     }
 }

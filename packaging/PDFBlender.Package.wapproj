@@ -7,10 +7,14 @@
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <DefaultLanguage>en-US</DefaultLanguage>
+    <!-- Declare the supported packaging platforms explicitly. -->
+    <Platforms>x86;x64;ARM64</Platforms>
+    <Platform Condition="'$(Platform)' == ''">x86</Platform>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != '' And Exists('$(VSToolsPath)\DotNet\Microsoft.DotNet.Props')" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\DesktopBridge\Microsoft.DesktopBridge.props" Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\DesktopBridge\Microsoft.DesktopBridge.props')" />
   <PropertyGroup>
+    <EntryPointProjectUniqueName>..\src\PDFBlender.App\PDFBlender.App.csproj</EntryPointProjectUniqueName>
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86|x64|ARM64</AppxBundlePlatforms>
@@ -25,22 +29,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Package.appxmanifest" />
-    <Content Include="..\assets\logo.png">
-      <Link>Assets\StoreLogo.png</Link>
-    </Content>
-    <Content Include="..\assets\logo.png">
-      <Link>Assets\Square44x44Logo.png</Link>
-    </Content>
-    <Content Include="..\assets\logo.png">
-      <Link>Assets\Square150x150Logo.png</Link>
-    </Content>
-    <Content Include="..\assets\logo.png">
-      <Link>Assets\Square310x310Logo.png</Link>
-    </Content>
-    <Content Include="..\assets\banner.png">
-      <Link>Assets\Wide310x150Logo.png</Link>
-    </Content>
+    <AppxManifest Include="Package.appxmanifest" />
+    <Content Include="Assets\*.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\DesktopBridge\Microsoft.DesktopBridge.targets" Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\DesktopBridge\Microsoft.DesktopBridge.targets')" />
 </Project>
