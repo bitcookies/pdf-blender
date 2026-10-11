@@ -176,7 +176,9 @@
                 BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="1"
                 CornerRadius="16"
-                Padding="8,0">
+                Padding="8,0"
+                Cursor="Hand"
+                MouseLeftButtonUp="IntensityPill_MouseLeftButtonUp">
             <TextBlock x:Name="IntensityText"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
@@ -186,6 +188,37 @@
                        TextTrimming="CharacterEllipsis" />
         </Border>
 
+        <Popup x:Name="IntensityInfoPopup"
+               PlacementTarget="{Binding ElementName=IntensityPill}"
+               Placement="Top"
+               StaysOpen="False"
+               AllowsTransparency="True"
+               PopupAnimation="Fade"
+               HorizontalOffset="-100"
+               VerticalOffset="16">
+            <Border x:Name="IntensityBubbleHost" Background="Transparent" Padding="24">
+                <StackPanel x:Name="IntensityBubbleContent" Width="220" HorizontalAlignment="Center" Effect="{DynamicResource FlyoutShadowEffect}">
+                    <Border Background="{DynamicResource CardBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="12,10">
+                        <TextBlock x:Name="IntensityInfoText"
+                                   TextWrapping="Wrap"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource TextBrush}" />
+                    </Border>
+                    <Path Width="14"
+                          Height="8"
+                          Margin="0,-1,0,0"
+                          HorizontalAlignment="Center"
+                          Data="M 0,0 L 7,7 L 14,0 Z"
+                          Fill="{DynamicResource CardBrush}"
+                          Stroke="{DynamicResource BorderBrush}"
+                          StrokeThickness="1" />
+                </StackPanel>
+            </Border>
+        </Popup>
         <ui:Button x:Name="EditButton"
                    Grid.Row="1"
                    Grid.RowSpan="5"

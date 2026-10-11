@@ -9,7 +9,6 @@ using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using PDFBlender.Core.Models;
 using UiCard = Wpf.Ui.Controls.Card;
-using UiButton = Wpf.Ui.Controls.Button;
 using UiTextBox = Wpf.Ui.Controls.TextBox;
 using UiToggleSwitch = Wpf.Ui.Controls.ToggleSwitch;
 using Wpf.Ui.Controls;
@@ -48,9 +47,8 @@ public partial class ConfigurationEditorPage : Page
     private readonly UiTextBox _metadataAuthor = new();
     private readonly UiTextBox _metadataOrganization = new();
     private readonly UiTextBox _metadataCopyright = new();
-    private readonly UiButton _promptTemplates = new();
+    private readonly ComboBox _promptTemplates = new();
     private readonly HashSet<string> _selectedPromptTemplateIds = new(StringComparer.OrdinalIgnoreCase);
-    private readonly List<CheckBox> _promptTemplateChecks = [];
     private readonly CheckBox _allowPrinting = new();
     private readonly CheckBox _allowCopying = new();
     private readonly CheckBox _allowModification = new();
@@ -308,62 +306,42 @@ public partial class ConfigurationEditorPage : Page
     private void ConfigurePromptTemplatePicker()
     {
         _selectedPromptTemplateIds.Clear();
-        _selectedPromptTemplateIds.UnionWith(_settings.PromptTemplateIds ?? Array.Empty<string>());
-        _promptTemplates.Content = UiText.Get("promptTemplates");
-        _promptTemplates.HorizontalContentAlignment = HorizontalAlignment.Left;
-        _promptTemplates.Height = 38;
-        _promptTemplates.Appearance = ControlAppearance.Secondary;
-        var popup = new Popup
+        var currentIds = _settings.PromptTemplateIds ?? Array.Empty<string>();
+        var labels = new[]
         {
-            PlacementTarget = _promptTemplates,
-            Placement = PlacementMode.Bottom,
-            StaysOpen = false,
-            AllowsTransparency = true,
-            Child = new Border
-            {
-                Background = (Brush)FindResource("CardBrush"),
-                BorderBrush = (Brush)FindResource("BorderBrush"),
-                BorderThickness = new Thickness(1),
-                Padding = new Thickness(8),
-                Child = new StackPanel { Width = 280 }
-            }
+            "promptTemplatePriority",
+            "promptTemplateRedirection",
+            "promptTemplateRefusal",
+            "promptTemplateClassical"
         };
-        var choices = (StackPanel)((Border)popup.Child).Child;
-        _promptTemplateChecks.Clear();
+
+        _promptTemplates.Items.Clear();
+        for (var i = 0; i < PromptTemplateCatalog.Ids.Count && i < labels.Length; i++)
+            _promptTemplates.Items.Add(UiText.Get(labels[i]));
+
+        var selectedIndex = -1;
         for (var i = 0; i < PromptTemplateCatalog.Ids.Count; i++)
         {
-            var check = new CheckBox
+            if (currentIds.Contains(PromptTemplateCatalog.Ids[i], StringComparer.OrdinalIgnoreCase))
             {
-                Content = UiText.Get(new[] { "promptTemplatePriority", "promptTemplateRedirection", "promptTemplateRefusal", "promptTemplateClassical" }[i]),
-                Tag = PromptTemplateCatalog.Ids[i],
-                IsChecked = _selectedPromptTemplateIds.Contains(PromptTemplateCatalog.Ids[i]),
-                Margin = new Thickness(2, 4, 2, 4)
-            };
-            check.Checked += PromptTemplateCheckChanged;
-            check.Unchecked += PromptTemplateCheckChanged;
-            _promptTemplateChecks.Add(check);
-            choices.Children.Add(check);
+                selectedIndex = i;
+                break;
+            }
         }
-        _promptTemplates.Click += (_, _) => popup.IsOpen = true;
-        UpdatePromptTemplateButtonText();
-    }
 
-    private void PromptTemplateCheckChanged(object sender, RoutedEventArgs e)
-    {
-        if (sender is CheckBox check && check.Tag is string id)
+        _promptTemplates.Height = 38;
+        _promptTemplates.SelectedIndex = selectedIndex;
+        if (selectedIndex >= 0)
+            _selectedPromptTemplateIds.Add(PromptTemplateCatalog.Ids[selectedIndex]);
+
+        _promptTemplates.SelectionChanged += (_, _) =>
         {
-            if (check.IsChecked == true) _selectedPromptTemplateIds.Add(id);
-            else _selectedPromptTemplateIds.Remove(id);
-            UpdatePromptTemplateButtonText();
+            _selectedPromptTemplateIds.Clear();
+            var index = _promptTemplates.SelectedIndex;
+            if (index >= 0 && index < PromptTemplateCatalog.Ids.Count)
+                _selectedPromptTemplateIds.Add(PromptTemplateCatalog.Ids[index]);
             UpdateSaveState();
-        }
-    }
-
-    private void UpdatePromptTemplateButtonText()
-    {
-        _promptTemplates.Content = _selectedPromptTemplateIds.Count == 0
-            ? UiText.Get("promptTemplates")
-            : $"{UiText.Get("promptTemplates")} ({_selectedPromptTemplateIds.Count})";
+        };
     }
     private void AddSection(string title)
     {
@@ -696,12 +674,17 @@ public partial class ConfigurationEditorPage : Page
     private void SetControlRowVisibility(FrameworkElement control, Visibility visibility)
     {
         DependencyObject? current = control;
-        DockPanel? row = null;
+        FrameworkElement? row = null;
         while (current is not null)
         {
-            if (current is DockPanel found)
+            if (current is Grid grid && grid.Parent is StackPanel)
             {
-                row = found;
+                row = grid;
+                break;
+            }
+            if (current is DockPanel dockPanel)
+            {
+                row = dockPanel;
                 break;
             }
             current = current is FrameworkElement element ? element.Parent : null;

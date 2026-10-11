@@ -6,6 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace PDFBlender.App;
 
@@ -23,6 +24,7 @@ public partial class BlendLevelRail : UserControl
     private int _dragTarget;
     private int _animationVersion;
     private static readonly Duration SelectionTransition = new(TimeSpan.FromMilliseconds(120));
+    private readonly DispatcherTimer _intensityPopupTimer = new() { Interval = TimeSpan.FromSeconds(3) };
 
     public event EventHandler<BlendLevelChangedEventArgs>? SelectionChanged;
     public event RoutedEventHandler? EditRequested;
@@ -32,6 +34,16 @@ public partial class BlendLevelRail : UserControl
     public BlendLevelRail()
     {
         InitializeComponent();
+        _intensityPopupTimer.Tick += (_, _) =>
+        {
+            _intensityPopupTimer.Stop();
+            IntensityInfoPopup.IsOpen = false;
+        };
+        Unloaded += (_, _) =>
+        {
+            _intensityPopupTimer.Stop();
+            IntensityInfoPopup.IsOpen = false;
+        };
         LevelSlider.PreviewKeyDown += LevelSlider_PreviewKeyDown;
         LevelSlider.PreviewMouseLeftButtonDown += LevelSlider_PreviewMouseLeftButtonDown;
         LevelSlider.MouseMove += LevelSlider_MouseMove;
@@ -144,7 +156,23 @@ public partial class BlendLevelRail : UserControl
         UpdateSelectionText();
     }
 
-    public void SetCaption(string caption) => CaptionText.Text = caption;
+    public void SetCaption(string caption)
+    {
+        CaptionText.Text = caption;
+        IntensityInfoText.Text = UiText.Get("intensityExplanation");
+        AutomationProperties.SetHelpText(IntensityPill, UiText.Get("intensityExplanation"));
+    }
+
+    private void IntensityPill_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        e.Handled = true;
+        if (_levels.ElementAtOrDefault(SelectedIndex)?.IsAvailable != true)
+            return;
+        IntensityInfoText.Text = UiText.Get("intensityExplanation");
+        IntensityInfoPopup.IsOpen = true;
+        _intensityPopupTimer.Stop();
+        _intensityPopupTimer.Start();
+    }
 
     public void SetAccessibilityName(string name) => AutomationProperties.SetName(LevelSlider, name);
 

@@ -365,6 +365,32 @@ public static class BuiltInConfigurations
 
         new(
             new BlendConfiguration(
+                "copy-protection",
+                "Copy Protection",
+                true,
+                new BlendSettings
+                {
+                    NormalizeContentWidth = true,
+                    ContentWidthPreset = PageSizePreset.A4,
+                    TargetWidthMillimeters = 210,
+                    Protection = ProtectionMethod.Flatten,
+                    CopyLayer = CopyLayerMode.ReplaceWithGibberish,
+                    ImageQuality = ImageQuality.High,
+                    Dpi = 300,
+                    PromptInjection = true,
+                    PromptInjectionText = PromptTemplateCatalog.Mixed,
+                    Noise = NoiseStrength.Low,
+                    Texture = TextureStrength.Low,
+                    PermissionRestriction = true,
+                    PermissionAllowModification = false
+                },
+                true),
+            PresetCategory.Common,
+            "presetCopyProtection",
+            "presetCopyProtectionDescription",
+            "regular:Copy24"),
+        new(
+            new BlendConfiguration(
                 "enhanced-protection",
                 "Enhanced Protection",
                 true,
@@ -419,14 +445,13 @@ public static class BuiltInConfigurations
                     Texture = TextureStrength.Medium,
                     GeometryPerturbation = true,
                     MicroTextPattern = true,
-                    GanAdversarialPerturbation = true
+                    GanAdversarialPerturbation = false
                 },
                 true),
             PresetCategory.Common,
             "presetMaximumProtection",
             "presetMaximumProtectionDescription",
-            "regular:LockShield48",
-            true)
+            "regular:LockShield48")
     ];
 
     public static IReadOnlyList<BlendConfiguration> All { get; } =
