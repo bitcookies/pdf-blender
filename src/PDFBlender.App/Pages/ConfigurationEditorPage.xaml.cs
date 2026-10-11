@@ -588,7 +588,7 @@ public partial class ConfigurationEditorPage : Page
         {
             Text = label,
             VerticalAlignment = (control as UiTextBox)?.AcceptsReturn == true ? VerticalAlignment.Top : VerticalAlignment.Center,
-            Margin = new Thickness(0, 0, 12, 0)
+            Margin = (control as UiTextBox)?.AcceptsReturn == true ? new Thickness(0, 7, 12, 0) : new Thickness(0, 0, 12, 0)
         });
 
         if (control is UiTextBox textBox && textBox.AcceptsReturn)
