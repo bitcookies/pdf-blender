@@ -168,17 +168,24 @@ public partial class ConfigurationPresetPage : Page
         Grid.SetColumn(intensity, 2);
         grid.Children.Add(intensity);
 
+        var addIcon = new SymbolIcon
+        {
+            Symbol = SymbolRegular.Add16,
+            FontSize = 14,
+            Margin = new Thickness(0, 0, 5, 0)
+        };
+        var addText = new TextBlock
+        {
+            Text = UiText.Get("add"),
+            VerticalAlignment = VerticalAlignment.Center
+        };
         var add = new UiButton
         {
             Content = new StackPanel
             {
                 Orientation = Orientation.Horizontal,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                Children =
-                {
-                    new SymbolIcon { Symbol = SymbolRegular.Add16, FontSize = 14, Margin = new Thickness(0, 0, 5, 0) },
-                    new TextBlock { Text = UiText.Get("add"), VerticalAlignment = VerticalAlignment.Center }
-                }
+                Children = { addIcon, addText }
             },
             Height = 28,
             MinHeight = 28,
@@ -191,12 +198,16 @@ public partial class ConfigurationPresetPage : Page
             VerticalContentAlignment = VerticalAlignment.Center,
             Tag = preset.Id,
             IsEnabled = !definition.IsExperimental,
-            Style = definition.IsExperimental
-                ? (Style)FindResource("DisabledPresetButtonStyle")
-                : null,
             ToolTip = definition.IsExperimental ? UiText.Get("experimentalPreset") : UiText.Get("add")
         };
-        add.Click += AddPreset_Click;
+        if (definition.IsExperimental)
+        {
+            var disabledForeground = (Brush)FindResource("DisabledTextBrush");
+            add.Style = (Style)FindResource("DisabledPresetButtonStyle");
+            add.Foreground = disabledForeground;
+            addIcon.Foreground = disabledForeground;
+            addText.Foreground = disabledForeground;
+        }        add.Click += AddPreset_Click;
         Grid.SetRow(add, 1);
         Grid.SetColumn(add, 0);
         Grid.SetColumnSpan(add, 3);
