@@ -7,6 +7,8 @@ public sealed record BlendSettings
     public double TargetWidthMillimeters { get; init; } = 210;
     public bool NormalizePageSize { get; init; }
     public PageSizePreset PageSize { get; init; } = PageSizePreset.A4;
+    public double PageWidthMillimeters { get; init; } = 210;
+    public double PageHeightMillimeters { get; init; } = 297;
     public ProtectionMethod Protection { get; init; } = ProtectionMethod.None;
     public ImageQuality ImageQuality { get; init; } = ImageQuality.Standard;
     public int Dpi { get; init; } = 300;

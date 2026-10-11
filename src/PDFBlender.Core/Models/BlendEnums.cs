@@ -38,7 +38,20 @@ public enum PageSizePreset
     A2,
     Letter,
     Legal,
-    Custom
+    Custom,
+    A6,
+    A1,
+    A0,
+    B5,
+    B4,
+    B3,
+    B2,
+    B1,
+    B0,
+    C5,
+    C4,
+    Tabloid,
+    Executive
 }
 
 public enum TextureStrength

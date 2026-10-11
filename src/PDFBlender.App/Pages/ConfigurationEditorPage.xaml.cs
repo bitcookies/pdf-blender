@@ -46,6 +46,8 @@ public partial class ConfigurationEditorPage : Page
     private readonly UiToggleSwitch _promptInjection = new();
     private readonly UiToggleSwitch _gan = new();
     private readonly UiTextBox _width = new();
+    private readonly UiTextBox _pageWidth = new();
+    private readonly UiTextBox _pageHeight = new();
     private readonly ComboBox _dpi = new();
     private readonly ComboBox _watermarkType = new();
     private readonly UiTextBox _watermarkText = new();
@@ -205,13 +207,15 @@ public partial class ConfigurationEditorPage : Page
         _metadata.IsChecked = _settings.MetadataNormalization || _settings.ProtectionDeclaration;
         _permissions.IsChecked = _settings.PermissionRestriction;
 
-        _contentWidthPreset.ItemsSource = new[] { PageSizePreset.A5, PageSizePreset.A4, PageSizePreset.A3, PageSizePreset.Letter, PageSizePreset.Legal, PageSizePreset.Custom };
+        _contentWidthPreset.ItemsSource = CommonPageSizes(includeCustom: true);
         _contentWidthPreset.SelectedItem = _settings.ContentWidthPreset == PageSizePreset.Original ? PageSizePreset.A4 : _settings.ContentWidthPreset;
         _width.Text = _settings.TargetWidthMillimeters.ToString("0.##", CultureInfo.InvariantCulture);
         _dpi.ItemsSource = new[] { 72, 150, 200, 300, 450, 600 };
         _dpi.SelectedItem = _settings.Dpi;
-        _pageSizePreset.ItemsSource = new[] { PageSizePreset.A5, PageSizePreset.A4, PageSizePreset.A3, PageSizePreset.A2, PageSizePreset.Letter, PageSizePreset.Legal };
+        _pageSizePreset.ItemsSource = CommonPageSizes(includeCustom: true);
         _pageSizePreset.SelectedItem = _settings.PageSize == PageSizePreset.Original ? PageSizePreset.A4 : _settings.PageSize;
+        _pageWidth.Text = _settings.PageWidthMillimeters.ToString("0.##", CultureInfo.InvariantCulture);
+        _pageHeight.Text = _settings.PageHeightMillimeters.ToString("0.##", CultureInfo.InvariantCulture);
         _imageQuality.ItemsSource = new[] { UiText.Get("qualityCompact"), UiText.Get("qualityStandard"), UiText.Get("qualityHigh"), UiText.Get("qualityLossless") };
         _imageQuality.SelectedIndex = (int)_settings.ImageQuality;
         _watermarkType.ItemsSource = new[] { UiText.Get("text"), UiText.Get("fullPage") };
@@ -231,7 +235,11 @@ public partial class ConfigurationEditorPage : Page
 
         AddSection(UiText.Get("pageFormat"));
         AddFeature(UiText.Get("normalizeWidth"), UiText.Get("normalizeHint"), _normalize, [Labeled(UiText.Get("targetWidthPreset"), _contentWidthPreset), Labeled(UiText.Get("targetWidth"), _width)]);
-        AddFeature(UiText.Get("normalizePageSize"), UiText.Get("normalizePageSizeHint"), _pageSize, [Labeled(UiText.Get("pageSize"), _pageSizePreset)]);
+        AddFeature(UiText.Get("normalizePageSize"), UiText.Get("normalizePageSizeHint"), _pageSize, [
+            Labeled(UiText.Get("pageSize"), _pageSizePreset),
+            Labeled(UiText.Get("pageWidth"), _pageWidth),
+            Labeled(UiText.Get("pageHeight"), _pageHeight)
+        ]);
 
         AddSection(UiText.Get("flattening"));
         AddFeature(UiText.Get("flatten"), UiText.Get("protectionHint"), _flatten, [Labeled(UiText.Get("dpi"), _dpi), Labeled(UiText.Get("imageQuality"), _imageQuality)]);
@@ -262,7 +270,9 @@ public partial class ConfigurationEditorPage : Page
         _normalize.Checked += (_, _) => { _pageSize.IsChecked = false; UpdateSaveState(); };
         _pageSize.Checked += (_, _) => { _normalize.IsChecked = false; UpdateSaveState(); };
         _contentWidthPreset.SelectionChanged += (_, _) => UpdateWidthFromPreset();
+        _pageSizePreset.SelectionChanged += (_, _) => UpdatePageSizeFromPreset();
         UpdateWidthFromPreset();
+        UpdatePageSizeFromPreset();
     }
 
     private void AddSection(string title)
@@ -282,16 +292,79 @@ public partial class ConfigurationEditorPage : Page
         _width.Visibility = preset == PageSizePreset.Custom ? Visibility.Visible : Visibility.Collapsed;
         if (preset == PageSizePreset.Custom)
             return;
-        _width.Text = preset switch
-        {
-            PageSizePreset.A5 => "148",
-            PageSizePreset.A4 => "210",
-            PageSizePreset.A3 => "297",
-            PageSizePreset.Letter => "215.9",
-            PageSizePreset.Legal => "215.9",
-            _ => _width.Text
-        };
+        _width.Text = WidthForPreset(preset).ToString("0.##", CultureInfo.InvariantCulture);
     }
+
+    private void UpdatePageSizeFromPreset()
+    {
+        if (_pageSizePreset.SelectedItem is not PageSizePreset preset)
+            return;
+        var custom = preset == PageSizePreset.Custom;
+        _pageWidth.Visibility = custom ? Visibility.Visible : Visibility.Collapsed;
+        _pageHeight.Visibility = custom ? Visibility.Visible : Visibility.Collapsed;
+        if (custom)
+            return;
+        var (width, height) = DimensionsForPreset(preset);
+        _pageWidth.Text = width.ToString("0.##", CultureInfo.InvariantCulture);
+        _pageHeight.Text = height.ToString("0.##", CultureInfo.InvariantCulture);
+    }
+
+    private static IReadOnlyList<PageSizePreset> CommonPageSizes(bool includeCustom) =>
+        new[]
+        {
+            PageSizePreset.A6, PageSizePreset.A5, PageSizePreset.A4, PageSizePreset.A3, PageSizePreset.A2,
+            PageSizePreset.A1, PageSizePreset.A0, PageSizePreset.B5, PageSizePreset.B4, PageSizePreset.B3,
+            PageSizePreset.B2, PageSizePreset.B1, PageSizePreset.B0, PageSizePreset.C5, PageSizePreset.C4,
+            PageSizePreset.Letter, PageSizePreset.Legal, PageSizePreset.Tabloid, PageSizePreset.Executive
+        }.Concat(includeCustom ? new[] { PageSizePreset.Custom } : Array.Empty<PageSizePreset>()).ToArray();
+
+    private static double WidthForPreset(PageSizePreset preset) => preset switch
+    {
+        PageSizePreset.A6 => 105,
+        PageSizePreset.A5 => 148,
+        PageSizePreset.A4 => 210,
+        PageSizePreset.A3 => 297,
+        PageSizePreset.A2 => 420,
+        PageSizePreset.A1 => 594,
+        PageSizePreset.A0 => 841,
+        PageSizePreset.B5 => 176,
+        PageSizePreset.B4 => 250,
+        PageSizePreset.B3 => 353,
+        PageSizePreset.B2 => 500,
+        PageSizePreset.B1 => 707,
+        PageSizePreset.B0 => 1000,
+        PageSizePreset.C5 => 162,
+        PageSizePreset.C4 => 229,
+        PageSizePreset.Letter => 215.9,
+        PageSizePreset.Legal => 215.9,
+        PageSizePreset.Tabloid => 279.4,
+        PageSizePreset.Executive => 184.15,
+        _ => 210
+    };
+
+    private static (double Width, double Height) DimensionsForPreset(PageSizePreset preset) => preset switch
+    {
+        PageSizePreset.A6 => (105, 148),
+        PageSizePreset.A5 => (148, 210),
+        PageSizePreset.A4 => (210, 297),
+        PageSizePreset.A3 => (297, 420),
+        PageSizePreset.A2 => (420, 594),
+        PageSizePreset.A1 => (594, 841),
+        PageSizePreset.A0 => (841, 1189),
+        PageSizePreset.B5 => (176, 250),
+        PageSizePreset.B4 => (250, 353),
+        PageSizePreset.B3 => (353, 500),
+        PageSizePreset.B2 => (500, 707),
+        PageSizePreset.B1 => (707, 1000),
+        PageSizePreset.B0 => (1000, 1414),
+        PageSizePreset.C5 => (162, 229),
+        PageSizePreset.C4 => (229, 324),
+        PageSizePreset.Letter => (215.9, 279.4),
+        PageSizePreset.Legal => (215.9, 355.6),
+        PageSizePreset.Tabloid => (279.4, 431.8),
+        PageSizePreset.Executive => (184.15, 266.7),
+        _ => (210, 297)
+    };
 
     private void AddFeature(string title, string hint, UiToggleSwitch toggle, IEnumerable<UIElement> details, bool requiresFlatten = false)
     {
@@ -474,13 +547,22 @@ public partial class ConfigurationEditorPage : Page
         }
         var width = double.TryParse(_width.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var value) ? value : double.NaN;
         if (_normalize.IsChecked != true && !double.IsFinite(width)) width = 210;
+        var pageWidth = double.TryParse(_pageWidth.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsedPageWidth) ? parsedPageWidth : double.NaN;
+        var pageHeight = double.TryParse(_pageHeight.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsedPageHeight) ? parsedPageHeight : double.NaN;
+        if (_pageSize.IsChecked != true)
+        {
+            pageWidth = 210;
+            pageHeight = 297;
+        }
         var settings = _settings with
         {
             NormalizeContentWidth = _normalize.IsChecked == true,
             TargetWidthMillimeters = width,
             ContentWidthPreset = _contentWidthPreset.SelectedItem is PageSizePreset widthPreset ? widthPreset : PageSizePreset.A4,
             NormalizePageSize = _pageSize.IsChecked == true,
-            PageSize = _pageSizePreset.SelectedItem is PageSizePreset pageSize ? pageSize : PageSizePreset.Original,
+            PageSize = _pageSizePreset.SelectedItem is PageSizePreset pageSize ? pageSize : PageSizePreset.A4,
+            PageWidthMillimeters = pageWidth,
+            PageHeightMillimeters = pageHeight,
             Protection = _flatten.IsChecked == true ? ProtectionMethod.Flatten : ProtectionMethod.None,
             Dpi = _dpi.SelectedItem is int dpi ? dpi : 300,
             ImageQuality = (ImageQuality)Math.Clamp(_imageQuality.SelectedIndex, 0, 3),

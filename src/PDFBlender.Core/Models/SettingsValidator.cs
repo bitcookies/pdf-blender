@@ -12,7 +12,12 @@ public static class SettingsValidator
             || !Enum.IsDefined(settings.Texture) || !Enum.IsDefined(settings.CopyLayer)) errors.Add("validationMode");
         if (settings.NormalizeContentWidth && (!Enum.IsDefined(settings.ContentWidthPreset) || settings.ContentWidthPreset == PageSizePreset.Original
             || !double.IsFinite(settings.TargetWidthMillimeters) || settings.TargetWidthMillimeters is < 10 or > 2000)) errors.Add("validationWidth");
-        if (settings.NormalizePageSize && (!Enum.IsDefined(settings.PageSize) || settings.PageSize is PageSizePreset.Original or PageSizePreset.Custom)) errors.Add("validationPaper");
+        if (settings.NormalizePageSize && (!Enum.IsDefined(settings.PageSize) || settings.PageSize == PageSizePreset.Original)) errors.Add("validationPaper");
+        if (settings.NormalizePageSize && settings.PageSize == PageSizePreset.Custom
+            && (!double.IsFinite(settings.PageWidthMillimeters) || !double.IsFinite(settings.PageHeightMillimeters)
+                || settings.PageWidthMillimeters is < 10 or > 2000
+                || settings.PageHeightMillimeters is < 10 or > 2000))
+            errors.Add("validationPaperSize");
         var raster = settings.Protection == ProtectionMethod.Flatten;
         if (raster && settings.Dpi is < 72 or > 600) errors.Add("validationDpi");
         if (raster && !Enum.IsDefined(settings.ImageQuality)) errors.Add("validationQuality");

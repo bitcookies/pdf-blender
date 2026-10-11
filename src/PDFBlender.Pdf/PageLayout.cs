@@ -25,12 +25,27 @@ internal readonly record struct PageLayout(double SourceWidth, double SourceHeig
         {
             var mm = settings.PageSize switch
             {
+                PageSizePreset.A6 => (105d, 148d),
                 PageSizePreset.A5 => (148d, 210d),
                 PageSizePreset.A4 => (210d, 297d),
                 PageSizePreset.A3 => (297d, 420d),
                 PageSizePreset.A2 => (420d, 594d),
+                PageSizePreset.A1 => (594d, 841d),
+                PageSizePreset.A0 => (841d, 1189d),
+                PageSizePreset.B5 => (176d, 250d),
+                PageSizePreset.B4 => (250d, 353d),
+                PageSizePreset.B3 => (353d, 500d),
+                PageSizePreset.B2 => (500d, 707d),
+                PageSizePreset.B1 => (707d, 1000d),
+                PageSizePreset.B0 => (1000d, 1414d),
+                PageSizePreset.C5 => (162d, 229d),
+                PageSizePreset.C4 => (229d, 324d),
                 PageSizePreset.Letter => (215.9d, 279.4d),
                 PageSizePreset.Legal => (215.9d, 355.6d),
+                PageSizePreset.Tabloid => (279.4d, 431.8d),
+                PageSizePreset.Executive => (184.15d, 266.7d),
+                PageSizePreset.Custom when settings.PageWidthMillimeters > 0 && settings.PageHeightMillimeters > 0
+                    => (settings.PageWidthMillimeters, settings.PageHeightMillimeters),
                 _ => throw new PdfProcessingException("validationPaper")
             };
             if (width > height) mm = (mm.Item2, mm.Item1);
