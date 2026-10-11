@@ -66,6 +66,7 @@ public partial class ConfigurationEditorPage : Page
     private string _selectedColorKey;
     private string _selectedIconKey;
     private BlendSettings _settings;
+    private readonly Dictionary<FrameworkElement, int> _visibilityVersions = new();
 
     internal ConfigurationEditorPage(AppSession session, DialogService dialogs, BlendConfiguration? source, bool isNew, Action back, Action<BlendConfiguration, bool, string, BlendSettings, string, string> save, Action listBack)
     {
@@ -592,7 +593,7 @@ public partial class ConfigurationEditorPage : Page
         panel.Children.Add(new TextBlock
         {
             Text = label,
-            VerticalAlignment = VerticalAlignment.Center,
+            VerticalAlignment = (control as UiTextBox)?.AcceptsReturn == true ? VerticalAlignment.Top : VerticalAlignment.Center,
             Margin = new Thickness(0, 0, 12, 0)
         });
 
@@ -689,49 +690,70 @@ public partial class ConfigurationEditorPage : Page
             }
             current = current is FrameworkElement element ? element.Parent : null;
         }
-        if (row is null) return;
+        if (row is null)
+            return;
+
         var show = visibility == Visibility.Visible;
+        var version = _visibilityVersions.TryGetValue(row, out var previousVersion) ? previousVersion + 1 : 1;
+        _visibilityVersions[row] = version;
+        row.BeginAnimation(FrameworkElement.HeightProperty, null);
+
         if (!IsLoaded || !SystemParameters.ClientAreaAnimation)
         {
-            row.BeginAnimation(FrameworkElement.HeightProperty, null);
             row.Visibility = visibility;
             row.Height = show ? double.NaN : 0;
             return;
         }
+
         if (show)
         {
             row.Visibility = Visibility.Visible;
             row.Height = double.NaN;
-            row.Measure(new Size(Math.Max(1, FeaturePanel.ActualWidth), double.PositiveInfinity));
-            var target = row.DesiredSize.Height;
+            row.UpdateLayout();
+            var availableWidth = FeaturePanel.ActualWidth > 0 ? FeaturePanel.ActualWidth : 760;
+            row.Measure(new Size(availableWidth, double.PositiveInfinity));
+            var target = Math.Max(1, row.DesiredSize.Height);
             row.Height = 0;
             var animation = new DoubleAnimation(0, target, TimeSpan.FromMilliseconds(160))
             {
                 EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
             };
-            animation.Completed += (_, _) => row.Height = double.NaN;
-            row.BeginAnimation(FrameworkElement.HeightProperty, animation);
-        }
-        else
-        {
-            var currentHeight = row.ActualHeight;
-            if (currentHeight <= 0)
-            {
-                row.Visibility = Visibility.Collapsed;
-                row.Height = 0;
-                return;
-            }
-            var animation = new DoubleAnimation(currentHeight, 0, TimeSpan.FromMilliseconds(140))
-            {
-                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
-            };
             animation.Completed += (_, _) =>
             {
-                row.Visibility = Visibility.Collapsed;
-                row.Height = 0;
+                if (!_visibilityVersions.TryGetValue(row, out var currentVersion) || currentVersion != version)
+                    return;
+                row.BeginAnimation(FrameworkElement.HeightProperty, null);
+                row.Height = double.NaN;
             };
             row.BeginAnimation(FrameworkElement.HeightProperty, animation);
+            return;
         }
+
+        row.Visibility = Visibility.Visible;
+        row.Height = double.NaN;
+        row.UpdateLayout();
+        var currentHeight = Math.Max(row.ActualHeight, row.DesiredSize.Height);
+        if (currentHeight <= 0)
+        {
+            row.Visibility = Visibility.Collapsed;
+            row.Height = 0;
+            return;
+        }
+
+        row.Height = currentHeight;
+        var collapseAnimation = new DoubleAnimation(currentHeight, 0, TimeSpan.FromMilliseconds(140))
+        {
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
+        };
+        collapseAnimation.Completed += (_, _) =>
+        {
+            if (!_visibilityVersions.TryGetValue(row, out var currentVersion) || currentVersion != version)
+                return;
+            row.BeginAnimation(FrameworkElement.HeightProperty, null);
+            row.Visibility = Visibility.Collapsed;
+            row.Height = 0;
+        };
+        row.BeginAnimation(FrameworkElement.HeightProperty, collapseAnimation);
     }
     private void UpdateSaveState() {
         var hasName = !string.IsNullOrWhiteSpace(NameBox.Text);
