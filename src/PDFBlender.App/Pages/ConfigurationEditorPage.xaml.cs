@@ -55,7 +55,6 @@ public partial class ConfigurationEditorPage : Page
     private readonly CheckBox _allowAnnotations = new();
     private readonly CheckBox _allowForms = new();
     private readonly UiToggleSwitch _promptInjection = new();
-    private readonly UiToggleSwitch _gan = new();
     private readonly UiTextBox _width = new();
     private readonly UiTextBox _pageWidth = new();
     private readonly UiTextBox _pageHeight = new();
@@ -211,7 +210,6 @@ public partial class ConfigurationEditorPage : Page
         _hiddenAi.IsChecked = _settings.HiddenAiText;
         _promptInjection.IsChecked = _settings.PromptInjection;
         _promptInjectionText.Text = _settings.PromptInjectionText;
-        _gan.IsChecked = false;
         _promptInjectionText.AcceptsReturn = true;
         _promptInjectionText.TextWrapping = TextWrapping.Wrap;
         _promptInjectionText.Height = 74;
@@ -284,10 +282,6 @@ public partial class ConfigurationEditorPage : Page
         AddSection(UiText.Get("promptInjectionGroup"));
         AddFeature(UiText.Get("hiddenAiText"), UiText.Get("hiddenAiTextHint"), _hiddenAi, [Labeled(UiText.Get("promptTemplates"), _promptTemplates)]);
         AddFeature(UiText.Get("promptInjection"), UiText.Get("promptInjectionHint"), _promptInjection, [Labeled(UiText.Get("promptText"), _promptInjectionText)]);
-
-        AddSection(UiText.Get("ganGroup"));
-        AddFeature(UiText.Get("ganPerturbation"), UiText.Get("ganPerturbationHint"), _gan, []);
-
         AddSection(UiText.Get("copyrightProtection"));
         AddFeature(UiText.Get("metadata"), UiText.Get("metadataHint"), _metadata, [Labeled(UiText.Get("author"), _metadataAuthor), Labeled(UiText.Get("organization"), _metadataOrganization), Labeled(UiText.Get("copyright"), _metadataCopyright)]);
         AddFeature(UiText.Get("permissionRestriction"), UiText.Get("permissionHint"), _permissions, [CreatePermissionOptions()]);
@@ -550,7 +544,7 @@ public partial class ConfigurationEditorPage : Page
             detail.BeginAnimation(FrameworkElement.HeightProperty, animation);
         }
 
-        toggle.IsEnabled = toggle != _gan && (!requiresFlatten || _flatten.IsChecked == true);
+        toggle.IsEnabled = !requiresFlatten || _flatten.IsChecked == true;
         RefreshEnabledVisual();
         toggle.IsEnabledChanged += (_, _) => RefreshEnabledVisual();
         toggle.Checked += (_, _) =>
@@ -757,7 +751,7 @@ public partial class ConfigurationEditorPage : Page
     }
     private void UpdateSaveState() {
         var hasName = !string.IsNullOrWhiteSpace(NameBox.Text);
-        var hasFeature = _normalize.IsChecked == true || _pageSize.IsChecked == true || _flatten.IsChecked == true || _watermark.IsChecked == true || _noise.IsChecked == true || _texture.IsChecked == true || _geometry.IsChecked == true || _microText.IsChecked == true || _copyLayer.IsChecked == true || _hiddenAi.IsChecked == true || _promptInjection.IsChecked == true || _gan.IsChecked == true || _metadata.IsChecked == true || _permissions.IsChecked == true;
+        var hasFeature = _normalize.IsChecked == true || _pageSize.IsChecked == true || _flatten.IsChecked == true || _watermark.IsChecked == true || _noise.IsChecked == true || _texture.IsChecked == true || _geometry.IsChecked == true || _microText.IsChecked == true || _copyLayer.IsChecked == true || _hiddenAi.IsChecked == true || _promptInjection.IsChecked == true || _metadata.IsChecked == true || _permissions.IsChecked == true;
         SaveButton.IsEnabled = hasName && (!_isNew || hasFeature) && (_copyLayer.IsChecked != true || _copyLayerMode.SelectedIndex != 3 || !string.IsNullOrWhiteSpace(_copyLayerCustomText.Text)) && (_hiddenAi.IsChecked != true || _selectedPromptTemplateIds.Count > 0);
         var saveTextResource = SaveButton.IsEnabled ? "AccentTextBrush" : "EditorSaveDisabledTextBrush";
 
