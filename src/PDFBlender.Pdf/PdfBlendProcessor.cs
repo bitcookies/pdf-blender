@@ -90,7 +90,7 @@ public sealed class PdfBlendProcessor : IBlendProcessor
             var layout = PageLayout.Create(rotated ? box.Height : box.Width, rotated ? box.Width : box.Height, settings);
             if (settings.NormalizeContentWidth || settings.NormalizePageSize) NativePageLayout.Apply(page, layout);
             PdfOverlays.Watermark(page, settings);
-            if (i == 0) PdfOverlays.HiddenStatements(page, settings);
+            PdfOverlays.HiddenStatements(page, settings);
             progress?.Report(new BlendProgress(i + 1, pageCount, "Native"));
         }
         ApplyMetadata(document, settings);
@@ -119,7 +119,7 @@ public sealed class PdfBlendProcessor : IBlendProcessor
             page.Height = XUnit.FromPoint(layout.Height);
             RasterPageBuilder.Build(page, bytes, i, layout, settings, token);
             PdfOverlays.Watermark(page, settings);
-            if (i == 0) PdfOverlays.HiddenStatements(page, settings);
+            PdfOverlays.HiddenStatements(page, settings);
             if (settings.CopyLayer != CopyLayerMode.Preserve)
             {
                 var letters = pig!.GetPage(i + 1);

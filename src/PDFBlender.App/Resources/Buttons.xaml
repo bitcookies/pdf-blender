@@ -10,10 +10,12 @@
         <Setter Property="Focusable" Value="False" />
         <Setter Property="IsTabStop" Value="False" />
     </Style>
+    <Style x:Key="DisabledPresetButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+        <Setter Property="Foreground" Value="{DynamicResource DisabledTextBrush}" />
+        <Setter Property="Cursor" Value="Arrow" />
+    </Style>
     <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Cursor" Value="Hand" />
     </Style>
 </ResourceDictionary>
-
-

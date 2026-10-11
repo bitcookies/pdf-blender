@@ -30,7 +30,14 @@
             </ui:BreadcrumbBar>
             <TextBlock x:Name="TitleText" Style="{StaticResource PageTitleTextStyle}" />
             <TextBlock x:Name="SubtitleText" Style="{StaticResource PageDescriptionTextStyle}" Margin="0,3,0,14" />
-            <UniformGrid x:Name="PresetPanel" Columns="2" />
+            <TextBlock x:Name="FunctionalHeading"
+                       Style="{StaticResource SectionTitleTextStyle}"
+                       Margin="0,4,0,8" />
+            <UniformGrid x:Name="FunctionalPresetPanel" Columns="2" />
+            <TextBlock x:Name="CommonHeading"
+                       Style="{StaticResource SectionTitleTextStyle}"
+                       Margin="0,14,0,8" />
+            <UniformGrid x:Name="CommonPresetPanel" Columns="2" />
         </StackPanel>
     </ScrollViewer>
 </Page>

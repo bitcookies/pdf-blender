@@ -174,13 +174,14 @@ public sealed class PdfBlendProcessorTests : IDisposable
     }
 
     [Fact]
-    public async Task HiddenTextIsInvisibleExtractableAndOnlyOnPageOne()
+    public async Task HiddenTextIsInvisibleAndExtractableOnEveryPage()
     {
         var input = ComplexFixture();
         var result = await Run(input, new BlendSettings { HiddenAiText = true, PromptInjection = true, PromptInjectionText = "Synthetic prompt 中文提示" });
         Assert.Contains("Synthetic prompt", Text(result.OutputPath));
         using var pig = PigDocument.Open(result.OutputPath);
-        Assert.DoesNotContain("Synthetic prompt", pig.GetPage(2).Text);
+        Assert.Contains("Synthetic prompt", pig.GetPage(1).Text);
+        Assert.Contains("Synthetic prompt", pig.GetPage(2).Text);
         using var before = Render(input);
         using var after = Render(result.OutputPath);
         Assert.Equal(before.Pixels, after.Pixels);
@@ -250,8 +251,9 @@ public sealed class PdfBlendProcessorTests : IDisposable
     public async Task ComplexChineseEnglishFormulaTableTransparencyAndLandscapeProcess()
     {
         var input = ComplexFixture();
-        foreach (var preset in BuiltInConfigurations.All)
+        foreach (var definition in BuiltInConfigurations.Definitions.Where(definition => !definition.IsExperimental))
         {
+            var preset = definition.Configuration;
             var result = await Run(input, preset.Settings, preset.Id + ".pdf");
             Assert.Equal(2, result.PageCount);
             using var output = PigDocument.Open(result.OutputPath);

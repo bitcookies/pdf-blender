@@ -10,7 +10,7 @@ Date: 2026-10-10. Local Windows / .NET SDK 10.0.401. No user document content wa
 - `pwsh ./build.ps1 1 -Force`: portable output successfully produced.
 - Published executable FileVersion/ProductVersion `0.10.0.0`; description/product `PDF Blender`; copyright `Copyright © 2016-2026 BITCOOKIES`.
 - Third-party notice and both new license texts are present in portable output.
-- Independent smoke console (ignored tmp project) used the production font resolver, all five presets with bilingual invisible text and optional reordered copy layer; all five completed and text extraction succeeded.
+- Independent smoke console (ignored tmp project) used the production font resolver, all nonexperimental presets with bilingual invisible text and optional reordered copy layer; experimental presets were rejected by validation.
 
 ## Automated output evidence
 Settings tests cover all-off defaults, valid five presets, active-parameter round trips, finite dimensions/DPI, dependency validation, independent permissions, GAN rejection and prompt/angle constraints.

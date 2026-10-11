@@ -61,11 +61,11 @@ The Configuration page shows five fixed 72 px Home blend slots followed by a sep
 
 Configuration cards are fixed at 72 px high. The icon, content, metadata, and three-dot action area use stable grid columns. The menu uses WPF-UI MenuItem entries and an explicit PlacementTarget so it opens below the clicked button.
 
-New configuration, preset selection, and editing are nested pages under BreadcrumbBar. The creation flow has no ContentDialog. A locked configuration disables edit and delete while leaving unlock available. Configuration persistence schema 9 resets unpublished older development files without changing preferences.
+New configuration, preset selection, and editing are nested pages under BreadcrumbBar. The creation flow has no ContentDialog. A locked configuration disables edit and delete while leaving unlock available. Configuration persistence schema 10 resets unpublished older development files without changing preferences.
 
 ## Configuration Page Revision
 
-Empty slots render the Add icon and the level-specific drop label inside the tile. Configuration cards use WPF-UI icons, five fixed columns, stable grid alignment, and a menu whose PlacementTarget is the three-dot button. Schema 9 stores stable ShortId, ColorKey and IconKey.
+Empty slots render the Add icon and the level-specific drop label inside the tile. Configuration cards use WPF-UI icons, five fixed columns, stable grid alignment, and a menu whose PlacementTarget is the three-dot button. Schema 10 stores stable ShortId, ColorKey and IconKey.
 
 ## v0.10 PDF Feature Controls
 All switches default off; name and at least one feature are required for a new custom config. Width and paper normalization are mutually exclusive. Width offers presets and Custom mm; page size fits centered into standard paper. Save/reopen retains preset, mm, DPI, quality, angle/text and every feature toggle.

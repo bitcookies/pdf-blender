@@ -38,6 +38,8 @@ internal static class ConfigurationIconCatalog
         return CreateKey(RegularKeys.Contains(key, StringComparer.Ordinal) ? key : RegularKeys[0], false);
     }
 
+    public static string NormalizePreset(string? key) => Normalize(key);
+
     public static string ForIndex(int index) => Normalize(RegularKeys[Math.Abs(index) % RegularKeys.Count]);
 
     public static string ForPresetIndex(int index)

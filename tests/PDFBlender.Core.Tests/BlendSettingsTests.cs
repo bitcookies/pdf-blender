@@ -41,16 +41,29 @@ public sealed class BlendSettingsTests
     [Fact]
     public void BuiltInConfigurationsContainStableLocalizedPresetIds()
     {
-        Assert.Equal(5, BuiltInConfigurations.All.Count);
-        Assert.All(BuiltInConfigurations.All, configuration => { Assert.True(configuration.IsBuiltIn); Assert.Empty(SettingsValidator.Validate(configuration.Settings)); });
-        Assert.Equal("format-only", BuiltInConfigurations.All[0].Id);
-        Assert.Equal("copy-layer-shield", BuiltInConfigurations.All[4].Id);
+        Assert.Equal(13, BuiltInConfigurations.All.Count);
+        Assert.Equal(9, BuiltInConfigurations.Definitions.Count(definition => definition.Category == PresetCategory.Functional));
+        Assert.Equal(4, BuiltInConfigurations.Definitions.Count(definition => definition.Category == PresetCategory.Common));
+        Assert.All(BuiltInConfigurations.Definitions, definition =>
+        {
+            Assert.True(definition.Configuration.IsBuiltIn);
+            Assert.False(string.IsNullOrWhiteSpace(definition.NameKey));
+            Assert.False(string.IsNullOrWhiteSpace(definition.DescriptionKey));
+            Assert.False(string.IsNullOrWhiteSpace(definition.IconKey));
+            var errors = SettingsValidator.Validate(definition.Configuration.Settings);
+            if (definition.IsExperimental)
+                Assert.Contains("validationGanUnsupported", errors);
+            else
+                Assert.Empty(errors);
+        });
+        Assert.Equal("normalize-width-a4", BuiltInConfigurations.All[0].Id);
+        Assert.Equal("maximum-protection", BuiltInConfigurations.All[^1].Id);
         Assert.Equal(0, BuiltInConfigurations.All[0].Intensity);
-        Assert.True(BuiltInConfigurations.All[4].Intensity >= 7);
+        Assert.True(BuiltInConfigurations.All[^1].Intensity > BuiltInConfigurations.All[0].Intensity);
     }
 
     [Fact]
-    public void ConfigurationIntensityUsesTheStrongestEnabledFeature()
+    public void ConfigurationIntensityUsesTheSumOfEnabledFeatureWeights()
     {
         var widthOnly = new BlendSettings { NormalizeContentWidth = true };
         Assert.Equal(0, ConfigurationIntensity.For(widthOnly));
@@ -60,7 +73,7 @@ public sealed class BlendSettingsTests
             Watermark = WatermarkStyle.FullPage,
             Noise = NoiseStrength.Low
         };
-        Assert.Equal(4, ConfigurationIntensity.For(fullPageWatermarkAndLowNoise));
+        Assert.Equal(6, ConfigurationIntensity.For(fullPageWatermarkAndLowNoise));
     }
 
     [Fact]

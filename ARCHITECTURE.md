@@ -17,12 +17,12 @@ Metadata preservation/normalization and advisory permissions run before save. `P
 Output uses a same-directory temporary file and non-overwriting rename with collision suffix retries. Cancel/failure cleans the temporary file; successful earlier batch outputs remain. Native library rendering/writing cannot be cancelled mid-call; checks surround pages and expensive stages. Pixel buffers are disposed per page, while compressed output remains in the document until save.
 
 ## Models and UI
-Core owns the feature catalog, settings, five optional preset definitions, intensity calculation and validation keys. App translates keys; error displays contain no stack traces or extracted document contents. Editor controls persist every effective selection, use the existing top-anchored expansion, and gate raster features by Flatten. GAN stays disabled. Permissions have no raster dependency. Name/feature rules apply to new configurations.
+Core owns the feature catalog, settings, thirteen optional preset definitions (nine functional and four common), intensity calculation and validation keys. App translates keys; error displays contain no stack traces or extracted document contents. Editor controls persist every effective selection, use the existing top-anchored expansion, and gate raster features by Flatten. GAN stays disabled. Permissions have no raster dependency. Name/feature rules apply to new configurations.
 
 AppSession owns configuration state, alternative five-slot selection and preferences. `BlendWorkflowService` snapshots each file's progress index and processes files sequentially. Existing native WPF-UI BreadcrumbBar, nested page callbacks, cached navigation, theme/language resources, notification services and per-monitor DPI behavior remain unchanged.
 
 ## Persistence and Privacy
-ConfigurationStore schema 9 resets older development configurations only. First run starts empty; presets are explicitly added in the current language. Preferences remain separate. Short IDs, colors, icons and slots persist with the existing store. No PDF uploads, extracted-content logging, stored owner password or retained temporary page images.
+ConfigurationStore schema 10 resets older development configurations only. First run starts empty; presets are explicitly added in the current language. Preferences remain separate. Short IDs, colors, icons and slots persist with the existing store. No PDF uploads, extracted-content logging, stored owner password or retained temporary page images.
 
 ## Dependencies and Distribution
 PDFsharp 6.2.4 (MIT) and PdfPig 0.1.16 (Apache-2.0) provide managed .NET-compatible editing/extraction; PDFtoImage 5.4.0/PDFium/Skia remain the renderer. See `THIRD-PARTY-NOTICES.md` and `licenses/`. No implementation is adopted from ignored `PDF-Poisoning/` references.

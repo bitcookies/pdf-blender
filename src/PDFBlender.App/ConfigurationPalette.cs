@@ -70,6 +70,31 @@ internal static class ConfigurationPalette
 
     public static string ForPresetIndex(int index) => new[] { "coral", "sky", "mint", "orange", "violet" }[Math.Abs(index) % 5];
 
+    private static readonly string[] IntensityScale =
+    [
+        "gray", "green", "emerald", "leaf", "mint", "teal",
+        "cyan", "sky", "azure", "ocean", "blueGray", "slate",
+        "yellow", "amber", "orange", "tangerine", "tomato", "terracotta",
+        "scarlet", "brick", "coral", "rose", "pink", "magenta",
+        "fuchsia", "lilac", "violet", "indigo", "jade", "lime", "brown", "gray"
+    ];
+
+    public static string ForIntensity(int intensity)
+    {
+        if (intensity <= 0) return "gray";
+
+        // Keep light protection green, move medium protection through blue and warm colors,
+        // and reserve red tones for the strongest combinations.
+        var position = intensity switch
+        {
+            <= 5 => 1 + (intensity - 1) * 4 / 4,
+            <= 12 => 6 + (intensity - 6) * 5 / 7,
+            <= 21 => 12 + (intensity - 13) * 6 / 9,
+            <= 35 => 18 + (intensity - 22) * 5 / 14,
+            _ => 24 + Math.Min(7, (intensity - 36) * 7 / 27)
+        };
+        return IntensityScale[Math.Clamp(position, 0, IntensityScale.Length - 1)];
+    }
     public static Brush GetBrush(string? key) => CreateBrush(GetColor(key));
 
     public static Color GetColor(string? key)

@@ -10,7 +10,8 @@ internal sealed class AppSession
     private List<string?> _slotIds;
     private string? _selectedConfigurationId;
 
-    public IReadOnlyList<BlendConfiguration> BuiltInConfigurations { get; } = PDFBlender.Core.Models.BuiltInConfigurations.All;
+    public IReadOnlyList<BuiltInPresetDefinition> BuiltInPresetDefinitions { get; } = PDFBlender.Core.Models.BuiltInConfigurations.Definitions;
+    public IReadOnlyList<BlendConfiguration> BuiltInConfigurations => BuiltInPresetDefinitions.Select(definition => definition.Configuration).ToList();
     public IReadOnlyList<BlendConfiguration> AllConfigurations => _userConfigurations;
     public IReadOnlyList<BlendConfiguration?> SlotConfigurations => _slotIds.Select(id => id is null ? null : GetConfiguration(id)).ToList();
     public IReadOnlyList<string?> SlotIds => _slotIds;
@@ -84,17 +85,26 @@ internal sealed class AppSession
 
     public string AddPresetConfiguration(string presetId)
     {
-        var preset = BuiltInConfigurations.FirstOrDefault(item => string.Equals(item.Id, presetId, StringComparison.OrdinalIgnoreCase));
-        if (preset is null) return string.Empty;
+        var definition = BuiltInPresetDefinitions.FirstOrDefault(item =>
+            string.Equals(item.Configuration.Id, presetId, StringComparison.OrdinalIgnoreCase));
+        if (definition is null || definition.IsExperimental) return string.Empty;
+        var preset = definition.Configuration;
         var id = "preset-" + Guid.NewGuid().ToString("N");
-        var presetIndex = PDFBlender.Core.Models.BuiltInConfigurations.All.ToList().FindIndex(item => string.Equals(item.Id, preset.Id, StringComparison.OrdinalIgnoreCase));
-        _userConfigurations.Add(preset with { Id = id, Name = MakeUniqueName(LocalizedPresetName(preset)), IsBuiltIn = false, IsLocked = false, ShortId = CreateShortId(), ColorKey = ConfigurationPalette.Normalize(preset.ColorKey ?? ConfigurationPalette.ForPresetIndex(presetIndex)), IconKey = ConfigurationIconCatalog.Normalize(preset.IconKey ?? ConfigurationIconCatalog.ForPresetIndex(presetIndex)) });
+        _userConfigurations.Add(preset with
+        {
+            Id = id,
+            Name = MakeUniqueName(UiText.Get(definition.NameKey)),
+            IsBuiltIn = false,
+            IsLocked = false,
+            ShortId = CreateShortId(),
+            ColorKey = ConfigurationPalette.ForIntensity(preset.Intensity),
+            IconKey = ConfigurationIconCatalog.Normalize(definition.IconKey)
+        });
         _selectedConfigurationId = id;
         SaveAll();
         RaiseChanged(SessionChangeKind.Configurations);
         return id;
     }
-
     public string CopyConfiguration(string id)
     {
         var source = GetConfiguration(id);
@@ -276,22 +286,6 @@ internal sealed class AppSession
         }
     }
 
-    private static string LocalizedPresetName(BlendConfiguration preset)
-    {
-        var name = preset.Id switch
-        {
-            "format-only" => UiText.Get("presetFormatOnly"),
-            "light-mark" => UiText.Get("presetLightMark"),
-            "reading-first" => UiText.Get("presetReadingFirst"),
-            "balanced-protection" => UiText.Get("presetBalancedProtection"),
-            "copy-layer-shield" => UiText.Get("presetCopyLayerShield"),
-            "visual-obstruction" => UiText.Get("presetVisualObstruction"),
-            "ai-processing-resistance" => UiText.Get("presetAiResistance"),
-            "custom" => UiText.Get("customConfiguration"),
-            _ => preset.Name
-        };
-        return name;
-    }
     private static List<string?> NormalizeSlots(IEnumerable<string?> slots)
     {
         var result = slots.Take(5).ToList();

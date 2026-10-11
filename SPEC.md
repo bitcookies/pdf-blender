@@ -19,7 +19,7 @@ The first run has no configurations and five empty slots. Users explicitly creat
 
 The five slots are alternative configurations. Selecting one runs its settings for the batch; slots are not sequential pipeline stages. Empty slots remain disabled. Existing Home, Settings and configuration layouts remain unchanged in v0.10.
 
-Schema 9 intentionally clears older unpublished development configurations and slots. Preferences are separate and survive this reset.
+Schema 10 intentionally clears older unpublished development configurations and slots. Preferences are separate and survive this reset.
 
 ## Stable PDF Functions
 ### Native layout
@@ -45,14 +45,23 @@ Built-in bilingual passive machine-processing notice and optional custom text ar
 Title, Author, Subject and Keywords survive raster rebuilding. Normalization sets Creator/Producer/modification date; declaration appends to Subject. Reader-dependent permission restrictions are independent of Flatten. Standard PDF permission encryption uses an empty opening password and random internal owner password; reading, printing and accessibility remain allowed, copying/modification restricted. Owner passwords are not exposed, stored or logged. Restrictions are bypassable, not an access/security boundary.
 
 ## Optional Presets
-| ID | English | Chinese | Enabled combination |
-|---|---|---|---|
-| format-only | Format Only | 仅格式整理 | A4 width |
-| light-mark | Light Mark | 轻度标识 | A4 width + text watermark |
-| reading-first | Reading First | 阅读优先 | A4 width + faint repeat watermark + metadata/declaration |
-| balanced-protection | Balanced Protection | 平衡保护 | A4 width + 300 DPI Standard flatten + low noise + watermark + permissions |
-| copy-layer-shield | Copy Layer Shield | 复制层防护 | A4 width + 300 DPI High flatten + gibberish, copying unrestricted |
+The preset catalog contains nine functional presets and four common presets. GAN and Maximum Protection are marked experimental and cannot be added until the GAN backend is implemented.
 
+| Group | ID | English | Chinese | Enabled combination |
+|---|---|---|---|---|
+| Functional | normalize-width-a4 | Normalize Page Width A4 | 统一页面宽度 A4 | A4 width |
+| Functional | scale-to-a4 | Scale Pages to A4 | 缩放页面到 A4 | A4 page size |
+| Functional | flatten-width-a4 | Flatten to A4 Width | 扁平化页面宽度 A4 | A4 width + image flatten |
+| Functional | flatten-to-a4 | Flatten Pages to A4 | 扁平化缩放页面到 A4 | A4 page size + image flatten |
+| Functional | copy-obfuscation | Copy Obfuscation | 复制混淆 | image flatten + gibberish copy layer |
+| Functional | prompt-injection | Prompt Injection | 提示词注入 | passive hidden processing text |
+| Functional | text-watermark | Text Watermark | 文字水印 | visible text watermark |
+| Functional | distortion-watermark | Distortion Watermark | 扰动水印 | image flatten + noise/texture/geometry/microtext |
+| Functional | gan | GAN | GAN | experimental GAN (unavailable) |
+| Common | light-protection | Light Protection | 轻度防护 | watermark + metadata/declaration |
+| Common | reading-only | For Reading Only | 仅供阅读 | flatten + gibberish + watermark + prompt + metadata |
+| Common | enhanced-protection | Enhanced Protection | 加强保护 | reading-only + low noise/texture |
+| Common | maximum-protection | Maximum Protection | 最强保护 | full protection combination + GAN (experimental) |
 ## Validation and Output Safety
 Validate active finite dimensions (10-2000 mm), DPI (72-600), supported enums, watermark text/angle and prompt constraints in Core and editor. Raster prerequisites and mutually exclusive layout are enforced in both. GAN remains disabled/experimental and enabling it is rejected.
 
