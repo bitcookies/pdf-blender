@@ -1,6 +1,6 @@
 # PDF Blender Design Overview
 
-Status: v0.9.0 lightweight maintenance baseline
+Status: v1.0.0 release hardening baseline
 Detailed requirements: `SPEC.md`  
 Architecture boundaries: `ARCHITECTURE.md`  
 Interface and localization: `INTERFACE.md`
@@ -35,7 +35,7 @@ The main window is 820×600 with a 760×540 minimum. It uses WPF-UI `NavigationV
 
 Settings contains software preferences: System/Light/Dark, System/English/Simplified Chinese, and an Allow multiple instances toggle (off by default). Theme, language, and instance policy changes apply immediately. When multiple instances are disabled, startup uses a per-user mutex to keep one running window. Configuration cards own their feature values. Preferences and configurations are stored under the roaming AppData folder named PDF Blender; malformed or out-of-range values fall back to safe defaults.
 
-The initial presets are `STIR`, `BLEND`, and `PULSE`. `CRUSH` and `OVERBLEND` remain future/experimental until their quality and behavior are validated. Users can independently toggle supported options, and manual edits turn the selected preset into a modified/custom configuration.
+The stable preset catalog contains the current functional and common presets documented in SPEC.md. GAN remains a disabled experimental feature until its quality and behavior are validated. Users can independently toggle supported options, and manual edits turn the selected preset into a modified/custom configuration.
 
 The application uses the pinned `WPF-UI` 4.3.0 package for Fluent controls, themes, and icons. PDF processing remains in the existing Core/Pdf projects; the UI dependency does not alter output or protection semantics.
 
@@ -53,7 +53,7 @@ Normalize Content Width makes visual content the selected width and derives its 
 
 The first protection path is flattening: render each page and reconstruct it as raster content, then apply supported image operations and watermarks before writing the output PDF. DPI and pixel noise must stay within tested readability limits. Processing is local, asynchronous, cancellable, reports progress, and removes temporary files on every exit path. The source file is not overwritten by default.
 
-The first implementation uses `PDFtoImage` 5.4.0 with PDFium and SkiaSharp in the isolated `PDFBlender.Pdf` project. The dependency targets .NET 10, renders locally, and is published with the Windows native assets for portable builds. Settings contains the collapsible About section with product version, links, license, feedback, and developer information; real-document quality validation remains a release gate. `PDF-Poisoning/` may inform research but is external reference material, not an implementation dependency.
+The first implementation uses `PDFtoImage` 5.4.0 with PDFium and SkiaSharp in the isolated `PDFBlender.Pdf` project. The dependency targets .NET 10, renders locally, and is published with the Windows native assets for portable builds. Settings contains the collapsible About section with product version, links, license, feedback, and developer information; real-document quality validation remains a release gate. External research material is not included in the source tree or release package.
 
 ## Deferred Direction
 
@@ -77,4 +77,4 @@ The Configuration page starts with five fixed 72 px Home blend slots. Empty slot
 
 The configuration list uses five compact columns with fixed 72 px card height. Each card has a WPF-UI icon on the left, name and enabled-feature summary in the center, short ID and qualitative intensity on the bottom row, and an anchored three-dot menu in the top-right.
 
-Configuration metadata includes ShortId, ColorKey, and IconKey. Schema 6 loads schemas 1-5 and fills missing metadata. Creation, preset selection, and editing use nested pages with BreadcrumbBar; delete confirmation remains a ContentDialog.
+Configuration metadata includes ShortId, ColorKey, and IconKey. ConfigurationStore schema 11 intentionally resets older unpublished development configurations. Creation, preset selection, and editing use nested pages with BreadcrumbBar; delete confirmation remains a ContentDialog.

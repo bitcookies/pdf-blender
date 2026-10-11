@@ -41,9 +41,9 @@ public sealed class BlendSettingsTests
     [Fact]
     public void BuiltInConfigurationsContainStableLocalizedPresetIds()
     {
-        Assert.Equal(13, BuiltInConfigurations.All.Count);
+        Assert.Equal(14, BuiltInConfigurations.All.Count);
         Assert.Equal(9, BuiltInConfigurations.Definitions.Count(definition => definition.Category == PresetCategory.Functional));
-        Assert.Equal(4, BuiltInConfigurations.Definitions.Count(definition => definition.Category == PresetCategory.Common));
+        Assert.Equal(5, BuiltInConfigurations.Definitions.Count(definition => definition.Category == PresetCategory.Common));
         Assert.All(BuiltInConfigurations.Definitions, definition =>
         {
             Assert.True(definition.Configuration.IsBuiltIn);

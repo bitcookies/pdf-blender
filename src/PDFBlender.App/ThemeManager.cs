@@ -137,6 +137,7 @@ internal static class ThemeManager
             SetBrush(resources, "NavigationViewSelectionIndicatorForeground", "#E74856");
             SetBrush(resources, "NavigationViewItemBorderBrush", "#454545");
             SetWpfUiSurfacePalette(resources, "#272727", "#252525", "#2D2D2D", "#2D2D2D", "#383838", "#454545", "#242424", "#F2F2F2", "#B8B8B8", "#8A8A8A");
+            SetWpfUiAccentPalette(resources, "#E74856", "#F05A67", "#D33D4D");
             SetBrush(resources, "PillBrush", "#3A3A3A");
             SetBrush(resources, "PillTextBrush", "#F2F2F2");
             SetBrush(resources, "NotificationBrush", "#2D2D2D");
@@ -202,6 +203,7 @@ internal static class ThemeManager
             SetBrush(resources, "NavigationViewSelectionIndicatorForeground", "#C9021E");
             SetBrush(resources, "NavigationViewItemBorderBrush", "#E6E6E6");
             SetWpfUiSurfacePalette(resources, "#F9F9F9", "#F3F3F3", "#E6E6E6", "#FFFFFF", "#F6F6F6", "#EAEAEA", "#F8F8F8", "#202020", "#5E5E5E", "#777777");
+            SetWpfUiAccentPalette(resources, "#C9021E", "#E45F60", "#A80119");
             SetBrush(resources, "PillBrush", "#F6F6F6");
             SetBrush(resources, "PillTextBrush", "#202020");
             SetBrush(resources, "NotificationBrush", "#FCFCFC");
@@ -258,6 +260,34 @@ internal static class ThemeManager
         };
     }
 
+    private static void SetWpfUiAccentPalette(ResourceDictionary resources, string primary, string secondary, string tertiary)
+    {
+        foreach (var key in new[]
+        {
+            "SystemAccentBrush",
+            "SystemAccentColorBrush",
+            "SystemAccentColorPrimaryBrush",
+            "PrimaryAccentBrush",
+            "SystemAccentColorSecondaryBrush",
+            "SecondaryAccentBrush",
+            "SystemAccentColorTertiaryBrush",
+            "TertiaryAccentBrush",
+            "AccentFillColorDefaultBrush",
+            "AccentFillColorSecondaryBrush",
+            "AccentFillColorTertiaryBrush",
+            "AccentButtonBorderBrush",
+            "SystemControlHighlightAccentBrush",
+            "SystemControlHighlightAltAccentBrush"
+        })
+        {
+            var color = key.Contains("Secondary", StringComparison.Ordinal)
+                ? secondary
+                : key.Contains("Tertiary", StringComparison.Ordinal)
+                    ? tertiary
+                    : primary;
+            SetBrush(resources, key, color);
+        }
+    }
     private static void SetWpfUiSurfacePalette(
         ResourceDictionary resources,
         string baseSurface,

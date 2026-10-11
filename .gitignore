@@ -32,7 +32,6 @@ project.assets.json
 *.pfx
 
 # Local-only reference material
-/PDF-Poisoning/
 /参考图/
 
 # Local processing output and fixtures

@@ -1,6 +1,6 @@
 # PDF Blender Interface Specification
 
-Status: v0.10.0 PDF core controls; existing GUI preserved
+Status: v1.0.0 PDF core controls; existing GUI preserved
 
 ## Visual Direction
 
@@ -67,7 +67,7 @@ New configuration, preset selection, and editing are nested pages under Breadcru
 
 Empty slots render the Add icon and the level-specific drop label inside the tile. Configuration cards use WPF-UI icons, five fixed columns, stable grid alignment, and a menu whose PlacementTarget is the three-dot button. Schema 10 stores stable ShortId, ColorKey and IconKey.
 
-## v0.10 PDF Feature Controls
+## v1.0 PDF Feature Controls
 All switches default off; name and at least one feature are required for a new custom config. Width and paper normalization are mutually exclusive. Width offers presets and Custom mm; page size fits centered into standard paper. Save/reopen retains preset, mm, DPI, quality, angle/text and every feature toggle.
 
 Keep existing section/card layout and animations. Copy-layer modes require Flatten and warn about copying/search/accessibility. Permissions operate without Flatten and warn about bypassability. Hidden notice and custom prompt are separate opt-in features, with multiline bounded text. GAN stays visibly disabled/experimental.

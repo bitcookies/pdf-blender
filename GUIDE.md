@@ -9,7 +9,7 @@
 - .NET SDK 10
 - 可访问 NuGet（首次构建需要恢复 PDF 渲染和测试依赖）
 - Visual Studio 的 WPF 开发组件
-- MSIX 打包需要额外的 Visual Studio Windows Application Packaging Project 支持；当前项目还没有配置 Store 打包工程
+- MSIX 打包需要额外的 Visual Studio Windows Application Packaging Project 支持；打包工程位于 `packaging/PDFBlender.Package.wapproj`
 
 在项目根目录打开 PowerShell 7：
 
@@ -66,7 +66,7 @@ pwsh -NoProfile -File .\build.ps1 1 -Force
 - `30`：便携版发布失败
 - `40`：MSIX 未配置或 MSIX 构建失败
 
-当前运行 `2` 会得到明确提示：项目尚未有 `packaging/PDFBlender.Package.wapproj`。等 Store 身份和打包工程准备好后，脚本会把 MSIX 输出到 `publish/installer/`。
+运行 `2` 会自动查找 Visual Studio MSBuild，并将 MSIX 输出到 `publish/installer/`。如果缺少 Windows Application Packaging workload，脚本会返回 `40`。
 
 ## 目录说明
 
@@ -79,7 +79,7 @@ PDFBlender/
 │  └─ PDFBlender.Pdf/      PDFium 渲染、图片处理和 PDF 重建实现
 ├─ tests/                  自动化测试，包含模型测试和最小 PDF 管线测试
 ├─ publish/                发布输出；portable 和 installer 分开存放，已被 Git 忽略
-├─ PDF-Poisoning/          外部参考项目，不属于 PDF Blender 源码
+├─ packaging/              MSIX 打包工程和 Package.appxmanifest
 ├─ 参考图/                 UI 参考图片，不属于发布内容
 ├─ SPEC.md                 产品规格和 MVP 范围
 ├─ ARCHITECTURE.md         AI 使用的技术架构约束
@@ -88,7 +88,7 @@ PDFBlender/
 ├─ AGENTS.md               AI 在本仓库中工作时必须遵守的规则
 ├─ LICENSE                 项目许可证
 ├─ PDFBlender.slnx         .NET 解决方案
-├─ Directory.Build.props   统一版本号，目前是 0.6.0 / 0.6.0.0
+├─ Directory.Build.props   统一版本号，目前是 1.0.0 / 1.0.0.0
 └─ build.ps1               数字构建入口
 ```
 
@@ -101,7 +101,7 @@ PDFBlender/
 3. 需要测试便携版时运行 `pwsh -NoProfile -File .\build.ps1 1`，然后启动 `publish/portable/PDFBlender.App.exe`。
 4. 提交前确认 `git status` 中没有 `publish/`、`bin/`、`obj/`、参考项目或本地 PDF。
 
-PDF 处理完全在本机执行。不要把 PDF 内容、提取文字或个人文档信息写入日志，也不要把 `PDF-Poisoning/` 或 `参考图/` 加入发布包。
+PDF 处理完全在本机执行。不要把 PDF 内容、提取文字或个人文档信息写入日志，也不要把 `参考图/` 加入发布包。
 
 ## v0.6.0 配置页面
 

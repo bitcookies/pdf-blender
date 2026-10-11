@@ -1,6 +1,6 @@
 # PDF Blender Product Specification
 
-Status: v0.10.0 PDF core implementation
+Status: v1.0.0 release hardening
 Product: PDF Blender
 Slogan: `DO NOT PLAGIARIZE MY PDF.`
 
@@ -9,15 +9,15 @@ PDF Blender creates publicly readable PDFs while raising the cost of extraction 
 
 ## Platform and Identity
 - Windows, C# / .NET 10, WPF and WPF-UI 4.3.0.
-- Current version `0.10.0`; executable/package version `0.10.0.0`.
+- Current version `1.0.0`; executable/package version `1.0.0.0`.
 - Reserved Store identity: Package Identity Name `57335Bitcookies.PDFBlender`; Publisher `CN=53636128-C1AF-456C-8B82-AC0D583B730C`; Publisher display name `Bitcookies`; Store ID `9P65BNNQRGVZ`.
 - Store owns update delivery. Do not hard-code an unpublished Store URL or build an updater.
-- Development portable publishing uses `pwsh ./build.ps1 1 -Force`. MSIX packaging is not yet configured; `build.ps1 2` reports the missing packaging project.
+- Development portable publishing uses `pwsh ./build.ps1 1 -Force`. MSIX packaging project is present; local package validation still requires the Visual Studio Windows Application Packaging workload.
 
 ## Configuration and Workflow
 The first run has no configurations and five empty slots. Users explicitly create a custom config or copy a localized preset; duplicate names receive `(2)` etc. Name and at least one enabled feature are required for new custom configs. Features default off. Configurations can be edited, copied, locked/unlocked and deleted. Lock blocks edit/delete. ShortId, ColorKey and IconKey are stable metadata.
 
-The five slots are alternative configurations. Selecting one runs its settings for the batch; slots are not sequential pipeline stages. Empty slots remain disabled. Existing Home, Settings and configuration layouts remain unchanged in v0.10.
+The five slots are alternative configurations. Selecting one runs its settings for the batch; slots are not sequential pipeline stages. Empty slots remain disabled. Existing Home, Settings and configuration layouts remain unchanged in v1.0.
 
 Schema 10 intentionally clears older unpublished development configurations and slots. Preferences are separate and survive this reset.
 
@@ -26,7 +26,7 @@ Schema 10 intentionally clears older unpublished development configurations and 
 Width normalization proportionally scales content to a chosen width in mm, retaining different page heights. Page size normalization fits content centered into A5/A4/A3/A2/Letter/Legal, selecting portrait or landscape from the source. These modes are exclusive and never implicitly flatten. Rotation and CropBox/MediaBox are handled. Simple URI links and markup coordinates transform with content. Widgets, appearance-bearing annotations, internal destinations and nonstandard UserUnit transformations fail explicitly when safe geometry cannot be guaranteed.
 
 ### Explicit image flattening
-Only Flatten replaces page objects with images. Default 300 DPI; selectable 72/150/200/300/450/600. Quality is Compact (JPEG 65), Standard (JPEG 85), High (JPEG 95) or Lossless (PNG). Encoding lossless does not preserve vectors. No image-format selector or WebP option exists. Rendering and output each have a 40-million-pixel page cap. Pages process sequentially with cancellation checks between operations.
+Only Flatten replaces page objects with images. Default 300 DPI; selectable 72/150/200/300/450/600. Quality is Low (JPEG 65), Medium (JPEG 85), High (JPEG 95) or Native (PNG lossless encoding). Encoding lossless does not preserve vectors. No image-format selector or WebP option exists. Rendering and output each have a 40-million-pixel page cap. Pages process sequentially with cancellation checks between operations.
 
 ### Watermarks and raster effects
 Watermarks accept multiline custom text, selectable angle, a single central mark or faint full-page repetition. They work in native and raster paths. Pixel noise, texture, bounded one-pixel geometry shifts and microtext require Flatten. Conservative amplitudes preserve human reading; these are no guarantee of OCR resistance.
@@ -45,7 +45,7 @@ Built-in bilingual passive machine-processing notice and optional custom text ar
 Title, Author, Subject and Keywords survive raster rebuilding. Normalization sets Creator/Producer/modification date; declaration appends to Subject. Reader-dependent permission restrictions are independent of Flatten. Standard PDF permission encryption uses an empty opening password and random internal owner password; reading, printing and accessibility remain allowed, copying/modification restricted. Owner passwords are not exposed, stored or logged. Restrictions are bypassable, not an access/security boundary.
 
 ## Optional Presets
-The preset catalog contains nine functional presets and four common presets. GAN and Maximum Protection are marked experimental and cannot be added until the GAN backend is implemented.
+The preset catalog contains nine functional presets and five common presets. GAN remains experimental and cannot be added until its backend is implemented; Maximum Protection uses all other available features and can be added.
 
 | Group | ID | English | Chinese | Enabled combination |
 |---|---|---|---|---|
@@ -61,14 +61,15 @@ The preset catalog contains nine functional presets and four common presets. GAN
 | Common | light-protection | Light Protection | 轻度防护 | watermark + metadata/declaration |
 | Common | reading-only | For Reading Only | 仅供阅读 | flatten + gibberish + watermark + prompt + metadata |
 | Common | enhanced-protection | Enhanced Protection | 加强保护 | reading-only + low noise/texture |
-| Common | maximum-protection | Maximum Protection | 最强保护 | full protection combination + GAN (experimental) |
+| Common | copy-protection | Copy Protection | 复制防护 | A4 width + flatten + gibberish copy + prompt injection + low noise/texture + permissions |
+| Common | maximum-protection | Maximum Protection | 最强保护 | all available stable protection features; GAN excluded |
 ## Validation and Output Safety
-Validate active finite dimensions (10-2000 mm), DPI (72-600), supported enums, watermark text/angle and prompt constraints in Core and editor. Raster prerequisites and mutually exclusive layout are enforced in both. GAN remains disabled/experimental and enabling it is rejected.
+Validate active finite dimensions (10-2000 mm), DPI (72-600), supported enums, watermark text/angle and prompt constraints in Core and editor. Raster prerequisites and mutually exclusive layout are enforced in both. GAN remains disabled and experimental; enabling it is rejected.
 
 Batch processing is asynchronous and cancellable; earlier successful files survive a later failure. Output is beside source as `<source>_<configuration name>.pdf`, then `(2)`, `(3)` etc. Input and existing output are never overwritten, including concurrent commit races. Same-directory temporary output is committed only on success; failure/cancellation removes it. Signed PDFs reject modifications. Damaged/password/font/page-memory/path problems have localized errors without content logging.
 
 ## Verification
-See `docs/pdf-v010-verification.md` for structural, extraction, pixel and render checks. Synthetic fixtures cover Chinese/English, formulas, tables/charts, transparent images, native/raster objects, portrait/landscape/multiple pages and cropped rotations. External viewer and MSIX compatibility must not be claimed without checks.
+See `docs/pdf-v010-verification.md` (the verification record is maintained for historical filename compatibility) for structural, extraction, pixel and render checks. Synthetic fixtures cover Chinese/English, formulas, tables/charts, transparent images, native/raster objects, portrait/landscape/multiple pages and cropped rotations. External viewer and MSIX compatibility must not be claimed without checks.
 
 ## Deferred
-GAN, adversarial neural models, unverified font substitutions, custom crypto/key management, structural corruption, cloud services and guaranteed extraction prevention remain outside stable v0.10.
+GAN, adversarial neural models, unverified font substitutions, custom crypto/key management, structural corruption, cloud services and guaranteed extraction prevention remain outside stable v1.0.

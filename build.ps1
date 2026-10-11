@@ -45,6 +45,26 @@ function Confirm-ReplaceOutput([string]$Path) {
     return $true
 }
 
+function Find-MSBuild {
+    $direct = Get-Command msbuild.exe -ErrorAction SilentlyContinue
+    if ($null -ne $direct) {
+        return $direct.Source
+    }
+
+    $programFilesX86 = [Environment]::GetEnvironmentVariable('ProgramFiles(x86)')
+    $vswhere = if ($programFilesX86) { Join-Path $programFilesX86 'Microsoft Visual Studio\Installer\vswhere.exe' } else { $null }
+    if ($vswhere -and (Test-Path -LiteralPath $vswhere)) {
+        $installationPath = (& $vswhere -latest -products * -property installationPath | Select-Object -First 1).Trim()
+        if ($installationPath) {
+            $candidate = Join-Path $installationPath 'MSBuild\Current\Bin\MSBuild.exe'
+            if (Test-Path -LiteralPath $candidate) {
+                return $candidate
+            }
+        }
+    }
+
+    return $null
+}
 function Invoke-Dotnet([string[]]$Arguments, [int]$FailureCode) {
     & dotnet @Arguments
     if ($LASTEXITCODE -ne 0) {
@@ -79,12 +99,44 @@ switch ($Mode) {
     }
     2 {
         if (-not (Test-Path -LiteralPath $packagingProject)) {
-            Write-Host 'MSIX packaging is not configured yet. Add packaging/PDFBlender.Package.wapproj with the Store identity from SPEC.md.' -ForegroundColor Yellow
+            Write-Host 'MSIX packaging project was not found at packaging/PDFBlender.Package.wapproj.' -ForegroundColor Yellow
+            exit 40
+        }
+        $msbuild = Find-MSBuild
+        if (-not $msbuild) {
+            Write-Host 'MSIX packaging requires Visual Studio MSBuild with the Windows Application Packaging workload.' -ForegroundColor Yellow
             exit 40
         }
         if (-not (Confirm-ReplaceOutput $installerOutput)) { exit 3 }
         New-Item -ItemType Directory -Path $publishRoot -Force | Out-Null
-        Invoke-Dotnet @('msbuild', $packagingProject, '/p:Configuration=Release', "/p:OutDir=$installerOutput\") 40
+        $vsRoot = Split-Path (Split-Path (Split-Path (Split-Path $msbuild -Parent) -Parent) -Parent) -Parent
+        $vsToolsRoot = Join-Path $vsRoot 'MSBuild\Microsoft\VisualStudio'
+        $vsToolsVersion = Get-ChildItem -LiteralPath $vsToolsRoot -Directory -ErrorAction SilentlyContinue |
+            Where-Object { Test-Path (Join-Path $_.FullName 'AppxPackage\Microsoft.AppxPackage.Targets') } |
+            Sort-Object Name -Descending |
+            Select-Object -First 1
+        $vsToolsPath = if ($vsToolsVersion) { $vsToolsVersion.FullName } else { $null }
+        $appxTargets = if ($vsToolsPath) { Join-Path $vsToolsPath 'AppxPackage\Microsoft.AppxPackage.Targets' } else { $null }
+        if (-not (Test-Path -LiteralPath $appxTargets)) {
+            Write-Host 'MSIX packaging requires the Visual Studio Windows Application Packaging workload.' -ForegroundColor Yellow
+            exit 40
+        }
+
+        $targetPlatformVersion = ((Get-Content -LiteralPath $packagingProject | Select-String -Pattern '<TargetPlatformVersion>([^<]+)</TargetPlatformVersion>').Matches.Groups[1].Value)
+        $windowsKitCandidates = @(
+            (Join-Path ${env:ProgramFiles(x86)} 'Windows Kits\10'),
+            (Join-Path $env:ProgramFiles 'Windows Kits\10')
+        ) | Where-Object { $_ }
+        $windowsKitRoot = $windowsKitCandidates |
+            Where-Object { Test-Path (Join-Path $_ "Platforms\UAP\$targetPlatformVersion\UAP.props") } |
+            Select-Object -First 1
+        if (-not $windowsKitRoot) {
+            Write-Host "MSIX packaging requires the Windows SDK UAP platform $targetPlatformVersion (UAP.props). Install the matching Windows 10/11 SDK, then retry." -ForegroundColor Yellow
+            exit 40
+        }
+
+        & $msbuild $packagingProject '/p:Configuration=Release' "/p:VSToolsPath=$vsToolsPath" "/p:OutDir=$installerOutput\"
+        if ($LASTEXITCODE -ne 0) { exit 40 }
         Write-Host "MSIX installer written to $installerOutput" -ForegroundColor Green
     }
 }
