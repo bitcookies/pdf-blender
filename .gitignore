@@ -25,8 +25,11 @@ packages/
 project.assets.json
 
 # MSIX build and signing artifacts
+/packaging/BundleArtifacts/
 *.msix
 *.msixbundle
+*.msixupload
+*.appxupload
 *.appinstaller
 *.cer
 *.pfx
