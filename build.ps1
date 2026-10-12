@@ -149,7 +149,7 @@ switch ($Mode) {
         }
 
         # Keep each platform's intermediate output separate; a shared OutDir can reuse the wrong AppxManifest.xml.
-        & $msbuild $packagingProject '/restore' '/verbosity:minimal' '/p:GenerateAppxPackageOnBuild=true' '/p:Configuration=Release' "/p:VSToolsPath=$vsToolsPath"
+        & $msbuild $packagingProject '/restore' '/verbosity:minimal' '/p:GenerateAppxPackageOnBuild=true' '/p:Configuration=Release' '/p:UapAppxPackageBuildMode=StoreAndSideload' '/p:AppxPackageIsForStore=true' '/p:BuildAppxUploadPackageForUap=true' '/p:BuildAppxSideloadPackageForUap=true' "/p:VSToolsPath=$vsToolsPath"
         if ($LASTEXITCODE -ne 0) { exit 40 }
 
         # Keep the three architecture packages together for manual installation and Store inspection.
