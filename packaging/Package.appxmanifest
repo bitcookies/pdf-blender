@@ -33,6 +33,7 @@
     </Application>
   </Applications>
   <Capabilities>
+    <!-- Required for the WPF desktop entry point. Runs as the current user, not as administrator. -->
     <rescap:Capability Name="runFullTrust" />
   </Capabilities>
 </Package>
