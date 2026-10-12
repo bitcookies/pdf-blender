@@ -54,6 +54,20 @@ A published privacy policy still needs the owner's contact details, a policy dat
 
 Mode 3 was built on x64 using Windows SDK 10.0.22621.0 and the local test certificate on 2026-10-12. SignTool signing and trust verification succeeded. No new automated PDF/UI tests are needed for this build-script-only change; installing/launching the generated artifact remains a separate smoke check.
 
+## Shell icon assets
+
+Regenerate the packaged logo family from the existing transparent logo with:
+
+```powershell
+pwsh ./packaging/Generate-Assets.ps1
+```
+
+This requires the installed ImageMagick `magick` command. The generated PNGs under `packaging/Assets` are package input resources and should remain tracked; final MSIX packages and temporary previews remain ignored.
+
+The manifest uses a transparent visual-elements background and explicitly enables the `PDF Blender` name on medium, wide and large Windows 10 tiles. Medium/wide tile artwork is 48 px at 100% scale; large tile artwork is 96 px. Scale-qualified resources cover 125%, 150%, 200% and 400%, with pixel dimensions rounded up to match Windows SDK validation. Target-size resources (16/24/32/48/256 px) include the `altform-unplated` qualifier for shell surfaces that support an icon without a tile backdrop.
+
+On 2026-10-12 the updated x64 local-test MSIX was successfully rebuilt, signed and verified. Its manifest contains the transparent background, short name and three name-display declarations. All 35 PNG resources are included; a MakePRI dump confirms the unplated/scale qualifiers are indexed. Local synthetic previews were visually reviewed. The user subsequently installed the updated test package and supplied Windows 10 Start menu screenshots confirming the app-list icon has no tile backdrop and the medium tile shows smaller artwork with the PDF Blender name. A pinned tile may need to be unpinned and pinned again after installing the updated package; do not clear system-wide icon caches as a first step. The package version remains 1.0.0.0; Windows may reject replacing different package contents at the same identity/version. Back up local preferences/configurations before removing an earlier local-test installation if replacement is required.
+
 References:
 
 - [Restricted capabilities and desktop apps](https://learn.microsoft.com/en-us/windows/uwp/packaging/app-capability-declarations)
