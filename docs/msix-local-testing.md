@@ -43,12 +43,12 @@ This is an implementation review, not a final privacy policy. Review date: 2026-
 - Preferences and configurations are stored locally as JSON under the application's `ApplicationData/PDF Blender` location. Windows may redirect this location for a packaged desktop app. This includes configuration names, custom watermark/copy/prompt text and user-provided metadata such as name, organization and copyright. No PDF contents or input-file history are serialized by the current configuration stores.
 - User-provided metadata, watermarks and hidden text can be embedded in generated PDFs when those options are enabled; recipients and extraction tools may read them. Configuration persistence and output embedding should not be described as collecting no data at all.
 - The current application source contains no HTTP client, upload endpoint, analytics/advertising SDK, account system or automatic update request. Processing does not require a document upload. Microsoft Store supplies updates through its own services.
-- Explicit About links open the default browser to GitHub project/license/issues pages. Requests made by that browser are subject to the destination's privacy policy; the app does not attach PDFs or their contents to those links.
+- Explicit About links open the default browser to the product website/privacy policy and GitHub project/license/issues pages. Requests made by that browser are subject to the destination's privacy policy; the app does not attach PDFs or their contents to those links.
 - Optional Windows completion notifications can show output file names on screen through the local Windows notification system. They are disabled by default. The app also provides local in-app notifications and sound playback.
 - Windows theme preferences are read to follow the system theme. Single-instance handling inspects matching application processes and restores the existing window; it is not process-activity telemetry.
 - No camera, microphone, location or contacts access is implemented. No application telemetry/document-content logging was found in the reviewed source. Windows/Store/browser diagnostics are separate platform behavior and should not be covered by an absolute promise about every process on the computer.
 
-A published privacy policy still needs the owner's contact details, a policy date, and applicable user rights/contact wording. Recheck these facts whenever processing, storage, notifications or external services change.
+Published website: https://pdf-blender.vercel.app/. Privacy policy: https://pdf-blender.vercel.app/privacy. Support email: bitcookies@nousbuild.com. The separately maintained website currently directs privacy requests to GitHub Issues; its owner should also publish the support email. Recheck these facts whenever processing, storage, notifications or external services change.
 
 ## Verification
 
@@ -74,3 +74,7 @@ References:
 - [runFullTrust manifest element](https://learn.microsoft.com/en-us/uwp/schemas/appxpackage/uapmanifestschema/element-rescap-capability)
 - [Sign an MSIX package](https://learn.microsoft.com/en-us/windows/msix/package/signing-package-overview)
 - [Microsoft Store policies](https://learn.microsoft.com/en-us/windows/apps/publish/store-policies)
+
+## Store submission verification
+
+See [the final release checklist](store-release-check.md) for the authoritative Partner Center identity, language resource packaging, symbols and final WACK record. Store mode 2 fully rebuilds resource packages and statically verifies the generated upload; local mode 3 signs a separate test package. Visual Studio 2026 no longer strips private symbols, so standard .appxsym archives are retained as approved, with no PDB files in the installed application.

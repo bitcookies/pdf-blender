@@ -10,7 +10,7 @@ PDF Blender creates publicly readable PDFs while raising the cost of extraction 
 ## Platform and Identity
 - Windows, C# / .NET 10, WPF and WPF-UI 4.3.0.
 - Current version `1.0.0`; executable/package version `1.0.0.0`.
-- Reserved Store identity: Package Identity Name `57335Bitcookies.PDFBlender`; Publisher `CN=53636128-C1AF-456C-8B82-AC0D583B730C`; Publisher display name `Bitcookies`; Store ID `9P65BNNQRGVZ`.
+- Reserved Store identity: Package Identity Name `57335Bitcookies.PDFBlender`; Publisher `CN=53636128-C1AF-456C-8B82-AC0D583B730C`; Publisher display name `Bitcookies`; Store ID `9P65NBNQRGVZ`.
 - Store owns update delivery. Do not hard-code an unpublished Store URL or build an updater.
 - Development portable publishing uses `pwsh ./build.ps1 1 -Force`. MSIX packaging project is present; local package validation still requires the Visual Studio Windows Application Packaging workload.
 

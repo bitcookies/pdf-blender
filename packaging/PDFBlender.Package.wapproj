@@ -20,7 +20,9 @@
     <AppxBundlePlatforms>x86|x64|ARM64</AppxBundlePlatforms>
     <AppxPackageDir>$(MSBuildThisFileDirectory)..\publish\installer\</AppxPackageDir>
     <GenerateAppInstallerFile>false</GenerateAppInstallerFile>
-    <AppxSymbolPackageEnabled>false</AppxSymbolPackageEnabled>
+    <AppxSymbolPackageEnabled>true</AppxSymbolPackageEnabled>
+    <AppxPackageIncludePrivateSymbols>false</AppxPackageIncludePrivateSymbols>
+    <!-- VS 2026 no longer strips private symbols; standard PDBs go only to the Store symbol archive. -->
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\src\PDFBlender.App\PDFBlender.App.csproj">
@@ -31,6 +33,8 @@
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest" />
     <Content Include="Assets\*.png" />
+    <PRIResource Include="Strings\en-US\Resources.resw" />
+    <PRIResource Include="Strings\zh-CN\Resources.resw" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\DesktopBridge\Microsoft.DesktopBridge.targets" Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\DesktopBridge\Microsoft.DesktopBridge.targets')" />
 </Project>

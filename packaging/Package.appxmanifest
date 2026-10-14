@@ -9,7 +9,7 @@
   <Properties>
     <DisplayName>PDF Blender</DisplayName>
     <PublisherDisplayName>Bitcookies</PublisherDisplayName>
-    <Description>PDF Blender</Description>
+    <Description>ms-resource:PackageDescription</Description>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
   <Resources>

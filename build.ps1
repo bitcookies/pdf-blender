@@ -209,17 +209,23 @@ switch ($Mode) {
         }
 
         if (-not (Confirm-ReplaceOutput $installerOutput)) { exit 3 }
+        # Rebuild resource packages as well: clearing publish output makes incremental resource packaging unsafe.
         # Keep each platform's intermediate output separate; a shared OutDir can reuse the wrong AppxManifest.xml.
-        & $msbuild $packagingProject '/restore' '/verbosity:minimal' '/p:GenerateAppxPackageOnBuild=true' '/p:Configuration=Release' '/p:UapAppxPackageBuildMode=StoreAndSideload' '/p:AppxPackageIsForStore=true' '/p:BuildAppxUploadPackageForUap=true' '/p:BuildAppxSideloadPackageForUap=true' "/p:VSToolsPath=$vsToolsPath"
+        & $msbuild $packagingProject '/restore' '/t:Rebuild' '/verbosity:minimal' '/p:GenerateAppxPackageOnBuild=true' '/p:Configuration=Release' '/p:UapAppxPackageBuildMode=StoreAndSideload' '/p:AppxPackageIsForStore=true' '/p:BuildAppxUploadPackageForUap=true' '/p:BuildAppxSideloadPackageForUap=true' "/p:VSToolsPath=$vsToolsPath"
         if ($LASTEXITCODE -ne 0) { exit 40 }
 
-        # Keep the three architecture packages together for manual installation and Store inspection.
+        [xml]$storeManifest = Get-Content -LiteralPath (Join-Path $root 'packaging/Package.appxmanifest') -Raw
+        $storeVersion = $storeManifest.Package.Identity.Version
+        $uploadFile = Join-Path $installerOutput "PDFBlender.Package_${storeVersion}_x86_x64_ARM64_bundle.msixupload"
+        & (Join-Path $root 'packaging/Verify-StorePackage.ps1') -PackagePath $uploadFile
+
+        # Keep only the application packages for Store inspection (not resource packages).
         # The WAP project owns its per-platform intermediate directories; do not redirect them with OutDir.
         $packageOutput = Join-Path $installerOutput 'PDFBlender.Package'
         New-Item -ItemType Directory -Path $packageOutput -Force | Out-Null
         foreach ($platform in @('x86', 'x64', 'ARM64')) {
             $platformPackageDirectory = Join-Path $root "packaging/bin/$platform/Release"
-            $platformPackages = Get-ChildItem -LiteralPath $platformPackageDirectory -Filter '*.msix' -File -ErrorAction SilentlyContinue
+            $platformPackages = Get-ChildItem -LiteralPath $platformPackageDirectory -Filter "PDFBlender.Package_${storeVersion}_$platform.msix" -File -ErrorAction SilentlyContinue
             if (-not $platformPackages) {
                 Write-Host "MSIX package for $platform was not found in $platformPackageDirectory." -ForegroundColor Yellow
                 exit 40

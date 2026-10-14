@@ -30,6 +30,7 @@ project.assets.json
 *.msixbundle
 *.msixupload
 *.appxupload
+*.appxsym
 *.appinstaller
 *.cer
 *.pfx
