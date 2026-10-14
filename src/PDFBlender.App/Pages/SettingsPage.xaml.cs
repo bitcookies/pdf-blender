@@ -69,6 +69,8 @@ public partial class SettingsPage : Page
         AboutProductName.Text = UiText.Get("appName");
         AboutCopyrightText.Text = UiText.Get("aboutCopyright");
         AboutVersionText.Text = $"v{GetApplicationVersion()}";
+        AboutWebsiteLabel.Text = UiText.Get("aboutWebsite");
+        AboutPrivacyLabel.Text = UiText.Get("aboutPrivacy");
         AboutGithubLabel.Text = UiText.Get("aboutGithub");
         AboutLicenseLabel.Text = UiText.Get("aboutLicense");
         AboutFeedbackLabel.Text = UiText.Get("aboutFeedback");

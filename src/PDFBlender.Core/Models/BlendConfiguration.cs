@@ -308,16 +308,28 @@ public static class BuiltInConfigurations
 
         new(
             new BlendConfiguration(
-                "gan",
-                "GAN",
+                "copyright-protection",
+                "Copyright Protection",
                 true,
-                new BlendSettings { GanAdversarialPerturbation = true },
+                new BlendSettings
+                {
+                    MetadataNormalization = true,
+                    ProtectionDeclaration = true,
+                    MetadataAuthorName = "PDF Blender",
+                    MetadataOrganization = "BITCOOKIES",
+                    MetadataCopyright = "Copyright © 2016-2026 BITCOOKIES",
+                    PermissionRestriction = true,
+                    PermissionAllowPrinting = true,
+                    PermissionAllowCopying = false,
+                    PermissionAllowModification = false,
+                    PermissionAllowAnnotations = false,
+                    PermissionAllowFormFilling = false
+                },
                 true),
             PresetCategory.Functional,
-            "presetGan",
-            "presetGanDescription",
-            "regular:BotSparkle24",
-            true),
+            "presetCopyrightProtection",
+            "presetCopyrightProtectionDescription",
+            "regular:DocumentLock16"),
 
         new(
             new BlendConfiguration(

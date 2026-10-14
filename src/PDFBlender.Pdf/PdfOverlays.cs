@@ -78,8 +78,14 @@ internal static class PdfOverlays
         {
             WriteInvisible(page, false, false, graphics =>
             {
-                var font = PdfFontResolver.ForText(customText, 1);
-                graphics.DrawString(customText, font, XBrushes.Black, new XPoint(1, 1));
+                // Keep the invisible warning inside the page bounds. Some PDF readers skip
+                // selectable text placed on the outermost edge of a raster page.
+                var fontSize = Math.Clamp(Math.Min(page.Width.Point, page.Height.Point) / 250, .8, 2.5);
+                var font = PdfFontResolver.ForText(customText, fontSize);
+                var baseline = Math.Max(fontSize + 1, page.Height.Point / 2);
+                var lines = customText.Replace("\r", string.Empty).Split('\n');
+                for (var i = 0; i < lines.Length; i++)
+                    graphics.DrawString(lines[i], font, XBrushes.Black, new XPoint(2, baseline + i * fontSize * 1.2));
             });
             return 1;
         }

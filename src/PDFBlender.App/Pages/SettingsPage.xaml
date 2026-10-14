@@ -211,10 +211,32 @@
                         <StackPanel>
                             <Grid MinHeight="46" Margin="16,0">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <TextBlock x:Name="AboutWebsiteLabel" Style="{StaticResource AboutRowLabelStyle}" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="pdf-blender.vercel.app" Style="{StaticResource AboutRowValueStyle}" />
+                                    <ui:Button Tag="https://pdf-blender.vercel.app/" Appearance="Transparent" Background="{DynamicResource SurfaceMutedBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Cursor="Hand" Click="AboutLinkButton_Click" Width="32" Height="32" Padding="4" Margin="8,0,0,0" CornerRadius="8" ToolTip="Open website" AutomationProperties.Name="Open PDF Blender website">
+                                        <ui:SymbolIcon Symbol="Open24" FontSize="15" />
+                                    </ui:Button>
+                                </StackPanel>
+                            </Grid>
+                            <Border Height="1" Background="{DynamicResource BorderBrush}" />
+                            <Grid MinHeight="46" Margin="16,0">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <TextBlock x:Name="AboutPrivacyLabel" Style="{StaticResource AboutRowLabelStyle}" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="pdf-blender.vercel.app/privacy" Style="{StaticResource AboutRowValueStyle}" />
+                                    <ui:Button Tag="https://pdf-blender.vercel.app/privacy" Appearance="Transparent" Background="{DynamicResource SurfaceMutedBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Cursor="Hand" Click="AboutLinkButton_Click" Width="32" Height="32" Padding="4" Margin="8,0,0,0" CornerRadius="8" ToolTip="Open privacy policy" AutomationProperties.Name="Open PDF Blender privacy policy">
+                                        <ui:SymbolIcon Symbol="Open24" FontSize="15" />
+                                    </ui:Button>
+                                </StackPanel>
+                            </Grid>
+                            <Border Height="1" Background="{DynamicResource BorderBrush}" />
+                            <Grid MinHeight="46" Margin="16,0">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                 <TextBlock x:Name="AboutGithubLabel" Style="{StaticResource AboutRowLabelStyle}" />
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                     <TextBlock Text="github.com/bitcookies/pdf-blender" Style="{StaticResource AboutRowValueStyle}" />
-                                    <ui:Button Tag="https://github.com/bitcookies/pdf-blender" Appearance="Transparent" Background="{DynamicResource SurfaceMutedBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Cursor="Hand" Click="AboutLinkButton_Click" Width="32" Height="32" Padding="4" Margin="8,0,0,0" CornerRadius="8" ToolTip="Open link" AutomationProperties.Name="Open GitHub project">
+                                    <ui:Button Tag="https://github.com/bitcookies/pdf-blender" Appearance="Transparent" Background="{DynamicResource SurfaceMutedBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Cursor="Hand" Click="AboutLinkButton_Click" Width="32" Height="32" Padding="4" Margin="8,0,0,0" CornerRadius="8" ToolTip="Open GitHub project" AutomationProperties.Name="Open GitHub project">
                                         <ui:SymbolIcon Symbol="Open24" FontSize="15" />
                                     </ui:Button>
                                 </StackPanel>

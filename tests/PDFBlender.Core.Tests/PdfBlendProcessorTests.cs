@@ -217,6 +217,22 @@ public sealed class PdfBlendProcessorTests : IDisposable
     }
 
     [Fact]
+    public async Task CustomCopyWarningIsExtractable()
+    {
+        var result = await Run(Minimal(), new BlendSettings
+        {
+            Protection = ProtectionMethod.Flatten,
+            Dpi = 72,
+            ImageQuality = ImageQuality.Lossless,
+            CopyLayer = CopyLayerMode.CustomWarning,
+            CopyLayerCustomText = "DO NOT COPY"
+        });
+
+        Assert.Contains("DO NOT COPY", Text(result.OutputPath));
+        using var pig = PigDocument.Open(result.OutputPath);
+        Assert.Contains("DO NOT COPY", pig.GetPage(1).Text);
+    }
+    [Fact]
     public async Task CopyLayerRequiresTextButSupportsMixedImageAndTextPages()
     {
         var imageOnly = PathFor("image.pdf");
