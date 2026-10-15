@@ -36,9 +36,9 @@ Get it for free from the Microsoft Store.
 
 ## Screenshot
 
-![Screenshot](https://pdf-blender.vercel.app/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fscreenshot-1-en-light.4a68b101.png&w=3840&q=75#gh-light-mode-only)
+![Screenshot](assets/screenshots/en-light.png#gh-light-mode-only)
 
-![Screenshot](https://pdf-blender.vercel.app/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fscreenshot-1-en-dark.f3752b71.png&w=3840&q=75#gh-dark-mode-only)
+![Screenshot](assets/screenshots/en-dark.png#gh-dark-mode-only)
 
 ## Privacy and Limitations
 

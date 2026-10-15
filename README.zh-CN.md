@@ -35,9 +35,9 @@ PDF Blender 让 PDF 保持清晰易读，同时提高内容被直接复制和提
 
 ## 截图
 
-![Screenshot](https://pdf-blender.vercel.app/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fscreenshot-1-zh-light.abb7f16a.png&w=3840&q=75#gh-light-mode-only)
+![Screenshot](assets/screenshots/zh-light.png#gh-light-mode-only)
 
-![Screenshot](https://pdf-blender.vercel.app/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fscreenshot-1-zh-dark.09de223c.png&w=2048&q=75#gh-dark-mode-only#gh-dark-mode-only)
+![Screenshot](assets/screenshots/zh-dark.png#gh-dark-mode-only)
 
 ## 隐私与使用边界
 
