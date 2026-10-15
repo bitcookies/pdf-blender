@@ -45,4 +45,4 @@ PDF Blender 不会上传 PDF 内容。它旨在增加内容被复制和提取的
 
 ## 许可证
 
-代码采用 [MIT 许可证](https://github.com/bitcookies/pdf-blender/blob/master/LICENSE)。
+代码采用 [GNU General Public License v3.0](https://github.com/bitcookies/pdf-blender/blob/master/LICENSE) 许可。

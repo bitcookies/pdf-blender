@@ -46,4 +46,4 @@ PDF Blender does not upload PDF content. It is designed to make copying and extr
 
 ## License
 
-The code is available under the [MIT license](https://github.com/bitcookies/pdf-blender/blob/master/LICENSE)
+The code is available under the [GNU General Public License v3.0](https://github.com/bitcookies/pdf-blender/blob/master/LICENSE)
