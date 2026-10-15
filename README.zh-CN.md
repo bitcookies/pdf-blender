@@ -14,6 +14,10 @@
 
 PDF Blender 让 PDF 保持清晰易读，同时提高内容被直接复制和提取的难度。你可以调整页面尺寸、将页面图片化、添加水印、定制复制层，并设置元数据和阅读器权限。PDF 不会离开你的设备。它不是加密或 DRM，无法阻止截图、OCR 或所有形式的复制。
 
+## 下载
+
+在 Microsoft Store 免费获取安装。
+
 <p align="center">
   <a href="https://apps.microsoft.com/detail/9P65NBNQRGVZ"><img src="assets/microsoft-store-zh.svg"></a>
 </p>
@@ -28,6 +32,12 @@ PDF Blender 让 PDF 保持清晰易读，同时提高内容被直接复制和提
 - 添加用于研究和实验的隐藏提示词，不承诺特定 AI 响应。
 - 设置文档元数据、版权信息和阅读器权限。
 - 在本机处理 PDF，不上传文档内容。
+
+## 截图
+
+![Screenshot](https://pdf-blender.vercel.app/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fscreenshot-1-zh-light.abb7f16a.png&w=3840&q=75#gh-light-mode-only)
+
+![Screenshot](https://pdf-blender.vercel.app/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fscreenshot-1-zh-dark.09de223c.png&w=2048&q=75#gh-dark-mode-only#gh-dark-mode-only)
 
 ## 隐私与使用边界
 

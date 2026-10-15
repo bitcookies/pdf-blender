@@ -10,9 +10,14 @@
   <a href="https://github.com/bitcookies/pdf-blender/blob/main/README.md">English</a> | <a href="https://github.com/bitcookies/pdf-blender/blob/main/README.zh-CN.md">简体中文</a>
 </p>
 
+
 ## Info
 
 PDF Blender helps you keep PDFs readable while making their content harder to copy or extract. Adjust page sizes, flatten pages into images, add watermarks, customize the copy layer, and set metadata or reader permissions. Your PDFs stay on your device while you work. PDF Blender is not encryption or DRM and cannot stop screenshots, OCR, or every form of copying.
+
+## Install
+
+Get it for free from the Microsoft Store.
 
 <p align="center">
   <a href="https://apps.microsoft.com/detail/9P65NBNQRGVZ"><img src="assets/microsoft-store-en.svg"></a>
@@ -28,6 +33,12 @@ PDF Blender helps you keep PDFs readable while making their content harder to co
 - Add hidden prompt text for research and experimentation, without promising a particular AI response.
 - Set document metadata, copyright information, and reader permissions.
 - Process PDFs locally without uploading document content.
+
+## Screenshot
+
+![Screenshot](https://pdf-blender.vercel.app/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fscreenshot-1-en-light.4a68b101.png&w=3840&q=75#gh-light-mode-only)
+
+![Screenshot](https://pdf-blender.vercel.app/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fscreenshot-1-en-dark.f3752b71.png&w=3840&q=75#gh-dark-mode-only)
 
 ## Privacy and Limitations
 
