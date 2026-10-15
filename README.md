@@ -10,10 +10,9 @@
   <a href="https://github.com/bitcookies/pdf-blender/blob/main/README.md">English</a> | <a href="https://github.com/bitcookies/pdf-blender/blob/main/README.zh-CN.md">简体中文</a>
 </p>
 
-
 ## Info
 
-PDF Blender helps make PDF content harder to copy and extract while keeping pages readable. Standardize page widths or resize pages to common paper sizes, flatten pages into images, add watermarks, and configure copy layers, metadata, and PDF permissions. All processing happens locally on your device. PDF Blender is not encryption or DRM and cannot prevent screenshots, OCR, or every form of copying.
+PDF Blender helps you keep PDFs readable while making their content harder to copy or extract. Adjust page sizes, flatten pages into images, add watermarks, customize the copy layer, and set metadata or reader permissions. Your PDFs stay on your device while you work. PDF Blender is not encryption or DRM and cannot stop screenshots, OCR, or every form of copying.
 
 <p align="center">
   <a href="https://apps.microsoft.com/detail/9P65NBNQRGVZ"><img src="assets/microsoft-store-en.svg"></a>
@@ -21,18 +20,18 @@ PDF Blender helps make PDF content harder to copy and extract while keeping page
 
 ## Features
 
-- Normalize page widths or resize pages to common paper sizes, including A4.
-- Flatten pages into images with configurable image quality.
+- Resize pages to A4 and other standard paper sizes, or normalize their widths.
+- Flatten pages into images with adjustable quality.
 - Add a single large watermark or repeated small watermarks.
-- Configure copy layers with layout perturbation, random Unicode, digits, letters, or custom warning text.
-- Apply visual perturbation, including pixel noise, texture changes, and geometric distortion.
-- Add hidden prompt text as a research-oriented document feature; it does not guarantee how AI systems will respond.
-- Set document metadata, copyright information, and PDF reader permissions.
-- Process documents locally on your device.
+- Shape the copy layer with layout changes, random Unicode, digits, letters, or custom warning text.
+- Apply pixel noise, texture changes, and geometric perturbation.
+- Add hidden prompt text for research and experimentation, without promising a particular AI response.
+- Set document metadata, copyright information, and reader permissions.
+- Process PDFs locally without uploading document content.
 
 ## Privacy and Limitations
 
-PDF files are processed locally and are not uploaded by PDF Blender. The app is intended to make copying and extraction more difficult, but it does not provide encryption, access control, or DRM. It cannot prevent screenshots, OCR, or every other way of copying content. See the [Privacy Policy](https://pdf-blender.vercel.app/privacy).
+PDF Blender does not upload PDF content. It is designed to make copying and extraction more difficult, but it does not provide encryption, access control, or DRM. It cannot prevent screenshots, OCR, or every other way of copying content. See the [Privacy Policy](https://pdf-blender.vercel.app/privacy).
 
 ## License
 
