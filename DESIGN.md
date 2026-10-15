@@ -1,6 +1,6 @@
 # PDF Blender Design Overview
 
-Status: v1.0.0 release hardening baseline
+Status: v1.1.0 release hardening baseline
 Detailed requirements: `SPEC.md`  
 Architecture boundaries: `ARCHITECTURE.md`  
 Interface and localization: `INTERFACE.md`
@@ -77,4 +77,4 @@ The Configuration page starts with five fixed 72 px Home blend slots. Empty slot
 
 The configuration list uses five compact columns with fixed 72 px card height. Each card has a WPF-UI icon on the left, name and enabled-feature summary in the center, short ID and qualitative intensity on the bottom row, and an anchored three-dot menu in the top-right.
 
-Configuration metadata includes ShortId, ColorKey, and IconKey. ConfigurationStore schema 11 intentionally resets older unpublished development configurations. Creation, preset selection, and editing use nested pages with BreadcrumbBar; delete confirmation remains a ContentDialog.
+Configuration metadata includes ShortId, ColorKey, and IconKey. ConfigurationStore schema 12 intentionally resets older unpublished development configurations. Creation, preset selection, and editing use nested pages with BreadcrumbBar; delete confirmation remains a ContentDialog.

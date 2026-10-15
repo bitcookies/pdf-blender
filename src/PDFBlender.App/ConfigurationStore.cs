@@ -13,7 +13,7 @@ internal sealed record ConfigurationDocument(
 
 internal static class ConfigurationStore
 {
-    internal const int CurrentSchemaVersion = 11;
+    internal const int CurrentSchemaVersion = 12;
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         WriteIndented = true,
@@ -34,18 +34,37 @@ internal static class ConfigurationStore
             if (File.Exists(FilePath))
             {
                 var document = JsonSerializer.Deserialize<ConfigurationDocument>(File.ReadAllText(FilePath), SerializerOptions);
-                if (document is not null && document.SchemaVersion == CurrentSchemaVersion)
-                    return NormalizeCurrent(document);
+                if (document is not null)
+                {
+                    if (document.SchemaVersion == CurrentSchemaVersion)
+                        return NormalizeCurrent(document);
+                    if (document.SchemaVersion == 11)
+                    {
+                        var migrated = MigrateV11(document);
+                        Save(migrated);
+                        return migrated;
+                    }
+                    BackupUnreadableConfiguration();
+                }
             }
         }
-        catch (JsonException) { }
+        catch (JsonException) { BackupUnreadableConfiguration(); }
         catch (IOException) { }
         catch (UnauthorizedAccessException) { }
 
-        // Development data is intentionally reset when the stored schema is
-        // from an earlier iteration. There are no released user configurations
-        // to migrate yet.
+        // Unknown or malformed documents fall back to safe defaults without overwriting the original file.
         return CreateDefault();
+    }
+
+    private static void BackupUnreadableConfiguration()
+    {
+        try
+        {
+            if (File.Exists(FilePath))
+                File.Copy(FilePath, FilePath + ".invalid.bak", true);
+        }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
     }
 
     public static void Save(ConfigurationDocument document)
@@ -56,6 +75,22 @@ internal static class ConfigurationStore
         var temporaryPath = FilePath + ".tmp";
         File.WriteAllText(temporaryPath, json);
         File.Move(temporaryPath, FilePath, true);
+    }
+
+    private static ConfigurationDocument MigrateV11(ConfigurationDocument document)
+    {
+        var migratedUsers = (document.UserConfigurations ?? [])
+            .Select(configuration => configuration with
+            {
+                Settings = (configuration.Settings ?? BlendSettings.Default) with
+                {
+                    CopyLayer = configuration.Settings?.CopyLayer is CopyLayerMode.ReplaceWithGibberish
+                        ? CopyLayerMode.UnicodeScramble
+                        : configuration.Settings?.CopyLayer ?? CopyLayerMode.Preserve
+                }
+            })
+            .ToList();
+        return NormalizeCurrent(new ConfigurationDocument(CurrentSchemaVersion, migratedUsers, document.SlotIds ?? [], document.SelectedConfigurationId));
     }
 
     private static ConfigurationDocument CreateDefault()

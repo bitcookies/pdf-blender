@@ -29,7 +29,9 @@ public enum CopyLayerMode
     UnicodeScramble,
     TextLayoutPerturbation,
     ReplaceWithGibberish,
-    CustomWarning
+    CustomWarning,
+    Numeric,
+    Alphabetic
 }
 
 public enum PageSizePreset

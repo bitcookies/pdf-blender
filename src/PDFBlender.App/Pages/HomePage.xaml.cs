@@ -366,8 +366,24 @@ public partial class HomePage : Page
         StatusText.SetResourceReference(TextBlock.ForegroundProperty, emptySlots ? "MutedTextBrush" : "PillTextBrush");
         StatusDot.SetResourceReference(Shape.FillProperty, emptySlots ? "MutedTextBrush" : "AccentBrush");
     }
+    private void BlendButton_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (_processingCts is not null) BlendButtonSurface.Tag = "ProcessingPressed";
+    }
+
+    private void BlendButton_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (_processingCts is not null) BlendButtonSurface.Tag = "Processing";
+    }
+
+    private void BlendButton_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+    {
+        if (_processingCts is not null) BlendButtonSurface.Tag = "Processing";
+    }
+
     private void SetProcessingState(bool processing)
     {
+        BlendButtonSurface.Tag = processing ? "Processing" : "Ready";
         BlendButton.IsEnabled = processing || (_session.InputPaths.Count > 0 && _session.SlotConfigurations.Any(configuration => configuration is not null));
         BrowseButton.IsEnabled = !processing;
         foreach (var visual in _previewVisuals)

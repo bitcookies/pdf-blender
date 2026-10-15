@@ -1,6 +1,6 @@
 # PDF Blender Architecture
 
-Status: v1.0.0 release hardening
+Status: v1.1.0 release hardening
 
 ## Structure
 `PDFBlender.slnx` has three production projects: App (WPF), Core (settings/contracts) and Pdf (processing). Raster effects stay in Pdf; no separate image framework is required. Preserve the GUI and lightweight service boundaries.
@@ -22,7 +22,7 @@ Core owns the feature catalog, settings, thirteen optional preset definitions (n
 AppSession owns configuration state, alternative five-slot selection and preferences. `BlendWorkflowService` snapshots each file's progress index and processes files sequentially. Existing native WPF-UI BreadcrumbBar, nested page callbacks, cached navigation, theme/language resources, notification services and per-monitor DPI behavior remain unchanged.
 
 ## Persistence and Privacy
-ConfigurationStore schema 11 resets older development configurations only. First run starts empty; presets are explicitly added in the current language. Preferences remain separate. Short IDs, colors, icons and slots persist with the existing store. No PDF uploads, extracted-content logging, stored owner password or retained temporary page images.
+ConfigurationStore schema 12 resets older development configurations only. First run starts empty; presets are explicitly added in the current language. Preferences remain separate. Short IDs, colors, icons and slots persist with the existing store. No PDF uploads, extracted-content logging, stored owner password or retained temporary page images.
 
 ## Dependencies and Distribution
 PDFsharp 6.2.4 (MIT) and PdfPig 0.1.16 (Apache-2.0) provide managed .NET-compatible editing/extraction; PDFtoImage 5.4.0/PDFium/Skia remain the renderer. See `THIRD-PARTY-NOTICES.md` and `licenses/`. No external reference implementation is included.

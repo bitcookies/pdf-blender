@@ -356,10 +356,11 @@ public partial class ConfigurationPage : Page
             Placement = PlacementMode.Bottom,
             StaysOpen = false
         };
+        var menuTextBrush = (Brush)FindResource(configuration.IsLocked ? "DisabledTextBrush" : "TextBrush");
         var edit = new UiMenuItem
         {
-            Header = UiText.Get("edit"),
-            Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.Edit16 },
+            Header = new TextBlock { Text = UiText.Get("edit"), Foreground = menuTextBrush },
+            Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.Edit16, Foreground = menuTextBrush },
             IsEnabled = !configuration.IsLocked
         };
         edit.Click += (_, _) => Dispatcher.BeginInvoke(new Action(() => OpenEditor(configuration, false)), DispatcherPriority.ContextIdle);
@@ -382,8 +383,8 @@ public partial class ConfigurationPage : Page
         lockItem.Click += (_, _) => _session.SetConfigurationLocked(configuration.Id, !configuration.IsLocked);
         var delete = new UiMenuItem
         {
-            Header = UiText.Get("delete"),
-            Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.Delete16 },
+            Header = new TextBlock { Text = UiText.Get("delete"), Foreground = menuTextBrush },
+            Icon = new Wpf.Ui.Controls.SymbolIcon { Symbol = Wpf.Ui.Controls.SymbolRegular.Delete16, Foreground = menuTextBrush },
             IsEnabled = !configuration.IsLocked
         };
         delete.Click += async (_, _) =>

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\PDFBlender.Core\PDFBlender.Core.csproj" />
@@ -21,7 +21,7 @@
     <AssemblyTitle>PDF Blender</AssemblyTitle>
     <Description>PDF Blender</Description>
     <Product>PDF Blender</Product>
-    <Copyright>Copyright © 2016-2026 BITCOOKIES</Copyright>
+    <Copyright>Copyright © 2016-2026 Bitcookies</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

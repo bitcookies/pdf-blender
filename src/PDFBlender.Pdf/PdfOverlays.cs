@@ -74,21 +74,6 @@ internal static class PdfOverlays
 
     public static int CopyLayer(PdfPage page, PigPage source, PageLayout layout, CopyLayerMode mode, string customText, CancellationToken token)
     {
-        if (mode == CopyLayerMode.CustomWarning)
-        {
-            WriteInvisible(page, false, false, graphics =>
-            {
-                // Keep the invisible warning inside the page bounds. Some PDF readers skip
-                // selectable text placed on the outermost edge of a raster page.
-                var fontSize = Math.Clamp(Math.Min(page.Width.Point, page.Height.Point) / 250, .8, 2.5);
-                var font = PdfFontResolver.ForText(customText, fontSize);
-                var baseline = Math.Max(fontSize + 1, page.Height.Point / 2);
-                var lines = customText.Replace("\r", string.Empty).Split('\n');
-                for (var i = 0; i < lines.Length; i++)
-                    graphics.DrawString(lines[i], font, XBrushes.Black, new XPoint(2, baseline + i * fontSize * 1.2));
-            });
-            return 1;
-        }
         var letters = source.Letters.Where(letter => !string.IsNullOrEmpty(letter.Value)).ToArray();
         if (letters.Length == 0) return 0;
         if (mode == CopyLayerMode.TextLayoutPerturbation)
@@ -107,8 +92,10 @@ internal static class PdfOverlays
                 var text = mode switch
                 {
                     CopyLayerMode.TextLayoutPerturbation => letter.Value,
-                    CopyLayerMode.UnicodeScramble => RandomText(letter.Value.Length, "αβγδεζηθκλμνξπρστυφχψω"),
-                    CopyLayerMode.ReplaceWithGibberish => RandomText(letter.Value.Length, "абвгдежзийклмнопрстуфхцчшщэюя"),
+                    CopyLayerMode.UnicodeScramble or CopyLayerMode.ReplaceWithGibberish => RandomText(letter.Value.Length, "αβγδεζηθκλμνξπρστυφχψωабвгдежзийклмнопрстуфхцчшщэюя¤§¶"),
+                    CopyLayerMode.Numeric => RandomText(letter.Value.Length, "0123456789"),
+                    CopyLayerMode.Alphabetic => RandomText(letter.Value.Length, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"),
+                    CopyLayerMode.CustomWarning => customText,
                     _ => throw new PdfProcessingException("validationMode")
                 };
                 var point = letter.StartBaseLine;

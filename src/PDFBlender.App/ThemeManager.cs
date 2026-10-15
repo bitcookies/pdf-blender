@@ -157,6 +157,11 @@ internal static class ThemeManager
             SetColor(resources, "AccentButtonEndColor", "#D33D4D");
             SetColor(resources, "AccentButtonHoverStartColor", "#F05A67");
             SetColor(resources, "AccentButtonHoverEndColor", "#D93D4D");
+            SetColor(resources, "CancelButtonStartColor", "#D9891B");
+            SetColor(resources, "CancelButtonEndColor", "#B86D0C");
+            SetColor(resources, "CancelButtonHoverStartColor", "#E6A23C");
+            SetColor(resources, "CancelButtonHoverEndColor", "#C98218");
+            SetColor(resources, "CancelButtonPressedColor", "#93550A");
             SetColor(resources, "EditorSaveDisabledStartColor", "#454545");
             SetColor(resources, "EditorSaveDisabledEndColor", "#3A3A3A");
             SetShadow(resources, dark: true);
@@ -223,6 +228,11 @@ internal static class ThemeManager
             SetColor(resources, "AccentButtonEndColor", "#D84D31");
             SetColor(resources, "AccentButtonHoverStartColor", "#FB536D");
             SetColor(resources, "AccentButtonHoverEndColor", "#D23040");
+            SetColor(resources, "CancelButtonStartColor", "#D97706");
+            SetColor(resources, "CancelButtonEndColor", "#B45309");
+            SetColor(resources, "CancelButtonHoverStartColor", "#EA8A12");
+            SetColor(resources, "CancelButtonHoverEndColor", "#C96608");
+            SetColor(resources, "CancelButtonPressedColor", "#9A3412");
             SetColor(resources, "EditorSaveDisabledStartColor", "#D6D6D6");
             SetColor(resources, "EditorSaveDisabledEndColor", "#C8C8C8");
             SetShadow(resources, dark: false);

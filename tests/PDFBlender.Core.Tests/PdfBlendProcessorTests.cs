@@ -149,6 +149,8 @@ public sealed class PdfBlendProcessorTests : IDisposable
     [InlineData(CopyLayerMode.UnicodeScramble)]
     [InlineData(CopyLayerMode.ReplaceWithGibberish)]
     [InlineData(CopyLayerMode.TextLayoutPerturbation)]
+    [InlineData(CopyLayerMode.Numeric)]
+    [InlineData(CopyLayerMode.Alphabetic)]
     public async Task CopyLayersHaveSelectableGeometryAndDoNotKeepOriginalObjects(CopyLayerMode mode)
     {
         var settings = new BlendSettings { Protection = ProtectionMethod.Flatten, CopyLayer = mode, Dpi = 72, ImageQuality = ImageQuality.Lossless };
@@ -158,13 +160,24 @@ public sealed class PdfBlendProcessorTests : IDisposable
         using var pdf = PigDocument.Open(first.OutputPath);
         Assert.NotEmpty(pdf.GetPage(1).Letters);
         Assert.All(pdf.GetPage(1).Letters, letter => Assert.InRange(letter.StartBaseLine.X, 0, 300));
-        if (mode != CopyLayerMode.TextLayoutPerturbation)
+        var extracted = Text(first.OutputPath);
+        if (mode == CopyLayerMode.Numeric)
         {
-            Assert.DoesNotContain("PDF Blender", Text(first.OutputPath));
+            Assert.NotEmpty(extracted);
+            Assert.All(extracted, character => Assert.InRange(character, '0', '9'));
+        }
+        else if (mode == CopyLayerMode.Alphabetic)
+        {
+            Assert.NotEmpty(extracted);
+            Assert.All(extracted, character => Assert.True(char.IsAsciiLetter(character)));
+        }
+        else if (mode != CopyLayerMode.TextLayoutPerturbation)
+        {
+            Assert.DoesNotContain("PDF Blender", extracted);
             Assert.NotEqual(Text(first.OutputPath), Text(second.OutputPath));
         }
         else
-            Assert.Equal("PDF Blender".OrderBy(c => c), Text(first.OutputPath).OrderBy(c => c));
+            Assert.Equal("PDF Blender".OrderBy(c => c), extracted.OrderBy(c => c));
         using var source = Render(input);
         using var output = Render(first.OutputPath);
         Assert.Equal(source.Pixels, output.Pixels);
@@ -228,7 +241,10 @@ public sealed class PdfBlendProcessorTests : IDisposable
             CopyLayerCustomText = "DO NOT COPY"
         });
 
-        Assert.Contains("DO NOT COPY", Text(result.OutputPath));
+        var customExtracted = Text(result.OutputPath);
+        Assert.Contains("DO NOT COPY", customExtracted);
+        Assert.DoesNotContain("PDF Blender", customExtracted);
+        Assert.True(customExtracted.Split("DO NOT COPY", StringSplitOptions.None).Length > 2);
         using var pig = PigDocument.Open(result.OutputPath);
         Assert.Contains("DO NOT COPY", pig.GetPage(1).Text);
     }

@@ -71,6 +71,11 @@
     <Color x:Key="AccentButtonHoverEndColor">#D23040</Color>
     <Color x:Key="AccentButtonDisabledStartColor">#C0C0C0</Color>
     <Color x:Key="AccentButtonDisabledEndColor">#B7B7B7</Color>
+    <Color x:Key="CancelButtonStartColor">#D97706</Color>
+    <Color x:Key="CancelButtonEndColor">#B45309</Color>
+    <Color x:Key="CancelButtonHoverStartColor">#EA8A12</Color>
+    <Color x:Key="CancelButtonHoverEndColor">#C96608</Color>
+    <Color x:Key="CancelButtonPressedColor">#9A3412</Color>
     <Color x:Key="EditorSaveDisabledStartColor">#D6D6D6</Color>
     <Color x:Key="EditorSaveDisabledEndColor">#C8C8C8</Color>
     <SolidColorBrush x:Key="EditorSaveDisabledTextBrush" Color="#666666" />

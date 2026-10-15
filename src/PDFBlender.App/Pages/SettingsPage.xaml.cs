@@ -214,5 +214,5 @@ public partial class SettingsPage : Page
     }
 
     private static string GetApplicationVersion() =>
-        (Assembly.GetEntryAssembly()?.GetName().Version ?? new Version(1, 0, 0, 0)).ToString(4);
+        (Assembly.GetEntryAssembly()?.GetName().Version ?? new Version(1, 1, 0, 0)).ToString(4);
 }

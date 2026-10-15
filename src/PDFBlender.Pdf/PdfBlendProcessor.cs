@@ -143,7 +143,7 @@ public sealed class PdfBlendProcessor : IBlendProcessor
         if (settings.MetadataNormalization)
         {
             document.Info.Creator = string.IsNullOrWhiteSpace(settings.MetadataOrganization) ? "PDF Blender" : settings.MetadataOrganization;
-            document.Info.Elements.SetString("/Producer", "PDF Blender 1.0.0.0");
+            document.Info.Elements.SetString("/Producer", "PDF Blender 1.1.0.0");
             document.Info.ModificationDate = DateTime.UtcNow;
             if (!string.IsNullOrWhiteSpace(settings.MetadataAuthorName)) document.Info.Author = settings.MetadataAuthorName;
         }

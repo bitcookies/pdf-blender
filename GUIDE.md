@@ -88,7 +88,7 @@ PDFBlender/
 ├─ AGENTS.md               AI 在本仓库中工作时必须遵守的规则
 ├─ LICENSE                 项目许可证
 ├─ PDFBlender.slnx         .NET 解决方案
-├─ Directory.Build.props   统一版本号，目前是 1.0.0 / 1.0.0.0
+├─ Directory.Build.props   统一版本号，目前是 1.1.0 / 1.1.0.0
 └─ build.ps1               数字构建入口
 ```
 

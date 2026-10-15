@@ -54,6 +54,7 @@ public partial class ConfigurationEditorPage : Page
     private readonly CheckBox _allowModification = new();
     private readonly CheckBox _allowAnnotations = new();
     private readonly CheckBox _allowForms = new();
+    private readonly TextBlock _copyPermissionWarning = new();
     private readonly UiToggleSwitch _promptInjection = new();
     private readonly UiTextBox _width = new();
     private readonly UiTextBox _pageWidth = new();
@@ -66,6 +67,7 @@ public partial class ConfigurationEditorPage : Page
     private string _selectedIconKey;
     private BlendSettings _settings;
     private readonly Dictionary<FrameworkElement, int> _visibilityVersions = new();
+    private static readonly CopyLayerMode[] CopyLayerModes = [ CopyLayerMode.TextLayoutPerturbation, CopyLayerMode.UnicodeScramble, CopyLayerMode.Numeric, CopyLayerMode.Alphabetic, CopyLayerMode.CustomWarning ];
 
     internal ConfigurationEditorPage(AppSession session, DialogService dialogs, BlendConfiguration? source, bool isNew, Action back, Action<BlendConfiguration, bool, string, BlendSettings, string, string> save, Action listBack)
     {
@@ -253,8 +255,9 @@ public partial class ConfigurationEditorPage : Page
         _noiseLevel.SelectedIndex = Math.Max(0, (int)_settings.Noise - 1);
         _textureLevel.ItemsSource = new[] { UiText.Get("low"), UiText.Get("medium"), UiText.Get("high") };
         _textureLevel.SelectedIndex = Math.Max(0, (int)_settings.Texture - 1);
-        _copyLayerMode.ItemsSource = new[] { UiText.Get("unicodeScramble"), UiText.Get("textLayoutPerturbation"), UiText.Get("gibberishCopyLayer"), UiText.Get("customWarning") };
-        _copyLayerMode.SelectedIndex = Math.Clamp((int)_settings.CopyLayer - 1, 0, 3);
+        _copyLayerMode.ItemsSource = new[] { UiText.Get("textLayoutPerturbation"), UiText.Get("randomUnicode"), UiText.Get("numericCopyLayer"), UiText.Get("alphabeticCopyLayer"), UiText.Get("customWarning") };
+        var modeIndex = Array.IndexOf(CopyLayerModes, _settings.CopyLayer is CopyLayerMode.ReplaceWithGibberish ? CopyLayerMode.UnicodeScramble : _settings.CopyLayer);
+        _copyLayerMode.SelectedIndex = modeIndex >= 0 ? modeIndex : 0;
 
         AddSection(UiText.Get("pageFormat"));
         AddFeature(UiText.Get("normalizeWidth"), UiText.Get("normalizeHint"), _normalize, [Labeled(UiText.Get("targetWidthPreset"), _contentWidthPreset), Labeled(UiText.Get("pageWidth"), _width)]);
@@ -294,8 +297,15 @@ public partial class ConfigurationEditorPage : Page
         _copyLayerMode.SelectionChanged += (_, _) => { UpdateCopyLayerDetailsVisibility(); UpdateSaveState(); };
 
         _copyLayerCustomText.TextChanged += (_, _) => UpdateSaveState();
+        _copyLayer.Checked += (_, _) => UpdateCopyPermissionWarning();
+        _copyLayer.Unchecked += (_, _) => UpdateCopyPermissionWarning();
+        _permissions.Checked += (_, _) => UpdateCopyPermissionWarning();
+        _permissions.Unchecked += (_, _) => UpdateCopyPermissionWarning();
+        _allowCopying.Checked += (_, _) => UpdateCopyPermissionWarning();
+        _allowCopying.Unchecked += (_, _) => UpdateCopyPermissionWarning();
         UpdateWidthFromPreset();
         UpdatePageSizeFromPreset();
+        UpdateCopyPermissionWarning();
     }
 
     private void ConfigurePromptTemplatePicker()
@@ -577,7 +587,7 @@ public partial class ConfigurationEditorPage : Page
 
     private void UpdateCopyLayerDetailsVisibility()
     {
-        SetControlRowVisibility(_copyLayerCustomText, _copyLayerMode.SelectedIndex == 3 ? Visibility.Visible : Visibility.Collapsed);
+        SetControlRowVisibility(_copyLayerCustomText, _copyLayerMode.SelectedIndex >= 0 && CopyLayerModes[_copyLayerMode.SelectedIndex] == CopyLayerMode.CustomWarning ? Visibility.Visible : Visibility.Collapsed);
     }
     private UIElement Labeled(string label, Control control)
     {
@@ -664,8 +674,23 @@ public partial class ConfigurationEditorPage : Page
             Grid.SetColumn(checkBox, i % 2);
             grid.Children.Add(checkBox);
         }
+        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        _copyPermissionWarning.Text = UiText.Get("copyPermissionWarning");
+        _copyPermissionWarning.TextWrapping = TextWrapping.Wrap;
+        _copyPermissionWarning.FontSize = 11;
+        _copyPermissionWarning.Foreground = (Brush)FindResource("MutedTextBrush");
+        _copyPermissionWarning.Margin = new Thickness(0, 5, 12, 0);
+        Grid.SetRow(_copyPermissionWarning, 3);
+        Grid.SetColumnSpan(_copyPermissionWarning, 2);
+        grid.Children.Add(_copyPermissionWarning);
         return grid;
     }
+    private void UpdateCopyPermissionWarning()
+    {
+        var visible = _copyLayer.IsChecked == true && _permissions.IsChecked == true && _allowCopying.IsChecked != true;
+        _copyPermissionWarning.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+    }
+
     private void SetControlRowVisibility(FrameworkElement control, Visibility visibility)
     {
         DependencyObject? current = control;
@@ -752,7 +777,7 @@ public partial class ConfigurationEditorPage : Page
     private void UpdateSaveState() {
         var hasName = !string.IsNullOrWhiteSpace(NameBox.Text);
         var hasFeature = _normalize.IsChecked == true || _pageSize.IsChecked == true || _flatten.IsChecked == true || _watermark.IsChecked == true || _noise.IsChecked == true || _texture.IsChecked == true || _geometry.IsChecked == true || _microText.IsChecked == true || _copyLayer.IsChecked == true || _hiddenAi.IsChecked == true || _promptInjection.IsChecked == true || _metadata.IsChecked == true || _permissions.IsChecked == true;
-        SaveButton.IsEnabled = hasName && (!_isNew || hasFeature) && (_copyLayer.IsChecked != true || _copyLayerMode.SelectedIndex != 3 || !string.IsNullOrWhiteSpace(_copyLayerCustomText.Text)) && (_hiddenAi.IsChecked != true || _selectedPromptTemplateIds.Count > 0);
+        SaveButton.IsEnabled = hasName && (!_isNew || hasFeature) && (_copyLayer.IsChecked != true || _copyLayerMode.SelectedIndex < 0 || CopyLayerModes[_copyLayerMode.SelectedIndex] != CopyLayerMode.CustomWarning || !string.IsNullOrWhiteSpace(_copyLayerCustomText.Text)) && (_hiddenAi.IsChecked != true || _selectedPromptTemplateIds.Count > 0);
         var saveTextResource = SaveButton.IsEnabled ? "AccentTextBrush" : "EditorSaveDisabledTextBrush";
 
         if (SaveButton.Content is TextBlock saveText)
@@ -803,7 +828,7 @@ public partial class ConfigurationEditorPage : Page
             Texture = _texture.IsChecked == true ? (TextureStrength)Math.Clamp(_textureLevel.SelectedIndex + 1, 1, 3) : TextureStrength.Off,
             GeometryPerturbation = _geometry.IsChecked == true,
             MicroTextPattern = _microText.IsChecked == true,
-            CopyLayer = _copyLayer.IsChecked == true ? (CopyLayerMode)Math.Clamp(_copyLayerMode.SelectedIndex + 1, 1, 4) : CopyLayerMode.Preserve,
+            CopyLayer = _copyLayer.IsChecked == true && _copyLayerMode.SelectedIndex >= 0 ? CopyLayerModes[_copyLayerMode.SelectedIndex] : CopyLayerMode.Preserve,
             CopyLayerCustomText = _copyLayerCustomText.Text ?? string.Empty,
             HiddenAiText = _hiddenAi.IsChecked == true,
             PromptTemplateIds = _selectedPromptTemplateIds.ToArray(),

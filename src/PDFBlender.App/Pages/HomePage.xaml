@@ -18,15 +18,45 @@
             <GradientStop Color="{DynamicResource AccentButtonDisabledStartColor}" Offset="0" />
             <GradientStop Color="{DynamicResource AccentButtonDisabledEndColor}" Offset="1" />
         </LinearGradientBrush>
+        <LinearGradientBrush x:Key="CancelGradientBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="{DynamicResource CancelButtonStartColor}" Offset="0" />
+            <GradientStop Color="{DynamicResource CancelButtonEndColor}" Offset="1" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="CancelGradientHoverBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="{DynamicResource CancelButtonHoverStartColor}" Offset="0" />
+            <GradientStop Color="{DynamicResource CancelButtonHoverEndColor}" Offset="1" />
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="CancelGradientPressedBrush" Color="{DynamicResource CancelButtonPressedColor}" />
         <Style x:Key="HomeGradientSurfaceStyle" TargetType="Border">
             <Setter Property="Background" Value="{StaticResource HomeGradientBrush}" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="{StaticResource HomeGradientHoverBrush}" />
                 </Trigger>
+
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="{StaticResource HomeGradientDisabledBrush}" />
+                </Trigger>
                 <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="False">
                     <Setter Property="Background" Value="{StaticResource HomeGradientDisabledBrush}" />
                 </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="BlendGradientSurfaceStyle" TargetType="Border" BasedOn="{StaticResource HomeGradientSurfaceStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="ProcessingPressed">
+                    <Setter Property="Background" Value="{StaticResource CancelGradientPressedBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="Processing">
+                    <Setter Property="Background" Value="{StaticResource CancelGradientBrush}" />
+                </DataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="Processing" />
+                        <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="{StaticResource CancelGradientHoverBrush}" />
+                </MultiDataTrigger>
             </Style.Triggers>
         </Style>
         <Style x:Key="HomeGradientButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
@@ -158,8 +188,8 @@
                 </ui:Card>
                 <ProgressBar x:Name="ProcessingProgress" Width="120" Height="5" Margin="10,0,8,0" Visibility="Collapsed" />
             </StackPanel>
-            <Border Grid.Column="1" Width="250" Height="52" CornerRadius="8" HorizontalAlignment="Right" Style="{StaticResource HomeGradientSurfaceStyle}" Tag="{Binding IsEnabled, ElementName=BlendButton}">
-                <ui:Button x:Name="BlendButton" Style="{StaticResource HomeGradientButtonStyle}" Width="250" Height="52" Click="BlendButton_Click" AutomationProperties.Name="Blend PDF">
+            <Border Grid.Column="1" Width="250" Height="52" CornerRadius="8" HorizontalAlignment="Right" x:Name="BlendButtonSurface" Style="{StaticResource BlendGradientSurfaceStyle}" Tag="Ready" IsEnabled="{Binding IsEnabled, ElementName=BlendButton}">
+                <ui:Button x:Name="BlendButton" Style="{StaticResource HomeGradientButtonStyle}" Width="250" Height="52" Click="BlendButton_Click" PreviewMouseLeftButtonDown="BlendButton_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="BlendButton_PreviewMouseLeftButtonUp" MouseLeave="BlendButton_MouseLeave" AutomationProperties.Name="Blend PDF">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <ui:SymbolIcon x:Name="BlendButtonIcon" Symbol="TriangleRight20" Filled="True" FontSize="19" Margin="0,0,8,0" Foreground="White" />
                         <TextBlock x:Name="BlendButtonText" FontSize="14" Foreground="White" />
