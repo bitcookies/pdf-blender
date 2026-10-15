@@ -44,6 +44,9 @@
         </Style>
         <Style x:Key="BlendGradientSurfaceStyle" TargetType="Border" BasedOn="{StaticResource HomeGradientSurfaceStyle}">
             <Style.Triggers>
+                <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="Disabled">
+                    <Setter Property="Background" Value="{StaticResource HomeGradientDisabledBrush}" />
+                </DataTrigger>
                 <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="ProcessingPressed">
                     <Setter Property="Background" Value="{StaticResource CancelGradientPressedBrush}" />
                 </DataTrigger>
@@ -188,7 +191,7 @@
                 </ui:Card>
                 <ProgressBar x:Name="ProcessingProgress" Width="120" Height="5" Margin="10,0,8,0" Visibility="Collapsed" />
             </StackPanel>
-            <Border Grid.Column="1" Width="250" Height="52" CornerRadius="8" HorizontalAlignment="Right" x:Name="BlendButtonSurface" Style="{StaticResource BlendGradientSurfaceStyle}" Tag="Ready" IsEnabled="{Binding IsEnabled, ElementName=BlendButton}">
+            <Border Grid.Column="1" Width="250" Height="52" CornerRadius="8" HorizontalAlignment="Right" x:Name="BlendButtonSurface" Style="{StaticResource BlendGradientSurfaceStyle}" Tag="Disabled">
                 <ui:Button x:Name="BlendButton" Style="{StaticResource HomeGradientButtonStyle}" Width="250" Height="52" Click="BlendButton_Click" PreviewMouseLeftButtonDown="BlendButton_PreviewMouseLeftButtonDown" PreviewMouseLeftButtonUp="BlendButton_PreviewMouseLeftButtonUp" MouseLeave="BlendButton_MouseLeave" AutomationProperties.Name="Blend PDF">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <ui:SymbolIcon x:Name="BlendButtonIcon" Symbol="TriangleRight20" Filled="True" FontSize="19" Margin="0,0,8,0" Foreground="White" />

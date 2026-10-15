@@ -29,6 +29,7 @@ function Show-Menu {
     Write-Host '  1  Portable publish (publish/portable)'
     Write-Host '  2  MSIX installer (publish/installer)'
     Write-Host '  3  Signed local-test MSIX (publish/local-test)'
+    Write-Host '  4  Clean caches and run 1, 2, 3'
     Write-Host '  0  Exit'
     Write-Host ''
 }
@@ -84,6 +85,36 @@ function Find-MSBuild {
 
     return $null
 }
+function Clear-BuildCaches {
+    $cachePaths = @(
+        (Join-Path $root 'packaging/BundleArtifacts'),
+        (Join-Path $root 'artifacts')
+    )
+
+    foreach ($cachePath in $cachePaths) {
+        if (Test-Path -LiteralPath $cachePath) {
+            Remove-Item -LiteralPath $cachePath -Recurse -Force
+        }
+    }
+
+    $cacheDirectories = foreach ($cacheRoot in @(
+        (Join-Path $root 'src'),
+        (Join-Path $root 'tests'),
+        (Join-Path $root 'packaging')
+    )) {
+        if (Test-Path -LiteralPath $cacheRoot) {
+            Get-ChildItem -LiteralPath $cacheRoot -Directory -Recurse -Force -ErrorAction SilentlyContinue |
+                Where-Object { $_.Name -in @('bin', 'obj') }
+        }
+    }
+
+    foreach ($cacheDirectory in $cacheDirectories | Sort-Object FullName -Descending) {
+        Remove-Item -LiteralPath $cacheDirectory.FullName -Recurse -Force
+    }
+
+    Write-Host 'Build caches cleared.' -ForegroundColor DarkGray
+}
+
 function Invoke-Dotnet([string[]]$Arguments, [int]$FailureCode) {
     & dotnet @Arguments
     if ($LASTEXITCODE -ne 0) {
@@ -95,19 +126,41 @@ if ($Mode -eq -1) {
     Show-Menu
     $selection = Read-Host 'Choose an action number'
     if (-not [int]::TryParse($selection, [ref]$Mode)) {
-        Write-Host 'Invalid action. Choose 1, 2, 3, or 0.' -ForegroundColor Red
+        Write-Host 'Invalid action. Choose 1, 2, 3, 4, or 0.' -ForegroundColor Red
         exit 2
     }
 }
 
-if ($Mode -notin 0, 1, 2, 3) {
-    Write-Host 'Invalid action. Choose 1, 2, 3, or 0.' -ForegroundColor Red
+if ($Mode -notin 0, 1, 2, 3, 4) {
+    Write-Host 'Invalid action. Choose 1, 2, 3, 4, or 0.' -ForegroundColor Red
     exit 2
 }
 
 if ($Mode -eq 0) {
     exit 0
 }
+
+if ($Mode -eq 4) {
+    Clear-BuildCaches
+    $pwsh = Join-Path $PSHOME 'pwsh.exe'
+    foreach ($childMode in 1, 2, 3) {
+        $childArguments = @('-NoProfile', '-File', $PSCommandPath, '-Mode', $childMode, '-Force')
+        if ($childMode -eq 3) {
+            $childArguments += @('-Architecture', $Architecture)
+            if ($CertificateThumbprint) {
+                $childArguments += @('-CertificateThumbprint', $CertificateThumbprint)
+            }
+        }
+        Write-Host "Running build mode $childMode..." -ForegroundColor Cyan
+        & $pwsh @childArguments
+        if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+        }
+    }
+    Write-Host 'Batch build completed: modes 1, 2, and 3.' -ForegroundColor Green
+    exit 0
+}
+
 
 switch ($Mode) {
     1 {

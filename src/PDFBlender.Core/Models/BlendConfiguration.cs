@@ -457,7 +457,7 @@ public static class BuiltInConfigurations
                     PromptInjection = true,
                     PromptInjectionText = PromptTemplateCatalog.Mixed,
                     HiddenAiText = true,
-                    PromptTemplateIds = PromptTemplateCatalog.Ids.ToArray(),
+                    PromptTemplateIds = [PromptTemplateCatalog.InstructionPriority],
                     MetadataNormalization = true,
                     ProtectionDeclaration = true,
                     PermissionRestriction = true,

@@ -182,7 +182,9 @@ public partial class HomePage : Page
                     ? string.Format(UiText.Get("selectedCount"), selectedPaths.Length)
                     : string.Empty;
             }
-            BlendButton.IsEnabled = selectedPaths.Length > 0 && _session.SlotConfigurations.Any(configuration => configuration is not null);
+            SetBlendButtonAvailability(
+                selectedPaths.Length > 0 &&
+                _session.SlotConfigurations.Any(configuration => configuration is not null));
             SetStatusText(_session.SlotConfigurations.All(configuration => configuration is null)
                 ? UiText.Get("noBlendSlots")
                 : selectedPaths.Length > 0 ? UiText.Get("readyToBlend") : UiText.Get("ready"));
@@ -207,7 +209,9 @@ public partial class HomePage : Page
             _previewVisuals.Add(preview);
             PreviewStrip.Children.Add(preview.Container);
         }
-        BlendButton.IsEnabled = hasFile && _session.SlotConfigurations.Any(configuration => configuration is not null);
+        SetBlendButtonAvailability(
+            hasFile &&
+            _session.SlotConfigurations.Any(configuration => configuration is not null));
         SetStatusText(_session.SlotConfigurations.All(configuration => configuration is null)
             ? UiText.Get("noBlendSlots")
             : hasFile ? UiText.Get("readyToBlend") : UiText.Get("ready"));
@@ -366,6 +370,14 @@ public partial class HomePage : Page
         StatusText.SetResourceReference(TextBlock.ForegroundProperty, emptySlots ? "MutedTextBrush" : "PillTextBrush");
         StatusDot.SetResourceReference(Shape.FillProperty, emptySlots ? "MutedTextBrush" : "AccentBrush");
     }
+    private void SetBlendButtonAvailability(bool enabled)
+    {
+        BlendButton.IsEnabled = enabled;
+
+        if (_processingCts is null)
+            BlendButtonSurface.Tag = enabled ? "Ready" : "Disabled";
+    }
+
     private void BlendButton_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         if (_processingCts is not null) BlendButtonSurface.Tag = "ProcessingPressed";
@@ -383,8 +395,12 @@ public partial class HomePage : Page
 
     private void SetProcessingState(bool processing)
     {
-        BlendButtonSurface.Tag = processing ? "Processing" : "Ready";
-        BlendButton.IsEnabled = processing || (_session.InputPaths.Count > 0 && _session.SlotConfigurations.Any(configuration => configuration is not null));
+        var canBlend = _session.InputPaths.Count > 0 &&
+            _session.SlotConfigurations.Any(configuration => configuration is not null);
+        BlendButtonSurface.Tag = processing
+            ? "Processing"
+            : canBlend ? "Ready" : "Disabled";
+        BlendButton.IsEnabled = processing || canBlend;
         BrowseButton.IsEnabled = !processing;
         foreach (var visual in _previewVisuals)
             visual.RemoveButton.IsEnabled = !processing;
