@@ -17,7 +17,12 @@ internal sealed class PdfFontResolver : IFontResolver
     }
 
     public FontResolverInfo? ResolveTypeface(string familyName, bool bold, bool italic) =>
-        new(familyName == "BlenderCjk" ? "simhei.ttf" : "arial.ttf");
+        new(familyName switch
+        {
+            "BlenderCjk" => "simhei.ttf",
+            "BlenderSymbols" => "seguisym.ttf",
+            _ => "arial.ttf"
+        });
 
     public byte[] GetFont(string faceName)
     {
@@ -51,8 +56,8 @@ internal sealed class PdfFontResolver : IFontResolver
         EnsureInitialized();
         var visible = string.Concat(text.Where(c => !char.IsControl(c)));
         var families = text.Any(c => c >= 0x2e80)
-            ? new[] { "BlenderCjk", "BlenderLatin" }
-            : new[] { "BlenderLatin", "BlenderCjk" };
+            ? new[] { "BlenderCjk", "BlenderLatin", "BlenderSymbols" }
+            : new[] { "BlenderLatin", "BlenderCjk", "BlenderSymbols" };
         try
         {
             foreach (var family in families)

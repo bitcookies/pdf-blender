@@ -21,12 +21,11 @@ public sealed class PdfBlendProcessorTests : IDisposable
 {
     private readonly string _root = Path.Combine(Path.GetTempPath(), "pdf-blender-tests", Guid.NewGuid().ToString("N"));
     private readonly PdfBlendProcessor _processor = new();
-    private static readonly object FontGate = new();
 
     public PdfBlendProcessorTests()
     {
         Directory.CreateDirectory(_root);
-        lock (FontGate) GlobalFontSettings.FontResolver ??= new FixtureFontResolver();
+        PdfFontResolver.EnsureInitialized();
     }
     public void Dispose() => Directory.Delete(_root, recursive: true);
     private string PathFor(string name) => Path.Combine(_root, name);
@@ -186,6 +185,84 @@ public sealed class PdfBlendProcessorTests : IDisposable
         Assert.DoesNotContain(structure.Internals.GetAllObjects().OfType<PdfDictionary>(), item => item.Elements.GetName("/Subtype") == "/Type1");
     }
 
+    [Fact]
+    public async Task LayoutCopyLayerPreservesWordStyleMathematicalUnicodeAndVisiblePage()
+    {
+        const string formula = "\U0001D447+\U0001D499=1";
+        var input = PathFor("word-style-formula.pdf");
+        using (var document = new PdfDocument())
+        {
+            var page = document.AddPage();
+            page.Width = XUnit.FromPoint(300);
+            page.Height = XUnit.FromPoint(200);
+            var math = PdfFontResolver.ForText(formula, 18);
+            using (var graphics = XGraphics.FromPdfPage(page))
+            {
+                graphics.DrawString("中文公式 English", PdfFontResolver.ForText("中文公式 English", 16), XBrushes.Black, new XPoint(20, 40));
+                graphics.DrawString(formula, math, XBrushes.Black, new XPoint(20, 90));
+                graphics.DrawString("x=2", math, XBrushes.Black, new XPoint(20, 130));
+            }
+            // Construct a standards-compliant source independently of the production writer.
+            // Word uses UTF-16BE surrogate pairs in its ToUnicode maps for math letters.
+            var font = document.Internals.GetAllObjects().OfType<PdfDictionary>()
+                .Single(item => item.Elements.GetName("/Subtype") == "/Type0" && item.Elements.GetName("/BaseFont").Contains("Segoe UI Symbol", StringComparison.Ordinal));
+            var pairs = GlyphHelper.GlyphIndicesFromString(formula + "x=2", math).DistinctBy(pair => pair.GlyphIndex).ToArray();
+            var mappings = string.Join("\n", pairs.Select(pair => $"<{pair.GlyphIndex:X4}> <{Convert.ToHexString(Encoding.BigEndianUnicode.GetBytes(char.ConvertFromUtf32(pair.CodePoint)))}>"));
+            var map = new PdfDictionary(document);
+            map.CreateStream(Encoding.ASCII.GetBytes($"/CIDInit /ProcSet findresource begin\n12 dict begin\nbegincmap\n/CIDSystemInfo << /Registry (Adobe) /Ordering (UCS) /Supplement 0 >> def\n/CMapName /Fixture-UCS def\n/CMapType 2 def\n1 begincodespacerange\n<0000> <FFFF>\nendcodespacerange\n{pairs.Length} beginbfchar\n{mappings}\nendbfchar\nendcmap\nCMapName currentdict /CMap defineresource pop\nend\nend"));
+            document.Internals.AddObject(map);
+            font.Elements["/ToUnicode"] = map.Reference!;
+            document.Save(input);
+        }
+        Assert.Contains(formula, Text(input));
+        var baseline = new BlendSettings { Protection = ProtectionMethod.Flatten, Dpi = 72, ImageQuality = ImageQuality.Lossless };
+        var plain = await Run(input, baseline, "plain.pdf");
+        var expected = Text(input).EnumerateRunes().Select(rune => rune.Value).Order().ToArray();
+        for (var run = 0; run < 2; run++)
+        {
+            var result = await Run(input, baseline with { CopyLayer = CopyLayerMode.TextLayoutPerturbation }, $"math-{run}.pdf");
+            Assert.Equal(expected, Text(result.OutputPath).EnumerateRunes().Select(rune => rune.Value).Order());
+            using var before = Render(plain.OutputPath);
+            using var after = Render(result.OutputPath);
+            Assert.Equal(before.Pixels, after.Pixels);
+            using var source = PigDocument.Open(input);
+            using var output = PigDocument.Open(result.OutputPath);
+            foreach (var rune in formula.EnumerateRunes().Where(rune => rune.Value > char.MaxValue))
+            {
+                var original = Assert.Single(source.GetPage(1).Letters, letter => letter.Value == rune.ToString());
+                var copied = Assert.Single(output.GetPage(1).Letters, letter => letter.Value == rune.ToString());
+                Assert.InRange(Math.Abs(original.StartBaseLine.X - copied.StartBaseLine.X), 0, .1);
+                Assert.InRange(Math.Abs(original.StartBaseLine.Y - copied.StartBaseLine.Y), 0, .1);
+                Assert.True(copied.BoundingBox.Width > 0);
+            }
+        }
+    }
+    [Fact]
+    public void SupplementaryTextMapsRetainBmpCharactersAcrossPagesAndFontSizes()
+    {
+        var path = PathFor("multi-page-text-map.pdf");
+        const string first = "x=2";
+        const string second = "\U0001D447+\U0001D499=1";
+        using (var document = new PdfDocument())
+        {
+            var writer = new PdfTextWriter(document);
+            var family = PdfFontResolver.ForText(second, 18).FontFamily.Name;
+            for (var i = 0; i < 2; i++)
+            {
+                var page = document.AddPage();
+                using var graphics = XGraphics.FromPdfPage(page);
+                var font = new XFont(family, i == 0 ? 12 : 24, XFontStyleEx.Regular, new XPdfFontOptions(PdfFontEncoding.Unicode));
+                writer.DrawString(page, graphics, "", font, XBrushes.Black, new XPoint(20, 20));
+                writer.DrawString(page, graphics, " ", font, XBrushes.Black, new XPoint(20, 30));
+                writer.DrawString(page, graphics, i == 0 ? first : second, font, XBrushes.Black, new XPoint(20, 60));
+            }
+            writer.Complete();
+            document.Save(path);
+        }
+        using var extracted = PigDocument.Open(path);
+        Assert.Contains(first, extracted.GetPage(1).Text);
+        Assert.Contains(second, extracted.GetPage(2).Text);
+    }
     [Fact]
     public async Task HiddenTextIsInvisibleAndExtractableOnEveryPage()
     {
@@ -444,11 +521,6 @@ public sealed class PdfBlendProcessorTests : IDisposable
         return path;
     }
 
-    private sealed class FixtureFontResolver : IFontResolver
-    {
-        public FontResolverInfo ResolveTypeface(string familyName, bool bold, bool italic) => new(familyName == "BlenderCjk" ? "simhei.ttf" : "arial.ttf");
-        public byte[] GetFont(string faceName) => File.ReadAllBytes(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), faceName));
-    }
     private sealed class InlineProgress<T>(Action<T> callback) : IProgress<T> { public void Report(T value) => callback(value); }
 
     private static byte[] CreateMinimalPdf()

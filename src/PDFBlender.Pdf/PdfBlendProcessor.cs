@@ -73,6 +73,7 @@ public sealed class PdfBlendProcessor : IBlendProcessor
     {
         PdfFontResolver.EnsureInitialized();
         using var document = PdfReader.Open(input, PdfDocumentOpenMode.Modify);
+        var textWriter = new PdfTextWriter(document);
         if (document.PageCount != pageCount) throw new PdfProcessingException("pdfInvalid");
         for (var i = 0; i < document.PageCount; i++)
         {
@@ -83,13 +84,14 @@ public sealed class PdfBlendProcessor : IBlendProcessor
             var rotated = Math.Abs(page.Rotate % 180) == 90;
             var layout = PageLayout.Create(rotated ? box.Height : box.Width, rotated ? box.Width : box.Height, settings);
             if (settings.NormalizeContentWidth || settings.NormalizePageSize) NativePageLayout.Apply(page, layout);
-            PdfOverlays.Watermark(page, settings);
-            PdfOverlays.HiddenStatements(page, settings);
+            PdfOverlays.Watermark(page, settings, textWriter);
+            PdfOverlays.HiddenStatements(page, settings, textWriter);
             progress?.Report(new BlendProgress(i + 1, pageCount, "Native"));
         }
         ApplyMetadata(document, settings);
         ApplyPermissions(document, settings);
         token.ThrowIfCancellationRequested();
+        textWriter.Complete();
         document.Save(output);
     }
 
@@ -98,6 +100,7 @@ public sealed class PdfBlendProcessor : IBlendProcessor
         PdfFontResolver.EnsureInitialized();
         using var source = PdfReader.Open(input, PdfDocumentOpenMode.Import);
         using var document = new PdfDocument();
+        var textWriter = new PdfTextWriter(document);
         CopyMetadata(source, document, settings);
         using var pig = settings.CopyLayer == CopyLayerMode.Preserve ? null : PigDocument.Open(input);
         var sourceSizes = PDFtoImage.Conversion.GetPageSizes(bytes, null);
@@ -112,18 +115,19 @@ public sealed class PdfBlendProcessor : IBlendProcessor
             page.Width = XUnit.FromPoint(layout.Width);
             page.Height = XUnit.FromPoint(layout.Height);
             RasterPageBuilder.Build(page, bytes, i, layout, settings, token);
-            PdfOverlays.Watermark(page, settings);
-            PdfOverlays.HiddenStatements(page, settings);
+            PdfOverlays.Watermark(page, settings, textWriter);
+            PdfOverlays.HiddenStatements(page, settings, textWriter);
             if (settings.CopyLayer != CopyLayerMode.Preserve)
             {
                 var letters = pig!.GetPage(i + 1);
-                totalLetters += PdfOverlays.CopyLayer(page, letters, layout, settings.CopyLayer, settings.CopyLayerCustomText, token);
+                totalLetters += PdfOverlays.CopyLayer(page, letters, layout, settings.CopyLayer, settings.CopyLayerCustomText, token, textWriter);
             }
             progress?.Report(new BlendProgress(i + 1, pageCount, "Raster"));
         }
         if (pig is not null && totalLetters == 0) throw new PdfProcessingException("pdfNoText");
         ApplyPermissions(document, settings);
         token.ThrowIfCancellationRequested();
+        textWriter.Complete();
         document.Save(output);
     }
 
@@ -143,7 +147,7 @@ public sealed class PdfBlendProcessor : IBlendProcessor
         if (settings.MetadataNormalization)
         {
             document.Info.Creator = string.IsNullOrWhiteSpace(settings.MetadataOrganization) ? "PDF Blender" : settings.MetadataOrganization;
-            document.Info.Elements.SetString("/Producer", "PDF Blender 1.1.0.0");
+            document.Info.Elements.SetString("/Producer", "PDF Blender 1.1.1.0");
             document.Info.ModificationDate = DateTime.UtcNow;
             if (!string.IsNullOrWhiteSpace(settings.MetadataAuthorName)) document.Info.Author = settings.MetadataAuthorName;
         }

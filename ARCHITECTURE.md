@@ -1,6 +1,6 @@
 # PDF Blender Architecture
 
-Status: v1.1.0 release hardening
+Status: v1.1.1 release hardening
 
 ## Structure
 `PDFBlender.slnx` has three production projects: App (WPF), Core (settings/contracts) and Pdf (processing). Raster effects stay in Pdf; no separate image framework is required. Preserve the GUI and lightweight service boundaries.

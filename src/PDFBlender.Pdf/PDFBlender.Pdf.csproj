@@ -3,6 +3,7 @@
   <ItemGroup>
     <PackageReference Include="PdfPig" Version="0.1.16" />
     <PackageReference Include="PDFsharp" Version="6.2.4" />
+    <InternalsVisibleTo Include="PDFBlender.Core.Tests" />
     <ProjectReference Include="..\PDFBlender.Core\PDFBlender.Core.csproj" />
     <PackageReference Include="PDFtoImage" Version="5.4.0" />
   </ItemGroup>

@@ -5,7 +5,7 @@
          IgnorableNamespaces="uap rescap">
   <Identity Name="57335Bitcookies.PDFBlender"
             Publisher="CN=53636128-C1AF-456C-8B82-AC0D583B730C"
-            Version="1.1.0.0" />
+            Version="1.1.1.0" />
   <Properties>
     <DisplayName>PDF Blender</DisplayName>
     <PublisherDisplayName>Bitcookies</PublisherDisplayName>

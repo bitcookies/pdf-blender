@@ -10,7 +10,7 @@ namespace PDFBlender.Pdf;
 
 internal static class PdfOverlays
 {
-    public static void Watermark(PdfPage page, BlendSettings settings)
+    public static void Watermark(PdfPage page, BlendSettings settings, PdfTextWriter writer)
     {
         if (settings.Watermark == WatermarkStyle.None && !settings.MicroTextPattern) return;
         using var graphics = XGraphics.FromPdfPage(page, XGraphicsPdfPageOptions.Append);
@@ -34,7 +34,7 @@ internal static class PdfOverlays
                 graphics.TranslateTransform(x, y);
                 graphics.RotateTransform(settings.WatermarkAngle);
                 for (var i = 0; i < lines.Length; i++)
-                    graphics.DrawString(lines[i], font, brush, new XPoint(-graphics.MeasureString(lines[i], font).Width / 2, i * size * 1.3));
+                    writer.DrawString(page, graphics, lines[i], font, brush, new XPoint(-graphics.MeasureString(lines[i], font).Width / 2, i * size * 1.3));
                 graphics.Restore(state);
             }
             if (settings.Watermark == WatermarkStyle.Single) Draw(width / 2, height / 2);
@@ -48,11 +48,11 @@ internal static class PdfOverlays
             var brush = new XSolidBrush(XColor.FromArgb(16, 70, 70, 70));
             for (var y = 8d; y < height; y += 36)
                 for (var x = 8d; x < width; x += 80)
-                    graphics.DrawString("PDF", font, brush, new XPoint(x, y));
+                    writer.DrawString(page, graphics, "PDF", font, brush, new XPoint(x, y));
         }
     }
 
-    public static void HiddenStatements(PdfPage page, BlendSettings settings)
+    public static void HiddenStatements(PdfPage page, BlendSettings settings, PdfTextWriter writer)
     {
         var templates = settings.HiddenAiText ? PromptTemplateCatalog.Resolve(settings.PromptTemplateIds) : string.Empty;
         var custom = settings.PromptInjection ? settings.PromptInjectionText : string.Empty;
@@ -66,13 +66,13 @@ internal static class PdfOverlays
             var y = 1d;
             foreach (var line in text.Replace("\r", "").Split('\n'))
             {
-                graphics.DrawString(line, font, XBrushes.Black, new XPoint(1, y));
+                writer.DrawString(page, graphics, line, font, XBrushes.Black, new XPoint(1, y));
                 y += .7;
             }
         });
     }
 
-    public static int CopyLayer(PdfPage page, PigPage source, PageLayout layout, CopyLayerMode mode, string customText, CancellationToken token)
+    public static int CopyLayer(PdfPage page, PigPage source, PageLayout layout, CopyLayerMode mode, string customText, CancellationToken token, PdfTextWriter writer)
     {
         var letters = source.Letters.Where(letter => !string.IsNullOrEmpty(letter.Value)).ToArray();
         if (letters.Length == 0) return 0;
@@ -110,7 +110,7 @@ internal static class PdfOverlays
                 graphics.TranslateTransform(x, y);
                 graphics.RotateTransform(-Math.Atan2(end.Y - point.Y, end.X - point.X) * 180 / Math.PI);
                 graphics.ScaleTransform(targetWidth / Math.Max(.1, measuredWidth), 1);
-                graphics.DrawString(text, font, XBrushes.Black, new XPoint(0, 0));
+                writer.DrawString(page, graphics, text, font, XBrushes.Black, new XPoint(0, 0));
                 graphics.Restore(state);
             }
         });

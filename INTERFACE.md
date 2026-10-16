@@ -1,6 +1,6 @@
 # PDF Blender Interface Specification
 
-Status: v1.1.0 PDF core controls; existing GUI preserved
+Status: v1.1.1 PDF core controls; existing GUI preserved
 
 ## Visual Direction
 

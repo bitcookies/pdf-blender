@@ -16,7 +16,7 @@ Use these Partner Center values verbatim:
 | Store protocol | ms-windows-store://pdp/?productid=9P65NBNQRGVZ |
 | MSA app ID | 116e34fe-9d09-4824-a9ff-f475b44b71ec |
 
-The PFN, SID, Store ID and MSA app ID are not additional manifest identity attributes. Package identity, publisher and publisher display name are declared in the manifest. Version remains 1.0.0.0; the Store version's fourth component is zero.
+The PFN, SID, Store ID and MSA app ID are not additional manifest identity attributes. Package identity, publisher and publisher display name are declared in the manifest. Version remains 1.1.1.0; the Store version's fourth component is zero.
 
 Product website: https://pdf-blender.vercel.app/
 Privacy policy: https://pdf-blender.vercel.app/privacy
@@ -40,16 +40,16 @@ Mode 2 clears only its ignored output directory, fully rebuilds all three archit
 The one file to submit is:
 
 ```text
-publish/installer/PDFBlender.Package_1.0.0.0_x86_x64_ARM64_bundle.msixupload
+publish/installer/PDFBlender.Package_1.1.1.0_x86_x64_ARM64_bundle.msixupload
 ```
 
 Standard Visual Studio output contains one bundle and one symbol archive per architecture:
 
 ```text
-PDFBlender.Package_1.0.0.0_x86_x64_ARM64.msixbundle
-PDFBlender.Package_1.0.0.0_x86.appxsym
-PDFBlender.Package_1.0.0.0_x64.appxsym
-PDFBlender.Package_1.0.0.0_ARM64.appxsym
+PDFBlender.Package_1.1.1.0_x86_x64_ARM64.msixbundle
+PDFBlender.Package_1.1.1.0_x86.appxsym
+PDFBlender.Package_1.1.1.0_x64.appxsym
+PDFBlender.Package_1.1.1.0_ARM64.appxsym
 ```
 
 Do not manually merge the symbol archives or rename an ordinary ZIP to simulate a Store upload. Mode 2 preserves the upload created by MSBuild. Packages remain unsigned; Microsoft signs them for Store distribution. No purchased CA certificate, local CER, PFX, USB signing token or MSIX Packaging Tool is required for this build pipeline.
@@ -63,7 +63,7 @@ License files are copied into every application payload. .NET runtime notices ar
 For an existing upload, repeat the static checks without rebuilding:
 
 ```powershell
-pwsh ./packaging/Verify-StorePackage.ps1 -PackagePath ./publish/installer/PDFBlender.Package_1.0.0.0_x86_x64_ARM64_bundle.msixupload
+pwsh ./packaging/Verify-StorePackage.ps1 -PackagePath ./publish/installer/PDFBlender.Package_1.1.1.0_x86_x64_ARM64_bundle.msixupload
 ```
 
 ## Signed local test and WACK
@@ -78,7 +78,7 @@ From an administrator PowerShell 7 session, run the installed Windows App Certif
 
 ```powershell
 $wack = 'D:Windows Kits10App Certification Kitappcert.exe'
-$package = Join-Path $PWD 'publish/local-test/PDFBlender.Package_1.0.0.0_x64_LocalTest.msix'
+$package = Join-Path $PWD 'publish/local-test/PDFBlender.Package_1.1.1.0_x64_LocalTest.msix'
 $report = Join-Path $PWD 'publish/release-check/wack-report.xml'
 New-Item -ItemType Directory -Path (Split-Path $report) -Force | Out-Null
 & $wack reset
@@ -114,3 +114,22 @@ Store submission data (screenshots, age rating, capability justification and lis
 - WACK raw report: ignored publish/release-check/wack-final-report.xml. Keep the report for the submission record.
 - The report also contains assembly-loading diagnostics from its older reflection analyzer against .NET 10; these did not change the debug-configuration test's PASS result.
 - Actual installed-app PDF/UI smoke checks and clean-profile first-start checks remain manual. x86 and ARM64 runtime behavior on corresponding devices was not tested.
+## Verification snapshot: 2026-10-16 (v1.1.1.0)
+
+- Source base commit: 1c2ef8e4e48d26d062d79623aa9f5eb6b68e2dd7 plus the uncommitted font/copy-layer fix and version changes. No release commit, installation or Store upload was performed.
+- Final `pwsh ./build.ps1 4 -Force`: completed modes 1, 2 and 3 after clearing build caches. Earlier interrupted builds were replaced by this final run.
+- Portable output: x64, framework-dependent. App EXE and App/Core/Pdf DLL file/product versions are 1.1.1.0.
+- Store output: `PDFBlender.Package_1.1.1.0_x86_x64_ARM64_bundle.msixupload`, 327759413 bytes, SHA-256 `49D6F9ECEDF594C16C7372EB61C05A5F9B7FD4611D9A7873DE0CEF63ACC0B1BE`.
+- Upload contents: one unsigned three-architecture MSIX bundle and three matching architecture-specific appxsym archives. Static Store package verification passed, including identity/version, English/Chinese resources, licenses, assets, capabilities, SHA-256 file blocks, native architectures, symbol matching and exclusion of PDF samples/certificates/PDBs from application payloads.
+- Inspected packaged EXE and App/Core/Pdf DLL versions directly: 1.1.1.0 in x86, x64, ARM64 and the signed x64 local-test package. DLL assembly versions also match. Store packages are unsigned; the local-test package contains a signature and passed SignTool trust verification.
+- Final Release solution build: 0 warnings, 0 errors. Final solution tests: 50 passed, 0 failed, 0 skipped.
+- Configuration schema remains 12; no configuration reset or migration was added for this patch.
+
+### Review of this patch
+
+- Added local Segoe UI Symbol fallback for mathematical characters while preserving font embedding permission checks; no font files or new dependencies are redistributed.
+- Reviewed the generated text writer in both native and raster output paths. It repairs supplementary Unicode destinations using UTF-16BE surrogate pairs and retains ordinary character mappings. Watermarks, microtext, hidden statements and copy layers all use the writer; imported document maps are not rewritten by this repair.
+- Regression coverage verifies Word-style Chinese/English/math input, preservation of the character multiset and text positions, pixel equality against plain flattening, repeated processing, and shared font mappings across pages and font sizes, including empty/space text.
+- The resource lookup depends on the pinned PDFsharp 6.2.4 generated font-selection format. Re-run these regressions before upgrading PDFsharp or adding other font encodings/styles.
+- Corrected the About-page fallback version alongside the authoritative version declarations and PDF Producer value. No blocking findings remain in the reviewed changes.
+- This run did not perform Edge/Acrobat manual selection/copy, installed-app GUI checks, WACK, or execution on x86/ARM64 hardware. Earlier verification snapshots are historical and do not certify this patch.

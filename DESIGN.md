@@ -1,6 +1,6 @@
 # PDF Blender Design Overview
 
-Status: v1.1.0 release hardening baseline
+Status: v1.1.1 release hardening baseline
 Detailed requirements: `SPEC.md`  
 Architecture boundaries: `ARCHITECTURE.md`  
 Interface and localization: `INTERFACE.md`
